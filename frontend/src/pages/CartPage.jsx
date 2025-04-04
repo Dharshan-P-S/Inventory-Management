@@ -1,7 +1,8 @@
 import React from 'react';
 import Cart from '../components/Cart';
 
-function CartPage({ cartItems, onIncrease, onDecrease, onRemove }) {
+// Add onBuy to props
+function CartPage({ cartItems, onIncrease, onDecrease, onRemove, onBuy }) {
   return (
     <div className="page-container">
       <Cart
@@ -9,6 +10,7 @@ function CartPage({ cartItems, onIncrease, onDecrease, onRemove }) {
         onIncrease={onIncrease}
         onDecrease={onDecrease}
         onRemove={onRemove}
+        onBuy={onBuy} // Pass onBuy down to Cart
       />
     </div>
   );

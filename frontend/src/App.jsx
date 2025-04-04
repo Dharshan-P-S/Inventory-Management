@@ -5,6 +5,7 @@ import Navigation from './components/Navigation.jsx'; // Ensure .jsx extension
 import HomePage from './pages/HomePage.jsx';       // Ensure .jsx extension
 import CartPage from './pages/CartPage.jsx';         // Ensure .jsx extension
 import NewItemPage from './pages/NewItemPage.jsx';   // Ensure .jsx extension
+import StockUpdatePage from './pages/StockUpdatePage.jsx'; // Ensure .jsx extension
 import './App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -29,7 +30,7 @@ function App() {
           try {
               const errData = await response.json();
               errorMsg += ` - ${errData.message || 'Unknown server error'}`;
-          } catch (jsonError) {
+          } catch { // Remove unused parameter
               errorMsg += ` - ${response.statusText}`;
           }
           throw new Error(errorMsg);
@@ -174,7 +175,7 @@ function App() {
         try {
             const errorData = await response.json();
             errorMsg += ` - ${errorData.message || 'Unknown server error'}`;
-        } catch (jsonError) {
+        } catch { // Remove unused parameter
              errorMsg += ` - ${response.statusText}`;
         }
         throw new Error(errorMsg);
@@ -193,6 +194,78 @@ function App() {
       alert(`Error adding item: ${e.message}`);
       return false;
     }
+  };
+
+  // --- Handle Buy ---
+  const handleBuy = async () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+    setApiError(null); // Clear previous errors
+    setLoading(true); // Indicate processing
+
+    console.log("Attempting to buy items:", cartItems);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/buy`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Send only necessary info: id and quantity bought
+        body: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Purchase failed: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            errorMsg += ` - ${errorData.message || 'Unknown server error'}`;
+        } catch { // Remove unused parameter
+             errorMsg += ` - ${response.statusText}`;
+        }
+        throw new Error(errorMsg);
+      }
+
+      const result = await response.json();
+      console.log("Purchase successful:", result);
+
+      // Clear the cart on successful purchase
+      setCartItems([]);
+
+      // Refresh grocery list to show updated stock
+      // Re-fetch all groceries to get the latest stock counts
+      const fetchResponse = await fetch(`${API_BASE_URL}/groceries`);
+       if (!fetchResponse.ok) throw new Error(`Failed to refresh groceries: ${fetchResponse.status}`);
+       const updatedGroceries = await fetchResponse.json();
+       setGroceryItems(updatedGroceries);
+
+
+      alert("Purchase successful! Your cart is cleared and stock updated.");
+
+    } catch (e) {
+      console.error("Error during purchase:", e);
+      setApiError(`Purchase failed: ${e.message}`);
+      alert(`Purchase failed: ${e.message}`);
+    } finally {
+      setLoading(false); // Stop loading indicator
+    }
+  };
+
+  // --- Handle Stock Update ---
+  const handleStockUpdate = async (itemId, quantityToAdd, onSuccess) => {
+    // For now, just update the local state
+    setGroceryItems(prevItems =>
+      prevItems.map(item =>
+        item.id === parseInt(itemId)
+          ? { ...item, quantityAvailable: item.quantityAvailable + quantityToAdd }
+          : item
+      )
+    );
+    alert('Stock updated successfully!');
+    if (onSuccess) onSuccess(); // Call the success callback to reset form state
   };
 
   // --- Render Logic ---
@@ -222,6 +295,7 @@ function App() {
                   onIncrease={handleIncreaseQuantity}
                   onDecrease={handleDecreaseQuantity}
                   onRemove={handleRemoveFromCart}
+                  onBuy={handleBuy} // Pass the new handler
                   // Optionally pass groceryItems if CartPage needs stock info for display
                    groceryItems={groceryItems}
                 />
@@ -231,6 +305,15 @@ function App() {
               path="/add-item"
               element={
                 <NewItemPage onAddItem={handleAddItem} apiError={apiError} />
+              }
+            />
+            <Route
+              path="/update-stock"
+              element={
+                <StockUpdatePage
+                  groceries={groceryItems}
+                  onUpdateStock={handleStockUpdate}
+                />
               }
             />
             <Route path="*" element={<h2>404 Page Not Found</h2>} />

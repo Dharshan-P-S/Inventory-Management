@@ -1,7 +1,8 @@
 import React from 'react';
 import CartItem from './CartItem';
 
-function Cart({ cartItems, onIncrease, onDecrease, onRemove }) {
+// Add onBuy to the destructured props
+function Cart({ cartItems, onIncrease, onDecrease, onRemove, onBuy }) {
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
   };
@@ -22,8 +23,14 @@ function Cart({ cartItems, onIncrease, onDecrease, onRemove }) {
               onRemove={onRemove}
             />
           ))}
-          <div className="cart-total">
-            <strong>Total: Rs. {calculateTotal()}</strong>
+          {/* Wrapper for total and buy button */}
+          <div className="cart-summary">
+            <div className="cart-total">
+              <strong>Total: Rs. {calculateTotal()}</strong>
+            </div>
+            <button onClick={onBuy} className="buy-button" disabled={cartItems.length === 0}>
+              Buy Now
+            </button>
           </div>
         </div>
       )}

@@ -1,92 +1,98 @@
 [
-    {
-      "id": 1,
-      "name": "Organic Gala Apple",
-      "price": 0.75,
-      "quantityAvailable": 45
-    },
-    {
-      "id": 2,
-      "name": "Whole Milk (1 Gallon)",
-      "price": 3.89,
-      "quantityAvailable": 18
-    },
-    {
-      "id": 3,
-      "name": "Sourdough Bread Loaf",
-      "price": 4.50,
-      "quantityAvailable": 25
-    },
-    {
-      "id": 4,
-      "name": "Free-Range Eggs (Dozen)",
-      "price": 4.20,
-      "quantityAvailable": 30
-    },
-    {
-      "id": 5,
-      "name": "Boneless Chicken Breast (1 lb)",
-      "price": 5.99,
-      "quantityAvailable": 0
-    },
-    {
-      "id": 6,
-      "name": "Banana",
-      "price": 0.35,
-      "quantityAvailable": 80
-    },
-    {
-      "id": 7,
-      "name": "Crunchy Oats Cereal",
-      "price": 4.10,
-      "quantityAvailable": 22
-    },
-    {
-      "id": 8,
-      "name": "Hass Avocado",
-      "price": 1.85,
-      "quantityAvailable": 0
-    },
-    {
-      "id": 9,
-      "name": "Greek Yogurt (Single Cup)",
-      "price": 1.25,
-      "quantityAvailable": 50
-    },
-    {
-      "id": 10,
-      "name": "Imported Dark Chocolate Bar",
-      "price": 3.50,
-      "quantityAvailable": 0
-    },
-    {
-      "id": 11,
-      "name": "Baby Spinach (Bag)",
-      "price": 3.15,
-      "quantityAvailable": 15
-    },
-    {
-      "id": 12,
-      "name": "Orange Bell Pepper",
-      "price": 1.29,
-      "quantityAvailable": 28
-    },
-    {
-      "id": 13,
-      "name": "Wild Caught Salmon (1 kg)",
-      "price": 12.99,
-      "quantityAvailable": 0
-    },
-    {
-      "id": 14,
-      "name": "Organic Quinoa (1 kg)",
-      "price": 5.49,
-      "quantityAvailable": 20
-    },
-    {
-      "id": 15,
-      "name": "Extra Virgin Olive Oil",
-      "price": 8.99,
-      "quantityAvailable": 16
-    }
+  {
+    "id": 1,
+    "name": "Organic Gala Apple",
+    "price": 0.75,
+    "quantityAvailable": 40
+  },
+  {
+    "id": 2,
+    "name": "Whole Milk (1 Gallon)",
+    "price": 3.89,
+    "quantityAvailable": 16
+  },
+  {
+    "id": 3,
+    "name": "Sourdough Bread Loaf",
+    "price": 4.5,
+    "quantityAvailable": 24
+  },
+  {
+    "id": 4,
+    "name": "Free-Range Eggs (Dozen)",
+    "price": 4.2,
+    "quantityAvailable": 30
+  },
+  {
+    "id": 5,
+    "name": "Boneless Chicken Breast (1 lb)",
+    "price": 5.99,
+    "quantityAvailable": 0
+  },
+  {
+    "id": 6,
+    "name": "Banana",
+    "price": 0.35,
+    "quantityAvailable": 80
+  },
+  {
+    "id": 7,
+    "name": "Crunchy Oats Cereal",
+    "price": 4.1,
+    "quantityAvailable": 22
+  },
+  {
+    "id": 8,
+    "name": "Hass Avocado",
+    "price": 1.85,
+    "quantityAvailable": 0
+  },
+  {
+    "id": 9,
+    "name": "Greek Yogurt (Single Cup)",
+    "price": 1.25,
+    "quantityAvailable": 50
+  },
+  {
+    "id": 10,
+    "name": "Imported Dark Chocolate Bar",
+    "price": 3.5,
+    "quantityAvailable": 0
+  },
+  {
+    "id": 11,
+    "name": "Baby Spinach (Bag)",
+    "price": 3.15,
+    "quantityAvailable": 15
+  },
+  {
+    "id": 12,
+    "name": "Orange Bell Pepper",
+    "price": 1.29,
+    "quantityAvailable": 28
+  },
+  {
+    "id": 13,
+    "name": "Wild Caught Salmon (1 kg)",
+    "price": 12.99,
+    "quantityAvailable": 0
+  },
+  {
+    "id": 14,
+    "name": "Organic Quinoa (1 kg)",
+    "price": 5.49,
+    "quantityAvailable": 20
+  },
+  {
+    "id": 15,
+    "name": "Extra Virgin Olive Oil",
+    "price": 8.99,
+    "quantityAvailable": 16
+  },
+  {
+    "id": 16,
+    "name": "Egg",
+    "price": 6.5,
+    "quantityAvailable": 100
+  }
 ]
