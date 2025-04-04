@@ -3,13 +3,13 @@
     "id": 1,
     "name": "Organic Gala Apple",
     "price": 0.75,
-    "quantityAvailable": 40
+    "quantityAvailable": 24
   },
   {
     "id": 2,
     "name": "Whole Milk (1 Gallon)",
     "price": 3.89,
-    "quantityAvailable": 16
+    "quantityAvailable": 6
   },
   {
     "id": 3,

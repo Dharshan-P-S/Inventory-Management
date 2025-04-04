@@ -452,6 +452,53 @@ main {
   font-size: 1rem;
 }
 
+.stock-update-form .form-group {
+  position: relative; /* Enables absolute positioning for suggestions */
+}
+
+.stock-update-form input[type="text"] {
+  max-width: 450px;
+  width: 100%;
+  padding: 0.8rem 1.2rem;
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 25px;
+  box-sizing: border-box;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.stock-update-form input[type="text"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border: 1px solid #ced4da;
+  border-top: none;
+  background-color: #fff;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-item {
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.suggestion-item:hover {
+  background-color: #f1f3f4;
+}
+
 .stock-update-form .quantity-adjuster {
   display: flex;
   align-items: center;
