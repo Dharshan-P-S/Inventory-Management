@@ -1,0 +1,422 @@
+/* === App.css (Based on User's Preference + Specific Updates) === */
+#root{
+  width: 100%;
+}
+
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background-color: #f4f4f4;
+  color: #333; /* Keep default text color */
+  min-width: 100vh;
+}
+
+.App {
+  padding: 0 1rem; /* Base padding for mobile */
+  width: 70%; /* Ensure it tries to use full width */
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+
+main {
+  padding: 20px 0;
+}
+
+/* --- Navigation (Old Base + Updated Hover) --- */
+.main-nav {
+  padding: 1rem;
+}
+
+.main-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1.5rem; /* Spacing between links */
+}
+
+.main-nav a:hover{
+  color: #007bff;
+}
+.main-nav a.active { /* Add .active selector here */
+  color: #007bff; /* Link color blue ONLY on hover/active */
+  border-bottom-color: #007bff; /* Underline blue ONLY on hover/active */
+}
+
+/* Ensure the base rule for .main-nav a remains like this (color: #333) */
+.main-nav a {
+  text-decoration: none;
+  color: #333; /* Default link color (NOT blue) */
+  font-weight: bold;
+  padding-bottom: 4px; /* Space for border */
+  border-bottom: 2px solid transparent; /* Prepare for hover effect */
+  transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* Smooth transition */
+}
+
+.cart-count {
+  display: inline-flex; /* Use flex to center content */
+  justify-content: center; /* Center number horizontally */
+  align-items: center; /* Center number vertically */
+  width: 20px; /* Fixed width */
+  height: 20px; /* Fixed height (equal to width for circle) */
+  background-color: #dc3545; /* Red background */
+  color: white; /* White text */
+  border-radius: 50%; /* Makes it a circle */
+  font-size: 0.75em; /* Adjust font size as needed */
+  font-weight: bold; /* Make number bold */
+  line-height: 1; /* Ensure text stays centered vertically */
+  margin-left: 6px; /* Adjust spacing from "Cart" */
+  vertical-align: middle; /* Align circle nicely with text */
+  box-sizing: border-box; /* Include border/padding in width/height */
+  /* Remove padding as fixed dimensions are used */
+  /* padding: 2px 6px; REMOVED */
+}
+
+
+/* Page Container */
+.page-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem; /* Added consistent margin */
+}
+
+
+/* Search Bar */
+.search-bar-container {
+  margin-bottom: 2rem; /* Ensure enough space below search bar */
+  display: flex;       /* Use flexbox to center the input */
+  justify-content: center; /* Center input horizontally */
+}
+/* Use user's style for the input itself */
+.search-bar-container input[type="text"] {
+  /* Remove old width/display rules that might interfere */
+  /* display: block; REMOVED */
+  /* width: 95%; REMOVED */
+
+  /* Apply better sizing and appearance */
+  max-width: 450px;     /* Limit width */
+  width: 100%;          /* Allow it to take width up to max-width */
+  padding: 0.8rem 1.2rem; /* Good padding for height/appearance */
+  font-size: 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 25px; /* Rounded ends */
+  box-sizing: border-box;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth focus transition */
+}
+
+.search-bar-container input[type="text"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Grocery List */
+.grocery-list-container h2, /* Keep h2 styling if used */
+.cart-container h2,
+.add-item-form-container h2 { /* Apply consistent heading style */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* gap: 20px; */ /* Original */
+  gap: 2rem; /* Slightly increased gap (24px) */
+}
+
+/* Grocery Item */
+.grocery-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #fff;
+  /* text-align: center; */ /* Remove center alignment for better layout with controls */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex; /* Use flex for better control alignment */
+  flex-direction: column;
+  justify-content: space-between;
+  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.grocery-item:hover {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Keep or adjust shadow */
+  transform: translateY(-3px); /* Keep the lift effect */
+}
+
+.grocery-item.out-of-stock { /* Add out of stock style */
+  background-color: #f8f9fa;
+  opacity: 0.7;
+}
+
+.grocery-item h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  text-align: left; /* Align text left */
+}
+
+.grocery-item p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  color: #555;
+  text-align: left; /* Align text left */
+}
+.grocery-item p:last-of-type { /* Space before controls */
+    margin-bottom: 10px;
+}
+
+/* --- Quantity Adjuster Controls Styling (Applied to GroceryItem) --- */
+.grocery-item .item-controls {
+  margin-top: auto; /* Push controls to bottom */
+  display: flex;
+  justify-content: flex-end; /* Space out controls and add button */
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px; /* Gap between adjuster and add button */
+}
+
+.grocery-item .quantity-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Gap between -, span, + */
+}
+
+/* --- Apply Cart Button Style to Grocery Item +/- Buttons --- */
+.grocery-item .quantity-adjuster button {
+  padding: 5px 10px;
+  margin: 0; /* Remove margin from cart style */
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  border-radius: 4px; /* Add border-radius */
+  line-height: 1; /* Ensure consistent height */
+  min-width: 28px;
+  font-size: 1rem;
+}
+.grocery-item .quantity-adjuster button:hover:not(:disabled) {
+  background-color: #e0e0e0; /* Consistent hover */
+}
+.grocery-item .quantity-adjuster button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Style for the quantity display number */
+.grocery-item .quantity-display {
+  min-width: 25px;
+  text-align: center;
+  font-weight: bold;
+  padding: 0 5px;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* --- Keep Original Green 'Add to Cart' Button Style --- */
+.grocery-item .add-to-cart-button { /* Target specific add button */
+  padding: 8px 15px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  /* margin-top: 10px; Removed margin-top, use flex gap */
+  transition: background-color 0.2s ease;
+  font-size: 0.9em; /* Adjust font size if needed */
+  line-height: 1.2; /* Adjust line height */
+}
+
+.grocery-item .add-to-cart-button:hover:not(:disabled) {
+  background-color: #4cae4c;
+}
+.grocery-item .add-to-cart-button:disabled {
+    background-color: #6c757d; /* Consistent disabled */
+    opacity: 0.65;
+}
+
+.grocery-item .stock-message { /* Style for out of stock message */
+    margin-top: 10px;
+    color: #dc3545;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+
+/* --- Cart (Using Specific Button Style) --- */
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee; /* Border below each item */
+  gap: 1rem;
+}
+
+.cart-item:last-child {
+    border-bottom: none; /* NO border below the LAST item */
+}
+
+
+.cart-item span:first-child { /* Item name/price */
+    flex-grow: 1; /* Allow name to grow */
+}
+
+.cart-item-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Gap between buttons/span */
+  flex-shrink: 0;
+}
+
+/* --- Apply Specific Cart Button Style --- */
+.cart-item-controls button {
+  padding: 5px 10px;
+  margin: 0; /* Remove default margins if any */
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  border-radius: 4px; /* Added border-radius */
+  line-height: 1; /* Consistent height */
+  min-width: 28px; /* Ensure minimum size */
+  font-size: 1rem;
+  transition: background-color 0.2s;
+}
+.cart-item-controls button:hover:not(:disabled) {
+  background-color: #e0e0e0; /* Consistent hover */
+}
+.cart-item-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Specific Remove Button Style */
+.cart-item-controls .remove-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    margin-left: 15px; /* Keep margin for spacing */
+    font-size: 0.85em; /* Adjust size */
+    padding: 6px 10px; /* Adjust padding */
+}
+.cart-item-controls .remove-button:hover {
+    background-color: #d32f2f;
+}
+
+.cart-item-controls span { /* Quantity display */
+  min-width: 25px; /* Ensure space */
+  text-align: center;
+  font-weight: bold;
+  padding: 0 5px; /* Add padding */
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.cart-empty-message { /* Style for empty cart */
+    text-align: center;
+    font-style: italic;
+    color: #6c757d;
+    padding: 2rem 0;
+}
+
+.cart-total {
+  padding-top: 0.5rem;      /* Space between border and text */
+  text-align: right;        /* <<< THIS ALIGNS THE CONTENT RIGHT */
+  font-size: 1.2em;
+  font-weight: bold;        /* Make total stand out */
+}
+
+/* --- Add Item Form (Keep Old Style) --- */
+.add-item-form-container { /* Apply page-container */
+  max-width: 500px;
+  margin: 2rem auto;
+  /* Inherits base style from .page-container */
+}
+
+.add-item-form .form-group {
+  margin-bottom: 1rem;
+}
+
+.add-item-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.add-item-form input[type="text"],
+.add-item-form input[type="number"] { /* Add number type */
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.add-item-form input[aria-invalid="true"] {
+    border-color: #dc3545; /* Red border for invalid inputs */
+    background-color: #f8d7da; /* Optional: light red background */
+}
+
+.add-item-form button[type="submit"] { /* Target submit button */
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 50%; /* Make button full width */
+  margin-top: 1rem; /* Space above */
+  display: block; /* Make it a block-level element */
+  margin-left: auto;  /* Automatic left margin */
+  margin-right: auto; /* Automatic right margin */
+}
+
+.add-item-form button[type="submit"]:hover {
+  background-color: #0056b3;
+}
+
+/* --- Error Messages (Keep Old + API Error) --- */
+.error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+  display: block; /* Ensure it takes space */
+}
+
+.api-error { /* Keep specific API error style */
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.25rem;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+  .App {
+    max-width: 1140px; /* Set a max width for desktop (adjust as needed, e.g., 960px, 1140px, 1200px) */
+    margin: 0 auto;    /* Center the container */
+    padding: 0 1.5rem; /* Optional: slightly increase padding for desktop */
+  }
+
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .add-item-form-container {
+    max-width: 600px;
+  }
+
+}
+
+@media (min-width: 1400px) {
+  .App {
+    max-width: 1320px;
+  }
+}
