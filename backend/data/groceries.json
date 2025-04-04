@@ -27,7 +27,7 @@
       "id": 5,
       "name": "Boneless Chicken Breast (1 lb)",
       "price": 5.99,
-      "quantityAvailable": 12
+      "quantityAvailable": 0
     },
     {
       "id": 6,
@@ -57,7 +57,7 @@
       "id": 10,
       "name": "Imported Dark Chocolate Bar",
       "price": 3.50,
-      "quantityAvailable": 5
+      "quantityAvailable": 0
     },
     {
       "id": 11,
@@ -73,13 +73,13 @@
     },
     {
       "id": 13,
-      "name": "Wild Caught Salmon (1 lb)",
+      "name": "Wild Caught Salmon (1 kg)",
       "price": 12.99,
-      "quantityAvailable": 8
+      "quantityAvailable": 0
     },
     {
       "id": 14,
-      "name": "Organic Quinoa (1 lb)",
+      "name": "Organic Quinoa (1 kg)",
       "price": 5.49,
       "quantityAvailable": 20
     },
