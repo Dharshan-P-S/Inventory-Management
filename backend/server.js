@@ -32,7 +32,7 @@ const writeData = (data) => {
 let groceryItems = readData();
 let nextId = groceryItems.length > 0 ? Math.max(...groceryItems.map(item => item.id)) + 1 : 1;
 
-app.use(cors({ origin: 'http://localhost:5174' }));
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json());
 
 app.get('/api/groceries', (req, res) => {
@@ -87,5 +87,4 @@ app.post('/api/groceries', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`Backend server running at http://localhost:${PORT}`);
-    console.log("Current grocery items:", groceryItems);
 });
