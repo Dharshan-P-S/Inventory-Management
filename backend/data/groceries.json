@@ -3,96 +3,112 @@
     "id": 1,
     "name": "Organic Gala Apple",
     "price": 0.75,
-    "quantityAvailable": 24
+    "quantityAvailable": 24,
+    "category": "Produce"
   },
   {
     "id": 2,
     "name": "Whole Milk (1 Gallon)",
     "price": 3.89,
-    "quantityAvailable": 6
+    "quantityAvailable": 6,
+    "category": "Dairy"
   },
   {
     "id": 3,
     "name": "Sourdough Bread Loaf",
     "price": 4.5,
-    "quantityAvailable": 24
+    "quantityAvailable": 24,
+    "category": "Bakery"
   },
   {
     "id": 4,
     "name": "Free-Range Eggs (Dozen)",
     "price": 4.2,
-    "quantityAvailable": 30
+    "quantityAvailable": 30,
+    "category": "Dairy"
   },
   {
     "id": 5,
     "name": "Boneless Chicken Breast (1 lb)",
     "price": 5.99,
-    "quantityAvailable": 0
+    "quantityAvailable": 0,
+    "category": "Meat & Seafood"
   },
   {
     "id": 6,
     "name": "Banana",
     "price": 0.35,
-    "quantityAvailable": 80
+    "quantityAvailable": 80,
+    "category": "Produce"
   },
   {
     "id": 7,
     "name": "Crunchy Oats Cereal",
     "price": 4.1,
-    "quantityAvailable": 22
+    "quantityAvailable": 22,
+    "category": "Pantry"
   },
   {
     "id": 8,
     "name": "Hass Avocado",
     "price": 1.85,
-    "quantityAvailable": 0
+    "quantityAvailable": 0,
+    "category": "Produce"
   },
   {
     "id": 9,
     "name": "Greek Yogurt (Single Cup)",
     "price": 1.25,
-    "quantityAvailable": 50
+    "quantityAvailable": 50,
+    "category": "Dairy"
   },
   {
     "id": 10,
     "name": "Imported Dark Chocolate Bar",
     "price": 3.5,
-    "quantityAvailable": 0
+    "quantityAvailable": 0,
+    "category": "Snacks"
   },
   {
     "id": 11,
     "name": "Baby Spinach (Bag)",
     "price": 3.15,
-    "quantityAvailable": 15
+    "quantityAvailable": 15,
+    "category": "Produce"
   },
   {
     "id": 12,
     "name": "Orange Bell Pepper",
     "price": 1.29,
-    "quantityAvailable": 28
+    "quantityAvailable": 28,
+    "category": "Produce"
   },
   {
     "id": 13,
     "name": "Wild Caught Salmon (1 kg)",
     "price": 12.99,
-    "quantityAvailable": 0
+    "quantityAvailable": 0,
+    "category": "Meat & Seafood"
   },
   {
     "id": 14,
     "name": "Organic Quinoa (1 kg)",
     "price": 5.49,
-    "quantityAvailable": 20
+    "quantityAvailable": 20,
+    "category": "Pantry"
   },
   {
     "id": 15,
     "name": "Extra Virgin Olive Oil",
     "price": 8.99,
-    "quantityAvailable": 16
+    "quantityAvailable": 16,
+    "category": "Pantry"
   },
   {
     "id": 16,
     "name": "Egg",
     "price": 6.5,
-    "quantityAvailable": 100
+    "quantityAvailable": 100,
+    "category": "Dairy"
   }
 ]

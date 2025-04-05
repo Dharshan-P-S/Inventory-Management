@@ -1,25 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react'; // Removed useState
 import GroceryItem from './GroceryItem';
-import SearchBar from './SearchBar';
+// Removed SearchBar import as it's now in HomePage
 
+// Simplified props: only receives the already filtered items
 function GroceryList({ items, onAddToCart }) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Removed searchTerm state and handleSearchChange function
+  // Removed filtering logic as it's done in HomePage
 
   return (
     <div className="grocery-list-container">
       <h2>Groceries</h2>
-      <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-      <div className="grocery-list">
-        {filteredItems.length > 0 ? (
-          filteredItems.map(item => (
+      {/* SearchBar removed from here */}
+      <div className="grocery-list items-grid"> {/* Added items-grid class */}
+        {items.length > 0 ? (
+          items.map(item => (
             <GroceryItem
               key={item.id}
               item={item}
@@ -27,7 +21,8 @@ function GroceryList({ items, onAddToCart }) {
             />
           ))
         ) : (
-          <p>No matching items found.</p>
+          // Updated message for combined filtering
+          <p>No matching items found for the current search and category.</p>
         )}
       </div>
     </div>

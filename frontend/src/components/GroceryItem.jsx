@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // Import Link
 
 function GroceryItem({ item, onAddToCart }) {
   // State to track the quantity the user intends to add
@@ -15,8 +16,7 @@ function GroceryItem({ item, onAddToCart }) {
     }
      // Optional: If stock increases, we could allow the user's chosen quantity
      // if it's now valid, but resetting to 1 is simpler.
-  }, [item.quantityAvailable, isOutOfStock]); // Re-run if stock changes
-
+  }, [item.quantityAvailable, isOutOfStock, quantityToAdd]); // Added quantityToAdd dependency
 
   const handleDecrease = () => {
     setQuantityToAdd(prev => Math.max(1, prev - 1)); // Prevent going below 1
@@ -27,7 +27,8 @@ function GroceryItem({ item, onAddToCart }) {
     setQuantityToAdd(prev => Math.min(item.quantityAvailable, prev + 1));
   };
 
-  const handleAddToCartClick = () => {
+  const handleAddToCartClick = (event) => {
+    event.stopPropagation(); // Prevent link navigation when clicking button
     // Double-check stock just in case, although buttons should be disabled
     if (isOutOfStock) {
       alert(`${item.name} is out of stock!`);
@@ -46,45 +47,52 @@ function GroceryItem({ item, onAddToCart }) {
 
   return (
     <div className={`grocery-item ${isOutOfStock ? 'out-of-stock' : ''}`}>
-      <h3>{item.name}</h3>
-      <p>Price: Rs. {item.price.toFixed(2)}</p>
-      <p>Available: {item.quantityAvailable}</p>
+      {/* Link wraps the display part */}
+      <Link to={`/item/${item.id}`} className="grocery-item-link">
+        <h3>{item.name}</h3>
+        <p>Price: Rs. {item.price.toFixed(2)}</p>
+        <p>Available: {item.quantityAvailable}</p>
+        {/* Display category */}
+        <p className="item-category">Category: {item.category || 'N/A'}</p>
+      </Link>
 
-      {/* Only show controls if item is in stock */}
-      {!isOutOfStock ? (
-        <div className="item-controls"> {/* Use a class for styling */}
-          {/* Quantity Adjustment Controls */}
-          <div className="quantity-adjuster">
+      {/* Controls section - stop propagation */}
+      <div className="item-controls-wrapper" onClick={(e) => e.stopPropagation()}>
+        {!isOutOfStock ? (
+          <div className="item-controls"> {/* Use a class for styling */}
+            {/* Quantity Adjustment Controls */}
+            <div className="quantity-adjuster">
+              <button
+                onClick={handleDecrease}
+                disabled={quantityToAdd <= 1} // Disable if quantity is already 1
+                aria-label={`Decrease quantity for ${item.name}`}
+              >
+                -
+              </button>
+              <span className="quantity-display" aria-live="polite">{quantityToAdd}</span> {/* Display the intended quantity */}
+              <button
+                onClick={handleIncrease}
+                disabled={quantityToAdd >= item.quantityAvailable} // Disable if quantity reaches stock limit
+                aria-label={`Increase quantity for ${item.name}`}
+              >
+                +
+              </button>
+            </div>
+
+            {/* Add to Cart Button */}
             <button
-              onClick={handleDecrease}
-              disabled={quantityToAdd <= 1} // Disable if quantity is already 1
-              aria-label={`Decrease quantity for ${item.name}`}
+              className="add-to-cart-button"
+              onClick={handleAddToCartClick}
+              // Disable if out of stock (already handled by conditional render, but safe)
+              disabled={isOutOfStock}
             >
-              -
-            </button>
-            <span className="quantity-display" aria-live="polite">{quantityToAdd}</span> {/* Display the intended quantity */}
-            <button
-              onClick={handleIncrease}
-              disabled={quantityToAdd >= item.quantityAvailable} // Disable if quantity reaches stock limit
-              aria-label={`Increase quantity for ${item.name}`}
-            >
-              +
+              Add to Cart
             </button>
           </div>
-
-          {/* Add to Cart Button */}
-          <button
-            className="add-to-cart-button"
-            onClick={handleAddToCartClick}
-            // Disable if out of stock (already handled by conditional render, but safe)
-            disabled={isOutOfStock}
-          >
-            Add to Cart
-          </button>
-        </div>
-      ) : (
-        <p className="stock-message">Out of Stock</p> // Show message if out of stock
-      )}
+        ) : (
+          <p className="stock-message">Out of Stock</p> // Show message if out of stock
+        )}
+      </div>
     </div>
   );
 }

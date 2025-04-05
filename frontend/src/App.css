@@ -85,9 +85,9 @@ main {
 
 /* Search Bar */
 .search-bar-container {
-  margin-bottom: 2rem; /* Ensure enough space below search bar */
-  display: flex;       /* Use flexbox to center the input */
-  justify-content: center; /* Center input horizontally */
+  margin-bottom: 1rem; /* Reduced margin */
+  display: flex;
+  justify-content: center;
 }
 /* Use user's style for the input itself */
 .search-bar-container input[type="text"] {
@@ -113,6 +113,38 @@ main {
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
+/* Category Filter */
+.category-filter-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  justify-content: center;
+  gap: 0.75rem; /* Space between buttons */
+  margin-bottom: 2rem; /* Space below filters */
+}
+
+.category-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  background-color: #f8f9fa; /* Light background */
+  color: #333;
+  border-radius: 20px; /* Rounded pill shape */
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.category-button:hover {
+  background-color: #e9ecef; /* Slightly darker on hover */
+  border-color: #adb5bd;
+}
+
+.category-button.active {
+  background-color: #007bff; /* Blue background for active */
+  color: white;
+  border-color: #0056b3; /* Darker blue border */
+}
+
+
 /* Grocery List */
 .grocery-list-container h2, /* Keep h2 styling if used */
 .cart-container h2,
@@ -121,11 +153,11 @@ main {
     margin-bottom: 20px;
 }
 
-.items-grid {
+/* Use items-grid directly on grocery-list now */
+.grocery-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  /* gap: 20px; */ /* Original */
-  gap: 2rem; /* Slightly increased gap (24px) */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Adjusted minmax */
+  gap: 1.5rem; /* Consistent gap */
 }
 
 /* Grocery Item */
@@ -140,6 +172,9 @@ main {
   flex-direction: column;
   justify-content: space-between;
   transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
+  position: relative; /* Needed for absolute positioning of link if used differently */
+  text-decoration: none; /* Remove default link underline from outer div */
+  color: inherit; /* Inherit text color */
 }
 
 .grocery-item:hover {
@@ -169,7 +204,30 @@ main {
     margin-bottom: 10px;
 }
 
+.grocery-item-link {
+  text-decoration: none; /* Remove underline from link */
+  color: inherit; /* Inherit text color */
+  display: block; /* Make link take up space */
+  padding-bottom: 10px; /* Add some space before controls start */
+  flex-grow: 1; /* Allow link area to grow */
+}
+
+.grocery-item-link:hover h3 { /* Example hover effect */
+  color: #007bff;
+}
+
+.item-category { /* Style for category display on item card */
+    font-size: 0.8em;
+    color: #6c757d;
+    text-align: left;
+    margin-top: 5px;
+}
+
 /* --- Quantity Adjuster Controls Styling (Applied to GroceryItem) --- */
+.item-controls-wrapper {
+  margin-top: auto; /* Push controls to the bottom */
+}
+
 .grocery-item .item-controls {
   margin-top: auto; /* Push controls to bottom */
   display: flex;
@@ -177,6 +235,8 @@ main {
   align-items: center;
   flex-wrap: wrap;
   gap: 10px; /* Gap between adjuster and add button */
+  position: relative;
+  z-index: 1;
 }
 
 .grocery-item .quantity-adjuster {
@@ -244,6 +304,117 @@ main {
     text-align: center;
     font-size: 0.9em;
     width: 100%;
+}
+
+
+/* --- Product Detail Page --- */
+.product-detail-page {
+  padding: 1.5rem;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.product-detail-content {
+  display: flex; /* Use flex for potential image + info layout */
+  flex-direction: column; /* Stack image/info vertically for now */
+  gap: 1.5rem;
+}
+
+/* TODO: Add styles for product image container if added */
+
+.product-info {
+  flex-grow: 1;
+}
+
+.product-info h1 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 2em;
+}
+
+.product-category {
+  font-size: 0.9em;
+  color: #6c757d;
+  margin-bottom: 1rem;
+}
+
+.product-price {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #28a745; /* Green price */
+  margin-bottom: 0.5rem;
+}
+
+.product-stock {
+  font-size: 1em;
+  margin-bottom: 1.5rem;
+  font-weight: bold;
+}
+.product-stock.in-stock {
+  color: #198754; /* Darker green for in stock */
+}
+.product-stock.out-of-stock {
+  color: #dc3545; /* Red for out of stock */
+}
+
+.product-description {
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+.product-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Placeholder style - replace with actual adjuster */
+.quantity-adjuster-placeholder {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-to-cart-button-detail { /* Style specifically for detail page button */
+  padding: 0.75rem 1.5rem;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.add-to-cart-button-detail:hover:not(:disabled) {
+  background-color: #4cae4c;
+}
+
+.add-to-cart-button-detail:disabled {
+    background-color: #6c757d;
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Reuse stock message style */
+.product-detail-page .stock-message {
+    margin-top: 1rem;
+    color: #dc3545;
+    font-weight: bold;
+    font-size: 1em;
 }
 
 
@@ -413,6 +584,62 @@ main {
 .add-item-form button[type="submit"]:hover {
   background-color: #0056b3;
 }
+
+/* --- Authentication Forms & Pages --- */
+.auth-page {
+  max-width: 450px; /* Limit width */
+  margin: 2rem auto; /* Center the form */
+}
+
+.auth-page h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Space between form groups */
+}
+
+/* Use existing form-group styles */
+.auth-form .form-group {
+  margin-bottom: 0; /* Remove default margin if using gap */
+}
+
+.auth-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.auth-button { /* Style for Login/Register buttons */
+  padding: 0.75rem 1.5rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%; /* Make button full width */
+  margin-top: 0.5rem; /* Space above button */
+  transition: background-color 0.2s ease;
+}
+
+.auth-button:hover {
+  background-color: #0056b3;
+}
+
 
 /* --- Error Messages (Keep Old + API Error) --- */
 .error-message {
@@ -602,6 +829,99 @@ main {
   justify-content: center;
 }
 
+/* --- Order History Page --- */
+.order-history-page h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Space between order items */
+}
+
+.order-history-item {
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Allow wrapping on small screens */
+  gap: 0.5rem 1rem; /* Row and column gap */
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #eee;
+}
+
+.order-header h3 {
+  margin: 0;
+  font-size: 1.2em;
+  flex-basis: 100%; /* Take full width initially */
+}
+
+.order-date,
+.order-total {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.order-total {
+  font-weight: bold;
+  color: #333;
+}
+
+.order-item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Space between items in the order */
+}
+
+.order-item-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  padding: 0.25rem 0;
+  gap: 1rem; /* Space between elements within a line item */
+}
+
+.order-item-detail span:first-child { /* Item name */
+  flex-grow: 1; /* Allow name to take available space */
+  text-align: left;
+}
+
+.order-item-detail span:not(:first-child) { /* Quantity and price */
+  flex-shrink: 0; /* Prevent shrinking */
+  min-width: 80px; /* Ensure some minimum width */
+  text-align: right;
+}
+
+.empty-history-message,
+.loading-message {
+  text-align: center;
+  font-style: italic;
+  color: #6c757d;
+  padding: 2rem 0;
+}
+
+
+/* Media Queries */
+@media (min-width: 576px) { /* Adjust header layout on slightly larger screens */
+  .order-header h3 {
+    flex-basis: auto; /* Allow h3 to not take full width */
+  }
+}
+
 @media (min-width: 768px) {
   .App {
     max-width: 1140px; /* Set a max width for desktop (adjust as needed, e.g., 960px, 1140px, 1200px) */
@@ -609,14 +929,14 @@ main {
     padding: 0 1.5rem; /* Optional: slightly increase padding for desktop */
   }
 
-  .items-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  }
-  
   .add-item-form-container {
     max-width: 600px;
   }
 
+  .product-detail-content {
+    flex-direction: row; /* Side-by-side layout on larger screens */
+  }
+  /* TODO: Add width constraints for image/info if needed */
 }
 
 @media (min-width: 1400px) {

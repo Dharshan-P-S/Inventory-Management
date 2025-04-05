@@ -6,6 +6,10 @@ import HomePage from './pages/HomePage.jsx';       // Ensure .jsx extension
 import CartPage from './pages/CartPage.jsx';         // Ensure .jsx extension
 import NewItemPage from './pages/NewItemPage.jsx';   // Ensure .jsx extension
 import StockUpdatePage from './pages/StockUpdatePage.jsx'; // Ensure .jsx extension
+import LoginPage from './pages/LoginPage.jsx'; // Import LoginPage
+import RegisterPage from './pages/RegisterPage.jsx'; // Import RegisterPage
+import OrderHistoryPage from './pages/OrderHistoryPage.jsx'; // Import OrderHistoryPage
+import ProductDetailPage from './pages/ProductDetailPage.jsx'; // Import ProductDetailPage
 import './App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -16,9 +20,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(null);
 
-  // --- Fetch Data (useEffect remains the same) ---
   useEffect(() => {
-    // ... (fetch logic as before) ...
     const fetchGroceries = async () => {
       setLoading(true);
       setApiError(null);
@@ -30,7 +32,7 @@ function App() {
           try {
               const errData = await response.json();
               errorMsg += ` - ${errData.message || 'Unknown server error'}`;
-          } catch { // Remove unused parameter
+          } catch {
               errorMsg += ` - ${response.statusText}`;
           }
           throw new Error(errorMsg);
@@ -48,14 +50,9 @@ function App() {
     fetchGroceries();
   }, []);
 
-
-  // --- Updated Cart Management ---
-  // handleAddToCart now accepts quantityToAdd (defaulting to 1 if not provided for backward compatibility, though not needed with current GroceryItem)
   const handleAddToCart = (itemToAdd, quantityToAdd = 1) => {
-     // --- Get current stock info ---
      const currentItemState = groceryItems.find(item => item.id === itemToAdd.id);
 
-     // --- Initial Checks ---
      if (!currentItemState) {
         alert(`${itemToAdd.name} is currently unavailable or not found. Please refresh.`);
         return;
@@ -64,21 +61,17 @@ function App() {
          alert(`Sorry, ${itemToAdd.name} is currently out of stock.`);
          return;
      }
-    // Check if requested quantity exceeds available stock
      if (quantityToAdd > currentItemState.quantityAvailable) {
         alert(`Cannot add ${quantityToAdd} ${itemToAdd.name}. Only ${currentItemState.quantityAvailable} available.`);
         return;
      }
 
-
     setCartItems(prevCartItems => {
       const existingCartItem = prevCartItems.find(item => item.id === itemToAdd.id);
 
       if (existingCartItem) {
-        // --- Calculate potential new quantity in cart ---
         const potentialNewQuantityInCart = existingCartItem.quantity + quantityToAdd;
 
-        // --- Check if adding exceeds total available stock ---
         if (potentialNewQuantityInCart > currentItemState.quantityAvailable) {
            const canAdd = currentItemState.quantityAvailable - existingCartItem.quantity;
            if (canAdd > 0) {
@@ -86,26 +79,21 @@ function App() {
            } else {
               alert(`Cannot add more ${itemToAdd.name}. Only ${currentItemState.quantityAvailable} total available, and you already have ${existingCartItem.quantity} in your cart.`);
            }
-           return prevCartItems; // Return previous state without changes
+           return prevCartItems;
         }
 
-        // --- Update quantity if stock permits ---
         return prevCartItems.map(item =>
           item.id === itemToAdd.id
             ? { ...item, quantity: potentialNewQuantityInCart }
             : item
         );
       } else {
-        // --- Add new item to cart (stock already checked above) ---
-        // Ensure quantityToAdd is at least 1 (should be guaranteed by GroceryItem)
         const actualQuantity = Math.max(1, quantityToAdd);
         return [...prevCartItems, { ...itemToAdd, quantity: actualQuantity }];
       }
     });
   };
 
-  // handleIncreaseQuantity only increases by 1, so it can stay mostly the same
-  // but it should still check against quantityAvailable
   const handleIncreaseQuantity = (itemId) => {
     const currentItemState = groceryItems.find(item => item.id === itemId);
     const cartItem = cartItems.find(item => item.id === itemId);
@@ -129,13 +117,10 @@ function App() {
     );
   };
 
-
-  // handleDecreaseQuantity remains the same
   const handleDecreaseQuantity = (itemId) => {
-    // ... (no changes needed here) ...
      setCartItems(prevCartItems => {
        const itemIndex = prevCartItems.findIndex(item => item.id === itemId);
-       if (itemIndex === -1) return prevCartItems; // Item not found
+       if (itemIndex === -1) return prevCartItems;
 
        const currentItem = prevCartItems[itemIndex];
 
@@ -144,21 +129,16 @@ function App() {
            item.id === itemId ? { ...item, quantity: item.quantity - 1 } : item
          );
        } else {
-         // Remove item if quantity is 1
          return prevCartItems.filter(item => item.id !== itemId);
        }
      });
   };
 
-  // handleRemoveFromCart remains the same
   const handleRemoveFromCart = (itemId) => {
-    // ... (no changes needed here) ...
     setCartItems(prevCartItems => prevCartItems.filter(item => item.id !== itemId));
   };
 
-  // handleAddItem (for adding new items via form) remains the same
   const handleAddItem = async (newItemData) => {
-    // ... (no changes needed here) ...
     console.log("Attempting to add item via API:", newItemData);
     setApiError(null);
     try {
@@ -175,7 +155,7 @@ function App() {
         try {
             const errorData = await response.json();
             errorMsg += ` - ${errorData.message || 'Unknown server error'}`;
-        } catch { // Remove unused parameter
+        } catch {
              errorMsg += ` - ${response.statusText}`;
         }
         throw new Error(errorMsg);
@@ -196,15 +176,14 @@ function App() {
     }
   };
 
-  // --- Handle Buy ---
   const handleBuy = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty.");
       return;
     }
 
-    setApiError(null); // Clear previous errors
-    setLoading(true); // Indicate processing
+    setApiError(null);
+    setLoading(true);
 
     console.log("Attempting to buy items:", cartItems);
 
@@ -214,61 +193,99 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        // Send only necessary info: id and quantity bought
-        body: JSON.stringify(cartItems.map(item => ({ id: item.id, quantity: item.quantity }))),
+        body: JSON.stringify(cartItems.map(item => ({
+            id: item.id,
+            quantity: item.quantity,
+            price: item.price,
+            name: item.name
+        }))),
       });
 
-      if (!response.ok) {
+      if (!response.ok && response.status !== 207) {
         let errorMsg = `Purchase failed: ${response.status}`;
         try {
             const errorData = await response.json();
             errorMsg += ` - ${errorData.message || 'Unknown server error'}`;
-        } catch { // Remove unused parameter
+        } catch {
              errorMsg += ` - ${response.statusText}`;
         }
         throw new Error(errorMsg);
       }
 
       const result = await response.json();
-      console.log("Purchase successful:", result);
+      console.log("Purchase/Order response:", result);
 
-      // Clear the cart on successful purchase
       setCartItems([]);
 
-      // Refresh grocery list to show updated stock
-      // Re-fetch all groceries to get the latest stock counts
       const fetchResponse = await fetch(`${API_BASE_URL}/groceries`);
        if (!fetchResponse.ok) throw new Error(`Failed to refresh groceries: ${fetchResponse.status}`);
        const updatedGroceries = await fetchResponse.json();
        setGroceryItems(updatedGroceries);
 
-
-      alert("Purchase successful! Your cart is cleared and stock updated.");
+      if (response.status === 207) {
+          alert(`Warning: ${result.message}`);
+      } else {
+          alert("Purchase successful! Your order has been recorded.");
+      }
 
     } catch (e) {
-      console.error("Error during purchase:", e);
+      console.error("Error during purchase/order saving:", e);
       setApiError(`Purchase failed: ${e.message}`);
       alert(`Purchase failed: ${e.message}`);
     } finally {
-      setLoading(false); // Stop loading indicator
+      setLoading(false);
     }
   };
 
-  // --- Handle Stock Update ---
-  const handleStockUpdate = async (itemId, quantityToAdd, onSuccess) => {
-    // For now, just update the local state
-    setGroceryItems(prevItems =>
-      prevItems.map(item =>
-        item.id === parseInt(itemId)
-          ? { ...item, quantityAvailable: item.quantityAvailable + quantityToAdd }
-          : item
-      )
-    );
-    alert('Stock updated successfully!');
-    if (onSuccess) onSuccess(); // Call the success callback to reset form state
+  const handleStockUpdate = async (itemId, quantityChange, onSuccess) => {
+    setApiError(null);
+    setLoading(true);
+    const numericItemId = parseInt(itemId, 10);
+
+    console.log(`Attempting to update stock for item ID ${numericItemId} by ${quantityChange}`);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/groceries/${numericItemId}/stock`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quantityChange: quantityChange }),
+      });
+
+      if (!response.ok) {
+        let errorMsg = `Stock update failed: ${response.status}`;
+        try {
+          const errorData = await response.json();
+          errorMsg += ` - ${errorData.message || 'Unknown server error'}`;
+        } catch {
+          errorMsg += ` - ${response.statusText}`;
+        }
+        throw new Error(errorMsg);
+      }
+
+      const updatedItem = await response.json();
+      console.log("Stock update successful:", updatedItem);
+
+      setGroceryItems(prevItems =>
+        prevItems.map(item =>
+          item.id === updatedItem.id ? updatedItem : item
+        )
+      );
+
+      alert(`Stock for ${updatedItem.name} updated successfully! New quantity: ${updatedItem.quantityAvailable}`);
+      if (onSuccess) onSuccess();
+
+    } catch (e) {
+      console.error("Error updating stock:", e);
+      const userMessage = `Error updating stock: ${e.message}`;
+      setApiError(userMessage);
+      alert(userMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // --- Render Logic ---
   return (
     <Router>
       <div className="App">
@@ -281,7 +298,6 @@ function App() {
               element={
                 <HomePage
                   items={groceryItems}
-                  // Pass the updated handler
                   onAddToCart={handleAddToCart}
                   loading={loading}
                 />
@@ -295,9 +311,8 @@ function App() {
                   onIncrease={handleIncreaseQuantity}
                   onDecrease={handleDecreaseQuantity}
                   onRemove={handleRemoveFromCart}
-                  onBuy={handleBuy} // Pass the new handler
-                  // Optionally pass groceryItems if CartPage needs stock info for display
-                   groceryItems={groceryItems}
+                  onBuy={handleBuy}
+                  groceryItems={groceryItems}
                 />
               }
             />
@@ -316,6 +331,10 @@ function App() {
                 />
               }
             />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/order-history" element={<OrderHistoryPage />} />
+            <Route path="/item/:id" element={<ProductDetailPage />} />
             <Route path="*" element={<h2>404 Page Not Found</h2>} />
           </Routes>
         </main>
