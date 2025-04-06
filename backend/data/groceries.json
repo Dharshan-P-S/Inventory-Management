@@ -3,14 +3,14 @@
     "id": 1,
     "name": "Organic Gala Apple",
     "price": 0.75,
-    "quantityAvailable": 24,
+    "quantityAvailable": 49,
     "category": "Produce"
   },
   {
     "id": 2,
     "name": "Whole Milk (1 Gallon)",
     "price": 3.89,
-    "quantityAvailable": 6,
+    "quantityAvailable": 3,
     "category": "Dairy"
   },
   {
@@ -38,14 +38,14 @@
     "id": 6,
     "name": "Banana",
     "price": 0.35,
-    "quantityAvailable": 80,
+    "quantityAvailable": 79,
     "category": "Produce"
   },
   {
     "id": 7,
     "name": "Crunchy Oats Cereal",
     "price": 4.1,
-    "quantityAvailable": 22,
+    "quantityAvailable": 19,
     "category": "Pantry"
   },
   {
@@ -59,7 +59,7 @@
     "id": 9,
     "name": "Greek Yogurt (Single Cup)",
     "price": 1.25,
-    "quantityAvailable": 50,
+    "quantityAvailable": 49,
     "category": "Dairy"
   },
   {
@@ -80,7 +80,7 @@
     "id": 12,
     "name": "Orange Bell Pepper",
     "price": 1.29,
-    "quantityAvailable": 28,
+    "quantityAvailable": 26,
     "category": "Produce"
   },
   {
@@ -110,5 +110,12 @@
     "price": 6.5,
     "quantityAvailable": 100,
     "category": "Dairy"
+  },
+  {
+    "id": "17",
+    "name": "Sparkling water bottle (250 ml)",
+    "price": 25,
+    "quantityAvailable": 34,
+    "category": "Uncategorized"
   }
 ]

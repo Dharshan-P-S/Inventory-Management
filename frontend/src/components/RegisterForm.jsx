@@ -2,18 +2,20 @@ import React, { useState } from 'react';
 
 function RegisterForm({ onSubmit }) {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState(''); // added email state
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   // TODO: Add error handling state
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // TODO: Add validation (e.g., password match)
-    if (password !== confirmPassword) {
-      alert("Passwords don't match!"); // Simple alert for now
+    console.log("Debug: email:", `"${email}"`, "password:", `"${password}"`, "confirmPassword:", `"${confirmPassword}"`);
+    // Validate passwords after trimming whitespace
+    if (password.trim() !== confirmPassword.trim()) {
+      alert("Passwords don't match!");
       return;
     }
-    onSubmit({ username, password });
+    onSubmit({ username: username.trim(), email: email.trim(), password });
   };
 
   return (
@@ -28,10 +30,21 @@ function RegisterForm({ onSubmit }) {
           required
         />
       </div>
+      {/* New email field */}
+      <div className="form-group">
+        <label htmlFor="register-email">Email:</label>
+        <input
+          type="email"
+          id="register-email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </div>
       <div className="form-group">
         <label htmlFor="register-password">Password:</label>
         <input
-          type="password"
+          type="password" // changed from text to password
           id="register-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -41,7 +54,7 @@ function RegisterForm({ onSubmit }) {
       <div className="form-group">
         <label htmlFor="register-confirm-password">Confirm Password:</label>
         <input
-          type="password"
+          type="password" // changed from text to password
           id="register-confirm-password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}

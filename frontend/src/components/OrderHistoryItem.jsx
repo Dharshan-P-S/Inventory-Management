@@ -17,9 +17,9 @@ function OrderHistoryItem({ order }) {
   return (
     <div className="order-history-item">
       <div className="order-header">
-        <h3>Order #{order.id}</h3>
-        <span className="order-date">Placed on: {formatDate(order.timestamp)}</span>
-        <span className="order-total">Total: Rs. {order.totalAmount.toFixed(2)}</span>
+        <h3>Order #{order.orderId}</h3>
+        <span className="order-date">Order Date: {formatDate(order.date)}</span>
+        <span className="order-total">Total: Rs. {order.total.toFixed(2)}</span>
       </div>
       <ul className="order-item-list">
         {order.items.map(item => (

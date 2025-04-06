@@ -4,12 +4,13 @@ import '../App.css'; // Ensure styles are imported
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
-function ProductDetailPage() {
+// Accept onAddToCart and currentUser props
+function ProductDetailPage({ onAddToCart, currentUser }) {
   const { id } = useParams(); // Get item ID from URL parameter
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // TODO: Add state/handler for adding to cart from this page
+  const [quantityToAdd, setQuantityToAdd] = useState(1); // State for quantity
 
   useEffect(() => {
     const fetchItemDetails = async () => {
@@ -38,11 +39,43 @@ function ProductDetailPage() {
     fetchItemDetails();
   }, [id]); // Re-fetch if ID changes
 
+  // Reset quantityToAdd if item changes or goes out of stock
+  useEffect(() => {
+    if (item && (item.quantityAvailable <= 0 || quantityToAdd > item.quantityAvailable)) {
+      setQuantityToAdd(1);
+    }
+  }, [item, quantityToAdd]);
+
   if (loading) return <p className="loading-message">Loading product details...</p>;
   if (error) return <p className="error-message api-error">{error}</p>;
   if (!item) return <p className="error-message">Product not found.</p>; // Should be caught by error state, but good fallback
 
   const isOutOfStock = item.quantityAvailable <= 0;
+
+  // Quantity handlers
+  const handleDecrease = () => {
+    setQuantityToAdd(prev => Math.max(1, prev - 1));
+  };
+
+  const handleIncrease = () => {
+    setQuantityToAdd(prev => Math.min(item.quantityAvailable, prev + 1));
+  };
+
+  // Add to cart handler
+  const handleAddToCartClick = () => {
+    if (isOutOfStock) {
+      alert(`${item.name} is out of stock!`);
+      return;
+    }
+    if (quantityToAdd > 0 && quantityToAdd <= item.quantityAvailable) {
+      onAddToCart(item, quantityToAdd);
+      alert(`${quantityToAdd} x ${item.name} added to cart!`);
+      setQuantityToAdd(1); // Reset quantity
+    } else {
+      alert(`Cannot add ${quantityToAdd}. Available: ${item.quantityAvailable}`);
+    }
+  };
+
 
   return (
     <div className="page-container product-detail-page">
@@ -62,20 +95,42 @@ function ProductDetailPage() {
             consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
 
-          {/* TODO: Add quantity selector and Add to Cart button */}
-          {!isOutOfStock && (
+          {/* --- Product Actions (Quantity & Add to Cart) --- */}
+          {/* Only show if NOT owner AND item is IN STOCK */}
+          {currentUser?.type !== 'owner' && !isOutOfStock && (
             <div className="product-actions">
-              {/* Placeholder for quantity adjuster */}
-              <div className="quantity-adjuster-placeholder">
-                <span>Quantity: 1</span> {/* Replace with actual adjuster later */}
+              <div className="quantity-adjuster">
+                <button
+                  onClick={handleDecrease}
+                  disabled={quantityToAdd <= 1}
+                  aria-label={`Decrease quantity for ${item.name}`}
+                >
+                  -
+                </button>
+                <span className="quantity-display" aria-live="polite">{quantityToAdd}</span>
+                <button
+                  onClick={handleIncrease}
+                  disabled={quantityToAdd >= item.quantityAvailable}
+                  aria-label={`Increase quantity for ${item.name}`}
+                >
+                  +
+                </button>
               </div>
-              <button className="add-to-cart-button-detail">
+              <button
+                className="add-to-cart-button-detail"
+                onClick={handleAddToCartClick}
+                disabled={isOutOfStock} // Double check, though parent condition handles this
+              >
                 Add to Cart
               </button>
             </div>
           )}
-           {isOutOfStock && (
-             <p className="stock-message">Currently unavailable</p>
+
+          {/* Show message if owner OR out of stock */}
+           {(currentUser?.type === 'owner' || isOutOfStock) && (
+             <p className="stock-message">
+               {isOutOfStock ? 'Currently unavailable' : 'Owners cannot add items to cart.'}
+             </p>
            )}
         </div>
       </div>

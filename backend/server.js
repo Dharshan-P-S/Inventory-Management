@@ -2,95 +2,287 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const bcrypt = require('bcryptjs');
+const cookieParser = require('cookie-parser');
+const { v4: uuidv4 } = require('uuid'); // For generating unique IDs
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const SALT_ROUNDS = 10; // For bcrypt hashing
+const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-very-secret-key'; // Use environment variable in production
 
-const dataFilePath = path.join(__dirname, 'data', 'groceries.json');
-const ordersFilePath = path.join(__dirname, 'data', 'orders.json'); // Path for orders
+// --- File Paths ---
+const groceriesFilePath = path.join(__dirname, 'data', 'groceries.json');
+const usersFilePath = path.join(__dirname, 'data', 'users.json');
+const orderHistoryFilePath = path.join(__dirname, 'data', 'order_history.json');
+const inventoryHistoryFilePath = path.join(__dirname, 'data', 'inventory_history.json'); // Inventory history file path
 
-// Helper function to read data from JSON file
-const readData = () => {
+// --- Helper Functions ---
+
+// Generic function to read JSON data
+const readJsonFile = (filePath) => {
     try {
-        if (fs.existsSync(dataFilePath)) {
-            const jsonData = fs.readFileSync(dataFilePath);
-            return JSON.parse(jsonData);
-        }
-        console.warn("Data file not found, returning empty array.");
-        return []; // Return empty array if file doesn't exist
-    } catch (error) {
-        console.error("Error reading data file:", error);
-        // In case of read error (e.g., corrupted JSON), return empty array or handle appropriately
-        return [];
-    }
-};
-
-// Helper function to write data to JSON file
-const writeData = (data) => {
-    try {
-        fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
-        return true; // Indicate success
-    } catch (error) {
-        console.error("Error writing data file:", error);
-        return false; // Indicate failure
-    }
-};
-
-// Helper function to read orders from JSON file
-const readOrders = () => {
-    try {
-        if (fs.existsSync(ordersFilePath)) {
-            const jsonData = fs.readFileSync(ordersFilePath);
-            // Handle empty file case
+        if (fs.existsSync(filePath)) {
+            const jsonData = fs.readFileSync(filePath);
+            // Handle empty file case gracefully
             return jsonData.length > 0 ? JSON.parse(jsonData) : [];
         }
-        console.warn("Orders file not found, returning empty array.");
-        return []; // Return empty array if file doesn't exist
-    } catch (error) {
-        console.error("Error reading orders file:", error);
+        console.warn(`File not found: ${filePath}. Returning empty array.`);
         return [];
-    }
-};
-
-// Helper function to write orders to JSON file
-const writeOrders = (orders) => {
-    try {
-        fs.writeFileSync(ordersFilePath, JSON.stringify(orders, null, 2));
-        return true; // Indicate success
     } catch (error) {
-        console.error("Error writing orders file:", error);
-        return false; // Indicate failure
+        console.error(`Error reading file ${filePath}:`, error);
+        return []; // Return empty array on error
     }
 };
 
-// Load initial data and determine next ID
-let groceryItems = readData();
-let nextId = groceryItems.length > 0 ? Math.max(...groceryItems.map(item => item.id)) + 1 : 1;
-// Load orders to determine next order ID
-let orders = readOrders();
-let nextOrderId = orders.length > 0 ? Math.max(...orders.map(order => order.id)) + 1 : 1;
+// Generic function to write JSON data
+const writeJsonFile = (filePath, data) => {
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+        return true;
+    } catch (error) {
+        console.error(`Error writing file ${filePath}:`, error);
+        return false;
+    }
+};
 
-// Middleware setup
-app.use(cors({ origin: 'http://localhost:5173' })); // Allow requests from frontend dev server
+// Specific read/write functions using the generic helpers
+const readGroceries = () => readJsonFile(groceriesFilePath);
+const writeGroceries = (data) => writeJsonFile(groceriesFilePath, data);
+const readUsers = () => readJsonFile(usersFilePath);
+const writeUsers = (data) => writeJsonFile(usersFilePath, data);
+const readOrderHistory = () => readJsonFile(orderHistoryFilePath);
+const writeOrderHistory = (data) => writeJsonFile(orderHistoryFilePath, data);
+const readInventoryHistory = () => readJsonFile(inventoryHistoryFilePath); // Read inventory history
+const writeInventoryHistory = (data) => writeJsonFile(inventoryHistoryFilePath, data); // Write inventory history
+
+
+// Helper function to read data from JSON file - DEPRECATED, use readGroceries
+const readData = () => {
+    // This function is kept for backward compatibility if needed, but prefer readGroceries
+    return readGroceries();
+};
+
+// Helper function to write data to JSON file - DEPRECATED, use writeGroceries
+const writeData = (data) => {
+    // This function is kept for backward compatibility if needed, but prefer writeGroceries
+    return writeGroceries(data);
+};
+
+// Helper function to read orders from JSON file - DEPRECATED, use readOrderHistory
+const readOrders = () => {
+    // This function is kept for backward compatibility if needed, but prefer readOrderHistory
+    return readOrderHistory();
+};
+
+// Helper function to write orders to JSON file - DEPRECATED, use writeOrderHistory
+const writeOrders = (orders) => {
+    // This function is kept for backward compatibility if needed, but prefer writeOrderHistory
+    return writeOrderHistory(orders);
+};
+
+
+// --- Load initial data (less critical now as we read fresh on requests) ---
+let groceryItems = readGroceries(); // Keep for potential reference if needed elsewhere
+let nextId = groceryItems.length > 0 ? Math.max(...groceryItems.map(item => parseInt(item.id) || 0)) + 1 : 1; // Ensure IDs are numbers for max()
+
+// --- Middleware setup ---
+app.use(cors({
+    origin: 'http://localhost:5173', // Allow requests from frontend dev server
+    credentials: true // Allow cookies to be sent/received
+}));
 app.use(express.json()); // Parse JSON request bodies
+app.use(cookieParser(COOKIE_SECRET)); // Parse cookies, use secret for signing
+
+// --- Authentication Middleware ---
+const requireAuth = (req, res, next) => {
+    const userId = req.signedCookies.userId; // Use signed cookies
+    if (!userId) {
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt to ${req.path}`);
+        return res.status(401).json({ message: 'Authentication required. Please log in.' });
+    }
+    // Attach user ID to request for later use in route handlers
+    req.userId = userId;
+    console.log(`[${new Date().toISOString()}] Authenticated access by user ${userId} to ${req.path}`);
+    next();
+};
+
+// --- User Type Middleware ---
+const requireCustomer = (req, res, next) => {
+    const users = readUsers();
+    const user = users.find(u => u.id === req.userId);
+    if (user && user.type === 'customer') {
+        next(); // User is a customer, proceed
+    } else {
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.userId} (not customer) to ${req.path}`);
+        res.status(403).json({ message: 'Unauthorized: Customers only.' });
+    }
+};
+
+const requireOwner = (req, res, next) => {
+    const users = readUsers();
+    const user = users.find(u => u.id === req.userId);
+    if (user && user.type === 'owner') {
+        next(); // User is an owner, proceed
+    } else {
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.userId} (not owner) to ${req.path}`);
+        res.status(403).json({ message: 'Unauthorized: Owners only.' });
+    }
+};
+
 
 // --- API Endpoints ---
 
-// GET /api/groceries - Retrieve all grocery items
-app.get('/api/groceries', (req, res) => {
+// --- User Authentication Endpoints ---
+
+// POST /api/register - Register a new user
+app.post('/api/register', async (req, res) => {
+    console.log(`[${new Date().toISOString()}] POST /api/register - Body:`, req.body);
+    const { username, password, email } = req.body;
+
+    // Basic validation
+    if (!username || !password || !email) {
+        return res.status(400).json({ message: 'Username, password, and email are required.' });
+    }
+    if (password.length < 6) { // Example: enforce minimum password length
+        return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
+    }
+
+    const users = readUsers();
+
+    // Check for existing user
+    const existingUser = users.find(u => u.username === username || u.email === email);
+    if (existingUser) {
+        const conflictField = existingUser.username === username ? 'Username' : 'Email';
+        console.warn(`[${new Date().toISOString()}] Registration failed: ${conflictField} already exists.`);
+        return res.status(409).json({ message: `${conflictField} already exists.` });
+    }
+
+    try {
+        // Hash password
+        const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
+
+        // Create new user
+        const newUser = {
+            id: uuidv4(), // Generate unique ID
+            username,
+            email,
+            passwordHash, // Store the hash, not the plain password
+            type: 'customer' // Default user type is customer
+        };
+
+        users.push(newUser);
+
+        // Save updated user list
+        const writeSuccess = writeUsers(users);
+        if (writeSuccess) {
+            console.log(`[${new Date().toISOString()}] User registered successfully: ${username} (ID: ${newUser.id})`);
+            // Exclude password hash from the response
+            const { passwordHash: _, ...userResponse } = newUser;
+            res.status(201).json({ message: 'User registered successfully.', user: userResponse });
+        } else {
+            console.error(`[${new Date().toISOString()}] FAILED TO SAVE new user ${username} TO FILE.`);
+            res.status(500).json({ message: 'Failed to save user data. Please try again.' });
+        }
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error during registration for ${username}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred during registration.' });
+    }
+});
+
+// POST /api/login - Log in a user
+app.post('/api/login', async (req, res) => {
+    console.log(`[${new Date().toISOString()}] POST /api/login - Body:`, req.body);
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required.' });
+    }
+
+    const users = readUsers();
+    const user = users.find(u => u.username === username);
+
+    if (!user) {
+        console.warn(`[${new Date().toISOString()}] Login failed: User not found - ${username}`);
+        return res.status(401).json({ message: 'Invalid username or password.' }); // Generic message for security
+    }
+
+    try {
+        // Compare provided password with stored hash
+        const match = await bcrypt.compare(password, user.passwordHash);
+
+        if (match) {
+            console.log(`[${new Date().toISOString()}] Login successful for user: ${username} (ID: ${user.id})`);
+            // Set a signed, HTTP-only cookie for session management
+            res.cookie('userId', user.id, {
+                httpOnly: true, // Prevents client-side JS access
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
+                signed: true, // Sign the cookie to prevent tampering
+                maxAge: 24 * 60 * 60 * 1000 // Example: Cookie expires in 1 day
+                // sameSite: 'Lax' // Or 'Strict' depending on requirements
+            });
+
+            // Return user info (excluding password hash and type)
+            const { passwordHash: _, type: __, ...userResponse } = user;
+            res.status(200).json({ message: 'Login successful.', user: { ...userResponse, type: user.type } });
+        } else {
+            console.warn(`[${new Date().toISOString()}] Login failed: Invalid password for user - ${username}`);
+            res.status(401).json({ message: 'Invalid username or password.' });
+        }
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error during login for ${username}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred during login.' });
+    }
+});
+
+// POST /api/logout - Log out a user
+app.post('/api/logout', (req, res) => {
+    const userId = req.signedCookies.userId;
+    console.log(`[${new Date().toISOString()}] POST /api/logout - User: ${userId || 'N/A'}`);
+    // Clear the cookie
+    res.clearCookie('userId');
+    res.status(200).json({ message: 'Logout successful.' });
+});
+
+// GET /api/session - Check current login status
+app.get('/api/session', requireAuth, (req, res) => {
+    // requireAuth middleware already validated the cookie and attached req.userId
+    console.log(`[${new Date().toISOString()}] GET /api/session - User: ${req.userId}`);
+    const users = readUsers();
+    const user = users.find(u => u.id === req.userId);
+
+    if (user) {
+        // Return user info (excluding password hash and type)
+        const { passwordHash: _, type: __, ...userResponse } = user;
+        res.status(200).json({ user: { ...userResponse, type: user.type } });
+    } else {
+        // This case should ideally not happen if requireAuth works correctly
+        console.error(`[${new Date().toISOString()}] Session check failed: User ID ${req.userId} from cookie not found in database.`);
+        res.clearCookie('userId'); // Clear invalid cookie
+        res.status(404).json({ message: 'User session data not found.' });
+    }
+});
+
+
+// --- Grocery Endpoints ---
+
+// GET /api/groceries - Retrieve all grocery items (No auth needed for browsing)
+app.get('/api/groceries',  (req, res) => {
     console.log(`[${new Date().toISOString()}] GET /api/groceries`);
-    // Read data fresh each time to ensure consistency if multiple requests happen
-    const currentGroceries = readData();
+    const currentGroceries = readGroceries();
     res.json(currentGroceries);
 });
 
-// POST /api/groceries - Add a new grocery item
-app.post('/api/groceries', (req, res) => {
+// POST /api/groceries - Add a new grocery item (Owners only)
+app.post('/api/groceries', requireAuth, requireOwner, (req, res) => { // Added requireOwner middleware
     console.log(`[${new Date().toISOString()}] POST /api/groceries - Body:`, req.body);
-    const { name, price, quantityAvailable } = req.body;
+    // Destructure category as well, make it optional
+    const { name, price, quantityAvailable, category } = req.body;
+    let currentGroceries = readGroceries(); // Read fresh data
 
     // --- Input Validation ---
     let errors = [];
+    // (Validation logic remains largely the same)
     if (!name || typeof name !== 'string' || name.trim() === '') {
         errors.push('Missing or invalid item name (must be a non-empty string)');
     }
@@ -110,46 +302,48 @@ app.post('/api/groceries', (req, res) => {
         return res.status(400).json({ message: 'Validation errors occurred', errors });
     }
 
+    // Determine next ID based on current data
+    const currentMaxId = currentGroceries.length > 0 ? Math.max(...currentGroceries.map(item => parseInt(item.id) || 0)) : 0;
+    const newId = currentMaxId + 1;
+
     // --- Create and Add Item ---
     const newItem = {
-        id: nextId++, // Assign next available ID and increment
+        id: newId.toString(), // Keep IDs as strings for consistency
         name: name.trim(),
         price: price,
-        quantityAvailable: quantityAvailable
+        quantityAvailable: quantityAvailable,
+        // Add category, trim whitespace, default to 'Uncategorized' if empty
+        category: category ? category.trim() : 'Uncategorized'
     };
 
-    // Read current data before modifying
-    let currentGroceries = readData();
     currentGroceries.push(newItem);
 
     // --- Persist Data ---
-    const writeSuccess = writeData(currentGroceries);
+    const writeSuccess = writeGroceries(currentGroceries);
 
     if (writeSuccess) {
-        // Update in-memory state ONLY if write was successful
-        groceryItems = currentGroceries;
+        groceryItems = currentGroceries; // Update in-memory cache if needed
         console.log(`[${new Date().toISOString()}] Added new item (ID: ${newItem.id}) and saved to file.`);
         res.status(201).json(newItem); // Return the newly created item
     } else {
-        // If write failed, roll back the ID increment and don't update in-memory state
-        nextId--;
         console.error(`[${new Date().toISOString()}] FAILED TO SAVE new item (ID: ${newItem.id}) TO FILE.`);
         res.status(500).json({ message: 'Failed to save the new item persistently. Please try again.' });
     }
 });
 
-// GET /api/groceries/:id - Retrieve a single grocery item by ID
+// GET /api/groceries/:id - Retrieve a single grocery item by ID (No auth needed)
 app.get('/api/groceries/:id', (req, res) => {
-    const itemId = parseInt(req.params.id, 10);
+    const itemId = req.params.id; // Keep as string or parse depending on data format
     console.log(`[${new Date().toISOString()}] GET /api/groceries/${itemId}`);
 
-    if (isNaN(itemId)) {
-        return res.status(400).json({ message: 'Invalid item ID provided.' });
-    }
+    // Basic validation if parsing ID
+    // if (isNaN(parseInt(itemId, 10))) {
+    //     return res.status(400).json({ message: 'Invalid item ID provided.' });
+    // }
 
-    // Read data fresh each time
-    const currentGroceries = readData();
-    const item = currentGroceries.find(g => g.id === itemId);
+    const currentGroceries = readGroceries();
+    // Adjust find logic if IDs are stored as numbers vs strings
+    const item = currentGroceries.find(g => g.id.toString() === itemId);
 
     if (item) {
         res.json(item);
@@ -159,10 +353,14 @@ app.get('/api/groceries/:id', (req, res) => {
     }
 });
 
-// POST /api/buy - Process a purchase request
-app.post('/api/buy', (req, res) => {
-    console.log(`[${new Date().toISOString()}] POST /api/buy - Body:`, req.body);
-    const itemsToBuy = req.body; // Expecting an array: [{ id: number, quantity: number, name: string, price: number }, ...] - Frontend sends more info now
+
+// --- Order Processing Endpoint (Requires Customer Authentication) ---
+
+// POST /api/buy - Process a purchase request (Customers only)
+app.post('/api/buy', requireAuth, requireCustomer, (req, res) => { // Added requireCustomer middleware
+    const userId = req.userId; // Get user ID from authenticated request
+    console.log(`[${new Date().toISOString()}] POST /api/buy - User: ${userId}, Body:`, req.body);
+    const itemsToBuy = req.body; // Expecting an array: [{ id: string/number, quantity: number, name: string, price: number }, ...]
 
     // --- Basic Request Validation ---
     if (!Array.isArray(itemsToBuy)) {
@@ -173,22 +371,22 @@ app.post('/api/buy', (req, res) => {
     }
 
     // --- Read current data (critical for stock check) ---
-    let currentGroceries = readData();
+    let currentGroceries = readGroceries();
     let validationErrors = [];
     let stockUpdates = []; // Store intended updates: { index: number, quantityToDeduct: number, name: string }
     let orderTotal = 0; // Calculate total for the order
 
     // --- Validate each item and check stock atomically ---
     for (const itemToBuy of itemsToBuy) {
-        // Validate item format in the request (ensure price and name are present for order saving)
-        if (!itemToBuy || typeof itemToBuy.id !== 'number' || typeof itemToBuy.quantity !== 'number' || itemToBuy.quantity <= 0 || !Number.isInteger(itemToBuy.quantity) || typeof itemToBuy.price !== 'number' || typeof itemToBuy.name !== 'string') {
+        // Validate item format in the request
+        if (!itemToBuy || itemToBuy.id == null || typeof itemToBuy.quantity !== 'number' || itemToBuy.quantity <= 0 || !Number.isInteger(itemToBuy.quantity) || typeof itemToBuy.price !== 'number' || typeof itemToBuy.name !== 'string') {
             validationErrors.push(`Invalid item format or quantity/price/name for item ID ${itemToBuy?.id || 'unknown'}.`);
-            continue; // Skip to next item if format is wrong
+            continue;
         }
 
-        const groceryItemIndex = currentGroceries.findIndex(item => item.id === itemToBuy.id);
+        // Find item, handling potential string/number ID differences
+        const groceryItemIndex = currentGroceries.findIndex(item => item.id.toString() === itemToBuy.id.toString());
 
-        // Check if item exists in our current data
         if (groceryItemIndex === -1) {
             validationErrors.push(`Item with ID ${itemToBuy.id} not found.`);
             continue;
@@ -196,86 +394,84 @@ app.post('/api/buy', (req, res) => {
 
         const groceryItem = currentGroceries[groceryItemIndex];
 
-        // Check stock availability
         if (groceryItem.quantityAvailable < itemToBuy.quantity) {
             validationErrors.push(`Insufficient stock for item ID ${itemToBuy.id} (${groceryItem.name}). Requested: ${itemToBuy.quantity}, Available: ${groceryItem.quantityAvailable}.`);
         } else {
-            // If valid so far, record the intended update
             stockUpdates.push({
                 index: groceryItemIndex,
                 quantityToDeduct: itemToBuy.quantity,
-                name: groceryItem.name // Store name for logging/confirmation
+                name: groceryItem.name
             });
-            // Add to order total
             orderTotal += itemToBuy.price * itemToBuy.quantity;
         }
     }
 
-    // --- If any validation errors occurred during the loop, abort the purchase ---
     if (validationErrors.length > 0) {
-        console.warn(`[${new Date().toISOString()}] POST /api/buy - Validation failed:`, validationErrors);
+        console.warn(`[${new Date().toISOString()}] POST /api/buy - Validation failed for user ${userId}:`, validationErrors);
         const statusCode = validationErrors.some(err => err.includes('Insufficient stock')) ? 409 : 400;
         return res.status(statusCode).json({ message: 'Purchase validation failed.', errors: validationErrors });
     }
 
-    // --- Apply stock updates (only if all validations passed) ---
+    // --- Apply stock updates ---
     stockUpdates.forEach(update => {
         currentGroceries[update.index].quantityAvailable -= update.quantityToDeduct;
-        console.log(`[${new Date().toISOString()}] Reducing stock for ${update.name} (ID: ${currentGroceries[update.index].id}) by ${update.quantityToDeduct}. New stock: ${currentGroceries[update.index].quantityAvailable}`);
+        console.log(`[${new Date().toISOString()}] User ${userId} buying: Reducing stock for ${update.name} (ID: ${currentGroceries[update.index].id}) by ${update.quantityToDeduct}. New stock: ${currentGroceries[update.index].quantityAvailable}`);
     });
 
     // --- Persist the updated grocery data ---
-    const writeSuccess = writeData(currentGroceries);
+    const groceryWriteSuccess = writeGroceries(currentGroceries);
 
-    if (writeSuccess) {
-        // Update the main in-memory grocery state ONLY after successful write
-        groceryItems = currentGroceries;
-        console.log(`[${new Date().toISOString()}] Purchase successful. Updated stock saved to file.`);
+    if (groceryWriteSuccess) {
+        groceryItems = currentGroceries; // Update cache if needed
+        console.log(`[${new Date().toISOString()}] Purchase by user ${userId} successful. Updated stock saved.`);
 
-        // --- Create and Save Order ---
+        // --- Create and Save Order History ---
         const newOrder = {
-            id: nextOrderId++,
-            timestamp: new Date().toISOString(),
-            items: itemsToBuy.map(item => ({
-                id: item.id,
+            orderId: uuidv4(), // Generate unique order ID
+            userId: userId, // Link order to the logged-in user
+            date: new Date().toISOString(),
+            items: itemsToBuy.map(item => ({ // Store details of items bought
+                id: item.id.toString(), // Ensure consistent ID format
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity
             })),
-            totalAmount: parseFloat(orderTotal.toFixed(2))
+            total: parseFloat(orderTotal.toFixed(2)) // Store calculated total
         };
 
-        // Read current orders, add new one, write back
-        let currentOrders = readOrders();
-        currentOrders.push(newOrder);
-        const orderWriteSuccess = writeOrders(currentOrders);
+        let currentOrderHistory = readOrderHistory();
+        currentOrderHistory.push(newOrder);
+        const orderWriteSuccess = writeOrderHistory(currentOrderHistory);
 
         if (orderWriteSuccess) {
-            orders = currentOrders; // Update in-memory orders
-            console.log(`[${new Date().toISOString()}] Order (ID: ${newOrder.id}) saved successfully.`);
-            res.status(200).json({ message: 'Purchase and order saving successful!', orderId: newOrder.id });
+            console.log(`[${new Date().toISOString()}] Order (ID: ${newOrder.orderId}) for user ${userId} saved successfully.`);
+            res.status(200).json({ message: 'Purchase successful and order saved!', orderId: newOrder.orderId });
         } else {
-            nextOrderId--; // Rollback order ID
-            console.error(`[${new Date().toISOString()}] CRITICAL: Purchase successful BUT FAILED TO SAVE order (ID: ${newOrder.id}) TO FILE.`);
+            // CRITICAL: Stock was updated, but order failed to save. This requires careful handling/logging.
+            console.error(`[${new Date().toISOString()}] CRITICAL: Purchase by user ${userId} successful BUT FAILED TO SAVE order (ID: ${newOrder.orderId}) TO FILE.`);
+            // Maybe attempt to roll back stock changes? Complex. For now, inform user.
             res.status(207).json({ message: 'Purchase successful, but failed to save order history. Please contact support.', purchaseStatus: 'success', orderStatus: 'failed' });
         }
     } else {
-        console.error(`[${new Date().toISOString()}] Purchase processed BUT FAILED TO SAVE updated stock TO FILE.`);
-        res.status(500).json({ message: 'Purchase processed but failed to save updated stock persistently. Please check server logs.' });
+        console.error(`[${new Date().toISOString()}] Purchase by user ${userId} processed BUT FAILED TO SAVE updated stock TO FILE.`);
+        // Don't proceed to save order if stock update failed
+        res.status(500).json({ message: 'Purchase processed but failed to save updated stock persistently. Order not created.' });
     }
 });
 
-// PATCH /api/groceries/:id/stock - Update stock for a specific item
-app.patch('/api/groceries/:id/stock', (req, res) => {
-    const itemId = parseInt(req.params.id, 10);
-    const { quantityChange } = req.body; // Can be positive (add) or negative (remove)
 
-    console.log(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Body:`, req.body);
+// --- Stock Update Endpoint (Owners only, Requires Authentication) ---
+
+// PATCH /api/groceries/:id/stock - Update stock for a specific item (Owners only)
+app.patch('/api/groceries/:id/stock', requireAuth, requireOwner, async (req, res) => { // Added requireOwner and requireAuth middleware
+    const itemId = req.params.id;
+    const { quantityChange } = req.body;
+    const userId = req.userId; // Get user ID from authenticated request
+
+    console.log(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - User: ${userId}, Body:`, req.body);
 
     // --- Input Validation ---
-    if (isNaN(itemId)) {
-        return res.status(400).json({ message: 'Invalid item ID provided.' });
-    }
+    // (Keep existing validation for itemId format if needed)
     if (quantityChange == null || typeof quantityChange !== 'number' || !Number.isInteger(quantityChange)) {
         return res.status(400).json({ message: 'Invalid quantityChange provided. Must be an integer.' });
     }
@@ -284,10 +480,9 @@ app.patch('/api/groceries/:id/stock', (req, res) => {
     }
 
     // --- Read current data ---
-    let currentGroceries = readData();
-    const itemIndex = currentGroceries.findIndex(item => item.id === itemId);
+    let currentGroceries = readGroceries();
+    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemId.toString());
 
-    // --- Check if item exists ---
     if (itemIndex === -1) {
         console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Item not found.`);
         return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
@@ -297,7 +492,6 @@ app.patch('/api/groceries/:id/stock', (req, res) => {
     const originalQuantity = itemToUpdate.quantityAvailable;
     const newQuantity = originalQuantity + quantityChange;
 
-    // --- Validate stock level for removal ---
     if (newQuantity < 0) {
         console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Cannot remove ${Math.abs(quantityChange)}. Only ${originalQuantity} available.`);
         return res.status(409).json({ message: `Cannot remove ${Math.abs(quantityChange)} of ${itemToUpdate.name}. Only ${originalQuantity} available.` });
@@ -308,31 +502,81 @@ app.patch('/api/groceries/:id/stock', (req, res) => {
     console.log(`[${new Date().toISOString()}] Updating stock for ${itemToUpdate.name} (ID: ${itemId}) from ${originalQuantity} to ${newQuantity}.`);
 
     // --- Persist the updated data ---
-    const writeSuccess = writeData(currentGroceries);
+    const writeSuccess = writeGroceries(currentGroceries);
 
     if (writeSuccess) {
-        // Update the main in-memory state ONLY after successful write
-        groceryItems = currentGroceries;
+        groceryItems = currentGroceries; // Update cache if needed
         console.log(`[${new Date().toISOString()}] Stock update successful for item ID ${itemId}. Saved to file.`);
-        res.status(200).json(currentGroceries[itemIndex]); // Return the updated item
+
+        // --- Log to inventory history ---
+        const historyEntry = {
+            itemId: itemId,
+            quantityChange: quantityChange,
+            timestamp: new Date().toISOString(),
+            userId: userId // Logged-in user ID
+        };
+        let currentInventoryHistory = readInventoryHistory();
+        currentInventoryHistory.push(historyEntry);
+        const historyWriteSuccess = writeInventoryHistory(currentInventoryHistory); // Save history
+
+        if (historyWriteSuccess) {
+            console.log(`[${new Date().toISOString()}] Inventory history updated for item ID ${itemId}.`);
+            res.status(200).json(currentGroceries[itemIndex]); // Return the updated item
+        } else {
+            console.error(`[${new Date().toISOString()}] Stock updated, but FAILED TO SAVE inventory history for item ID ${itemId}.`);
+            res.status(207).json({ message: 'Stock updated successfully, but failed to save inventory history.', stockUpdateStatus: 'success', historyStatus: 'failed' });
+        }
+
+
     } else {
-        // CRITICAL: If write fails, roll back the in-memory change before responding
-        currentGroceries[itemIndex].quantityAvailable = originalQuantity; // Revert change
+        // Roll back in-memory change if write failed
+        currentGroceries[itemIndex].quantityAvailable = originalQuantity;
         console.error(`[${new Date().toISOString()}] Stock update processed BUT FAILED TO SAVE updated stock TO FILE for item ID ${itemId}.`);
         res.status(500).json({ message: 'Stock update processed but failed to save persistently. Please check server logs.' });
     }
 });
 
-// GET /api/orders - Retrieve all past orders
-app.get('/api/orders', (req, res) => {
-    console.log(`[${new Date().toISOString()}] GET /api/orders`);
-    // Read orders fresh each time
-    const currentOrders = readOrders();
-    res.json(currentOrders);
+
+// --- Order History Endpoint (Requires Authentication) ---
+
+// GET /api/orders - Retrieve order history for the logged-in user
+app.get('/api/orders', requireAuth, (req, res) => {
+    const userId = req.userId;
+    console.log(`[${new Date().toISOString()}] GET /api/orders - User: ${userId}`);
+
+    const allOrderHistory = readOrderHistory();
+    // Filter orders to return only those belonging to the logged-in user
+    const userOrderHistory = allOrderHistory.filter(order => order.userId === userId);
+
+    console.log(`[${new Date().toISOString()}] Found ${userOrderHistory.length} orders for user ${userId}.`);
+    res.json(userOrderHistory);
 });
+
+// --- Inventory History Endpoint (Owners only, Requires Authentication) ---
+
+// GET /api/inventory-history - Retrieve all inventory history records
+app.get('/api/inventory-history', requireAuth, requireOwner, (req, res) => {
+    const userId = req.userId; // Get user ID from authenticated request
+    console.log(`[${new Date().toISOString()}] GET /api/inventory-history - Owner: ${userId}`);
+
+    try {
+        const inventoryHistory = readInventoryHistory();
+        // Optional: Enhance history data (e.g., add item names if needed, though might be slow)
+        // For now, just return the raw history
+        console.log(`[${new Date().toISOString()}] Retrieved ${inventoryHistory.length} inventory history records for owner ${userId}.`);
+        res.status(200).json(inventoryHistory);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error reading inventory history for owner ${userId}:`, error);
+        res.status(500).json({ message: 'Failed to retrieve inventory history.' });
+    }
+});
+
 
 // --- Start Server ---
 app.listen(PORT, () => {
     console.log(`Backend server running at http://localhost:${PORT}`);
-    console.log(`Data file path: ${dataFilePath}`);
+    console.log(`Groceries file path: ${groceriesFilePath}`);
+    console.log(`Users file path: ${usersFilePath}`);
+    console.log(`Order History file path: ${orderHistoryFilePath}`);
+    console.log(`Inventory History file path: ${inventoryHistoryFilePath}`); // Log inventory history file path
 });

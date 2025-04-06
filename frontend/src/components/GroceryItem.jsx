@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Import Link
 
-function GroceryItem({ item, onAddToCart }) {
+function GroceryItem({ item, onAddToCart, currentUser }) { // Added currentUser prop
   // State to track the quantity the user intends to add
   const [quantityToAdd, setQuantityToAdd] = useState(1);
 
@@ -56,12 +56,13 @@ function GroceryItem({ item, onAddToCart }) {
         <p className="item-category">Category: {item.category || 'N/A'}</p>
       </Link>
 
-      {/* Controls section - stop propagation */}
-      <div className="item-controls-wrapper" onClick={(e) => e.stopPropagation()}>
-        {!isOutOfStock ? (
-          <div className="item-controls"> {/* Use a class for styling */}
-            {/* Quantity Adjustment Controls */}
-            <div className="quantity-adjuster">
+      {/* Controls section - only show for non-owners */}
+      {currentUser?.type !== 'owner' && (
+        <div className="item-controls-wrapper" onClick={(e) => e.stopPropagation()}>
+          {!isOutOfStock ? (
+            <div className="item-controls"> {/* Use a class for styling */}
+              {/* Quantity Adjustment Controls */}
+              <div className="quantity-adjuster">
               <button
                 onClick={handleDecrease}
                 disabled={quantityToAdd <= 1} // Disable if quantity is already 1
@@ -87,12 +88,13 @@ function GroceryItem({ item, onAddToCart }) {
               disabled={isOutOfStock}
             >
               Add to Cart
-            </button>
-          </div>
-        ) : (
-          <p className="stock-message">Out of Stock</p> // Show message if out of stock
-        )}
-      </div>
+              </button>
+            </div>
+          ) : (
+            <p className="stock-message">Out of Stock</p> // Show message if out of stock
+          )}
+        </div>
+      )}
     </div>
   );
 }

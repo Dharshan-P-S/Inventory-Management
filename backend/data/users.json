@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "b95d8984-5b18-412f-bbd0-afcfc0b6b332",
+    "username": "sasi",
+    "email": "sasikiranl0000@gmail.com",
+    "passwordHash": "$2b$10$NcYWTnQ1g.TvmfbJqmQUMO8pcJ10b6x1BEvcqcnpSdjKPko/agZ9S",
+    "type" : "customer"
+  },
+  {
+    "id": "4bfd600f-33fe-4ecb-a932-ea3302769f7d",
+    "username": "dharshan",
+    "email": "example@gmail.com",
+    "passwordHash": "$2b$10$IM1Z7jwHGsoq2pamURUQBezbp.f7IuRPOkyPVeAVO5thnqRUGyePG",
+    "type": "owner"
+  }
+]

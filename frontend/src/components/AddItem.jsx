@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-function AddItemForm({ onSubmit }) {
+function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySuggestions prop
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [quantityAvailable, setQuantityAvailable] = useState('');
+  const [category, setCategory] = useState(''); // Added category state
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -35,12 +36,8 @@ function AddItemForm({ onSubmit }) {
         name: name.trim(),
         price: parseFloat(price),
         quantityAvailable: parseInt(quantityAvailable, 10),
+        category: category.trim() || 'Uncategorized' // Default to "Uncategorized" if empty
       });
-      // DO NOT reset form here anymore. Parent will handle navigation/reset on success.
-      // setName('');
-      // setPrice('');
-      // setQuantityAvailable('');
-      // setErrors({});
     }
   };
 
@@ -89,6 +86,24 @@ function AddItemForm({ onSubmit }) {
           {/* Update error display binding */}
           {errors.quantityAvailable && <p id="quantity-error" className="error-message">{errors.quantityAvailable}</p>}
         </div>
+
+        {/* Category Input */}
+        <div className="form-group">
+          <label htmlFor="category">Category (optional):</label>
+          <input
+            type="text"
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            list="category-list" // Link to datalist
+          />
+          <datalist id="category-list">
+            {categorySuggestions.map((suggestion, index) => (
+              <option key={index} value={suggestion} />
+            ))}
+          </datalist>
+        </div>
+
         <button type="submit">Add Item to grocery list</button>
       </form>
     </div>

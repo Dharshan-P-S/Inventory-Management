@@ -553,13 +553,28 @@ main {
 }
 
 .add-item-form input[type="text"],
-.add-item-form input[type="number"] { /* Add number type */
+.add-item-form input[type="number"],
+.add-item-form input[type="email"],
+.add-item-form select { /* Add select if you style dropdowns */
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
+  font-size: 1rem; /* Ensure font size consistency */
+  font-family: inherit; /* Inherit font */
+  -webkit-appearance: none; /* Reset appearance for WebKit browsers */
+  -moz-appearance: none;    /* Reset appearance for Firefox */
+  appearance: none;        /* Standard reset */
 }
+/* Style for datalist suggestions dropdown */
+.add-item-form input[type="text"]::-webkit-calendar-picker-indicator {
+  display: none; /* Hide default arrow in Chrome/Safari */
+}
+.add-item-form input[type="text"]::-webkit-list-button {
+  display: none; /* Also try to hide the button if it appears */
+}
+/* You might need to style the datalist options if needed, but defaults are usually fine */
 
 .add-item-form input[aria-invalid="true"] {
     border-color: #dc3545; /* Red border for invalid inputs */
@@ -614,7 +629,8 @@ main {
 }
 
 .auth-form input[type="text"],
-.auth-form input[type="password"] {
+.auth-form input[type="password"],
+.auth-form input[type="email"] {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
