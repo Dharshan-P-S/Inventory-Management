@@ -11,6 +11,7 @@ import RegisterPage from './pages/RegisterPage.jsx'; // Import RegisterPage
 import OrderHistoryPage from './pages/OrderHistoryPage.jsx'; // Import OrderHistoryPage
 import InventoryHistoryPage from './pages/InventoryHistoryPage.jsx'; // Import InventoryHistoryPage
 import ProductDetailPage from './pages/ProductDetailPage.jsx'; // Import ProductDetailPage
+import DeletedItemsPage from './pages/DeletedItemsPage.jsx'; // Import DeletedItemsPage
 import './App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -112,6 +113,29 @@ function App() {
       setCurrentUser(null); // Log out locally anyway on error
       setCartItems([]);
     }
+  };
+
+  // --- Item Deletion (Frontend State Update) ---
+  // This function is called *after* the backend successfully deletes the item
+  const handleDeleteItem = (itemIdToDelete) => {
+    const itemIdStr = itemIdToDelete.toString(); // Ensure consistent ID type
+    setGroceryItems(prevItems => prevItems.filter(item => item.id.toString() !== itemIdStr));
+    console.log(`Removed item ${itemIdStr} from frontend state.`);
+  };
+
+  // --- Item Restoration (Frontend State Update) ---
+  // This function is called *after* the backend successfully restores the item
+  const handleItemRestored = (restoredItem) => {
+    // Ensure ID is a string for consistency
+    const restoredItemStrId = { ...restoredItem, id: restoredItem.id.toString() };
+    setGroceryItems(prevItems => {
+      // Check if item already exists (e.g., due to race condition or manual refresh)
+      if (prevItems.some(item => item.id.toString() === restoredItemStrId.id)) {
+        return prevItems; // Avoid adding duplicates
+      }
+      return [...prevItems, restoredItemStrId];
+    });
+    console.log(`Added restored item ${restoredItemStrId.id} back to frontend state.`);
   };
 
 
@@ -459,11 +483,12 @@ function App() {
               element={
                 <HomePage
                   items={groceryItems}
-                  onAddToCart={handleAddToCart}
-                  loading={loading || authLoading}
-                  currentUser={currentUser} // Pass current user
-                />
-              }
+                   onAddToCart={handleAddToCart}
+                   loading={loading || authLoading}
+                   currentUser={currentUser} // Pass current user
+                   onDeleteItem={handleDeleteItem} // Pass delete handler
+                 />
+               }
             />
             <Route
               path="/cart"
@@ -505,9 +530,9 @@ function App() {
                    <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace />
                 ) : (
                   <Navigate to="/login" state={{ from: '/update-stock', message: "Please log in as an owner to update stock." }} replace />
-                )
-              }
-            />
+                 )
+               }
+             />
             {/* Protected Route for Owners: Inventory History */}
             <Route
               path="/inventory-history"
@@ -521,9 +546,27 @@ function App() {
                 )
               }
             />
+            {/* Protected Route for Owners: Deleted Items */}
             <Route
-                path="/login"
-                element={
+              path="/deleted-items"
+              element={
+                currentUser && currentUser.type === 'owner' ? (
+                  <DeletedItemsPage
+                    currentUser={currentUser}
+                    apiError={apiError}
+                    setApiError={setApiError}
+                    onItemRestored={handleItemRestored} // Pass restore handler
+                  />
+                ) : currentUser ? (
+                   <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace />
+                ) : (
+                  <Navigate to="/login" state={{ from: '/deleted-items', message: "Please log in as an owner to view deleted items." }} replace />
+                )
+              }
+            />
+             <Route
+                 path="/login"
+                 element={
                     currentUser ? (
                         <Navigate to="/" replace /> // Redirect if already logged in
                     ) : (

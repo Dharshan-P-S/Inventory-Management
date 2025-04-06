@@ -16,6 +16,7 @@ const groceriesFilePath = path.join(__dirname, 'data', 'groceries.json');
 const usersFilePath = path.join(__dirname, 'data', 'users.json');
 const orderHistoryFilePath = path.join(__dirname, 'data', 'order_history.json');
 const inventoryHistoryFilePath = path.join(__dirname, 'data', 'inventory_history.json'); // Inventory history file path
+const deletedGroceriesFilePath = path.join(__dirname, 'data', 'deleted_groceries.json'); // Deleted groceries file path
 
 // --- Helper Functions ---
 
@@ -55,6 +56,8 @@ const readOrderHistory = () => readJsonFile(orderHistoryFilePath);
 const writeOrderHistory = (data) => writeJsonFile(orderHistoryFilePath, data);
 const readInventoryHistory = () => readJsonFile(inventoryHistoryFilePath); // Read inventory history
 const writeInventoryHistory = (data) => writeJsonFile(inventoryHistoryFilePath, data); // Write inventory history
+const readDeletedGroceries = () => readJsonFile(deletedGroceriesFilePath); // Read deleted groceries
+const writeDeletedGroceries = (data) => writeJsonFile(deletedGroceriesFilePath, data); // Write deleted groceries
 
 
 // Helper function to read data from JSON file - DEPRECATED, use readGroceries
@@ -552,6 +555,129 @@ app.get('/api/orders', requireAuth, (req, res) => {
     res.json(userOrderHistory);
 });
 
+
+// --- Grocery Deletion Endpoint (Owners only, Requires Authentication) ---
+
+// DELETE /api/groceries/delete/:id - Delete a grocery item (move to deleted_groceries.json)
+app.delete('/api/groceries/delete/:id', requireAuth, requireOwner, (req, res) => {
+    const itemIdToDelete = req.params.id;
+    const userId = req.userId; // Get user ID from authenticated request
+
+    console.log(`[${new Date().toISOString()}] DELETE /api/groceries/delete/${itemIdToDelete} - Owner: ${userId}`);
+
+    let currentGroceries = readGroceries();
+    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemIdToDelete.toString());
+
+    if (itemIndex === -1) {
+        console.warn(`[${new Date().toISOString()}] DELETE /api/groceries/delete/${itemIdToDelete} - Item not found.`);
+        return res.status(404).json({ message: `Item with ID ${itemIdToDelete} not found.` });
+    }
+
+    const itemToDelete = currentGroceries[itemIndex];
+
+    // Prepare the entry for deleted items
+    const deletedItemEntry = {
+        ...itemToDelete,
+        deletedAt: new Date().toISOString(),
+        deletedBy: userId // Optional: track who deleted it
+    };
+
+    // Read current deleted items
+    let currentDeletedGroceries = readDeletedGroceries();
+    currentDeletedGroceries.push(deletedItemEntry);
+
+    // Remove item from the main groceries list
+    currentGroceries.splice(itemIndex, 1);
+
+    // Write both files
+    const writeGroceriesSuccess = writeGroceries(currentGroceries);
+    const writeDeletedSuccess = writeDeletedGroceries(currentDeletedGroceries);
+
+    if (writeGroceriesSuccess && writeDeletedSuccess) {
+        groceryItems = currentGroceries; // Update cache if needed
+        console.log(`[${new Date().toISOString()}] Item ID ${itemIdToDelete} deleted by owner ${userId} and moved to deleted items.`);
+        res.status(200).json({ message: `Item '${itemToDelete.name}' deleted successfully.` });
+    } else {
+        // Attempt to roll back if possible (tricky with file writes)
+        // For simplicity, log the error and return a server error
+        console.error(`[${new Date().toISOString()}] FAILED TO WRITE FILES during delete operation for item ID ${itemIdToDelete}. Groceries write: ${writeGroceriesSuccess}, Deleted write: ${writeDeletedSuccess}`);
+        // If one write succeeded and the other failed, the data is inconsistent.
+        res.status(500).json({ message: 'Failed to complete delete operation due to a server error. Data might be inconsistent.' });
+    }
+});
+
+
+// --- Deleted Groceries Endpoint (Owners only, Requires Authentication) ---
+
+// GET /api/deleted-groceries - Retrieve all deleted grocery items
+app.get('/api/deleted-groceries', requireAuth, requireOwner, (req, res) => {
+    const userId = req.userId; // Get user ID from authenticated request
+    console.log(`[${new Date().toISOString()}] GET /api/deleted-groceries - Owner: ${userId}`);
+
+    try {
+        const deletedGroceries = readDeletedGroceries();
+        console.log(`[${new Date().toISOString()}] Retrieved ${deletedGroceries.length} deleted grocery records for owner ${userId}.`);
+        res.status(200).json(deletedGroceries);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error reading deleted groceries for owner ${userId}:`, error);
+        res.status(500).json({ message: 'Failed to retrieve deleted groceries.' });
+    }
+});
+
+// POST /api/deleted-groceries/restore/:id - Restore a deleted grocery item
+app.post('/api/deleted-groceries/restore/:id', requireAuth, requireOwner, (req, res) => {
+    const itemIdToRestore = req.params.id;
+    const userId = req.userId;
+
+    console.log(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Owner: ${userId}`);
+
+    let currentDeletedGroceries = readDeletedGroceries();
+    const itemIndex = currentDeletedGroceries.findIndex(item => item.id.toString() === itemIdToRestore.toString());
+
+    if (itemIndex === -1) {
+        console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item not found in deleted items.`);
+        return res.status(404).json({ message: `Item with ID ${itemIdToRestore} not found in deleted items.` });
+    }
+
+    const itemToRestore = currentDeletedGroceries[itemIndex];
+
+    // Remove metadata added during deletion
+    const { deletedAt, deletedBy, ...restoredItemData } = itemToRestore;
+
+    // Read current active groceries
+    let currentGroceries = readGroceries();
+
+    // Check if an item with the same ID already exists in the active list (edge case)
+    const existingActiveItem = currentGroceries.find(item => item.id.toString() === restoredItemData.id.toString());
+    if (existingActiveItem) {
+        console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item with ID ${restoredItemData.id} already exists in active groceries. Cannot restore duplicate.`);
+        // Decide how to handle: overwrite? return error? For now, return error.
+        return res.status(409).json({ message: `Cannot restore item '${restoredItemData.name}'. An item with ID ${restoredItemData.id} already exists in the active list.` });
+    }
+
+    // Add the item back to the active list
+    currentGroceries.push(restoredItemData);
+
+    // Remove the item from the deleted list
+    currentDeletedGroceries.splice(itemIndex, 1);
+
+    // Write both files
+    const writeGroceriesSuccess = writeGroceries(currentGroceries);
+    const writeDeletedSuccess = writeDeletedGroceries(currentDeletedGroceries);
+
+    if (writeGroceriesSuccess && writeDeletedSuccess) {
+        groceryItems = currentGroceries; // Update cache if needed
+        console.log(`[${new Date().toISOString()}] Item ID ${itemIdToRestore} restored by owner ${userId}.`);
+        // Also need to update the main grocery list state in App.jsx after successful restore
+        // The frontend will need to handle this based on the response
+        res.status(200).json({ message: `Item '${restoredItemData.name}' restored successfully.`, restoredItem: restoredItemData });
+    } else {
+        console.error(`[${new Date().toISOString()}] FAILED TO WRITE FILES during restore operation for item ID ${itemIdToRestore}. Groceries write: ${writeGroceriesSuccess}, Deleted write: ${writeDeletedSuccess}`);
+        res.status(500).json({ message: 'Failed to complete restore operation due to a server error. Data might be inconsistent.' });
+    }
+});
+
+
 // --- Inventory History Endpoint (Owners only, Requires Authentication) ---
 
 // GET /api/inventory-history - Retrieve all inventory history records
@@ -579,4 +705,5 @@ app.listen(PORT, () => {
     console.log(`Users file path: ${usersFilePath}`);
     console.log(`Order History file path: ${orderHistoryFilePath}`);
     console.log(`Inventory History file path: ${inventoryHistoryFilePath}`); // Log inventory history file path
+    console.log(`Deleted Groceries file path: ${deletedGroceriesFilePath}`); // Log deleted groceries file path
 });

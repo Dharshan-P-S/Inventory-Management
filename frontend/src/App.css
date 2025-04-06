@@ -14,7 +14,7 @@ body {
 
 .App {
   padding: 0 1rem; /* Base padding for mobile */
-  width: 70%; /* Ensure it tries to use full width */
+  width: 80%; /* Ensure it tries to use full width */
   box-sizing: border-box; /* Include padding in width calculation */
 }
 
@@ -156,7 +156,7 @@ main {
 /* Use items-grid directly on grocery-list now */
 .grocery-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Adjusted minmax */
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); /* Adjusted minmax */
   gap: 1.5rem; /* Consistent gap */
 }
 
@@ -959,4 +959,72 @@ main {
   .App {
     max-width: 1320px;
   }
+}
+
+/* --- Delete/Restore Button Styles --- */
+.delete-button,
+.restore-button {
+  background-color: #ff4d4d; /* Red background */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-block; /* Ensure button respects padding */
+}
+
+.delete-button:hover {
+  background-color: #e60000; /* Darker red on hover */
+}
+
+.restore-button {
+  background-color: #4CAF50; /* Green background */
+}
+
+.restore-button:hover:not(:disabled) {
+  background-color: #367c39; /* Darker green on hover */
+}
+
+.restore-button:disabled {
+  background-color: #cccccc; /* Grey out when disabled */
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+
+/* --- Deleted Items Page Specific Styles --- */
+.deleted-items-page h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.deleted-items-list {
+  /* Reuse items-grid styles */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+.deleted-item {
+  /* Inherits grocery-item styles */
+  border-left: 5px solid #ff4d4d; /* Add a red indicator */
+  position: relative; /* For potential absolute positioning inside */
+}
+
+.deleted-item p {
+  margin: 0.3rem 0; /* Adjust spacing */
+}
+
+/* Ensure owner controls wrapper behaves well */
+.owner-controls {
+  margin-top: auto; /* Push controls to the bottom if needed */
+  padding-top: 0.5rem; /* Add some space above buttons */
+}
+
+/* Adjust error message centering */
+.error-message.main-error {
+  margin: 1rem auto; /* Center error message */
+  max-width: 800px; /* Limit width */
 }

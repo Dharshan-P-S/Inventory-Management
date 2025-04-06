@@ -1,19 +1,5 @@
 [
   {
-    "id": 1,
-    "name": "Organic Gala Apple",
-    "price": 0.75,
-    "quantityAvailable": 49,
-    "category": "Produce"
-  },
-  {
-    "id": 2,
-    "name": "Whole Milk (1 Gallon)",
-    "price": 3.89,
-    "quantityAvailable": 3,
-    "category": "Dairy"
-  },
-  {
     "id": 3,
     "name": "Sourdough Bread Loaf",
     "price": 4.5,
@@ -108,7 +94,7 @@
     "id": 16,
     "name": "Egg",
     "price": 6.5,
-    "quantityAvailable": 100,
+    "quantityAvailable": 50,
     "category": "Dairy"
   },
   {
@@ -117,5 +103,19 @@
     "price": 25,
     "quantityAvailable": 34,
     "category": "Uncategorized"
+  },
+  {
+    "id": 1,
+    "name": "Organic Gala Apple",
+    "price": 0.75,
+    "quantityAvailable": 49,
+    "category": "Produce"
+  },
+  {
+    "id": 2,
+    "name": "Whole Milk (1 Gallon)",
+    "price": 3.89,
+    "quantityAvailable": 3,
+    "category": "Dairy"
   }
 ]

@@ -3,7 +3,7 @@ import GroceryList from '../components/GroceryList';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
 
-function HomePage({ items, onAddToCart, loading, error, currentUser }) { // Added currentUser prop
+function HomePage({ items, onAddToCart, loading, error, currentUser, onDeleteItem }) { // Added currentUser and onDeleteItem props
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -39,7 +39,7 @@ function HomePage({ items, onAddToCart, loading, error, currentUser }) { // Adde
         selectedCategory={selectedCategory}
         onSelectCategory={handleCategoryChange}
       />
-      <GroceryList items={filteredItems} onAddToCart={onAddToCart} currentUser={currentUser} /> {/* Pass currentUser down */}
+      <GroceryList items={filteredItems} onAddToCart={onAddToCart} currentUser={currentUser} onDeleteItem={onDeleteItem} /> {/* Pass currentUser and onDeleteItem down */}
     </div>
   );
 }

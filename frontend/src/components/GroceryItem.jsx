@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom'; // Import Link
 
-function GroceryItem({ item, onAddToCart, currentUser }) { // Added currentUser prop
+const API_BASE_URL = 'http://localhost:3001/api';
+
+function GroceryItem({ item, onAddToCart, currentUser, onDeleteItem }) { // Added currentUser and onDeleteItem props
   // State to track the quantity the user intends to add
   const [quantityToAdd, setQuantityToAdd] = useState(1);
 
@@ -41,9 +43,36 @@ function GroceryItem({ item, onAddToCart, currentUser }) { // Added currentUser 
       setQuantityToAdd(1); // Reset quantity selector to 1 after adding
     } else {
         // This case should ideally not be reachable if buttons are correctly disabled
-        alert(`Cannot add ${quantityToAdd}. Available: ${item.quantityAvailable}`);
+      alert(`Cannot add ${quantityToAdd}. Available: ${item.quantityAvailable}`);
     }
   };
+
+  const handleDeleteClick = async (event) => {
+    event.stopPropagation(); // Prevent link navigation
+    if (window.confirm(`Are you sure you want to delete ${item.name}?`)) {
+      try {
+        // Use the correct full backend URL
+        const response = await fetch(`${API_BASE_URL}/groceries/delete/${item.id}`, {
+          method: 'DELETE',
+          credentials: 'include', // <<< Important: Send cookies for authentication
+          headers: {
+            'Content-Type': 'application/json',
+            // Include auth token if needed
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        console.log(result.message); // Log success message
+        onDeleteItem(item.id); // Notify parent component to refresh list
+      } catch (error) {
+        console.error('Failed to delete item:', error);
+        alert(`Failed to delete item: ${error.message}`);
+      }
+    }
+  };
+
 
   return (
     <div className={`grocery-item ${isOutOfStock ? 'out-of-stock' : ''}`}>
@@ -94,6 +123,19 @@ function GroceryItem({ item, onAddToCart, currentUser }) { // Added currentUser 
             <p className="stock-message">Out of Stock</p> // Show message if out of stock
           )}
         </div>
+      )}
+
+      {/* Delete button for owners */}
+      {currentUser?.type === 'owner' && (
+         <div className="item-controls-wrapper owner-controls" onClick={(e) => e.stopPropagation()}>
+           <button
+             className="delete-button"
+             onClick={handleDeleteClick}
+             aria-label={`Delete ${item.name}`}
+           >
+             Delete Item
+           </button>
+         </div>
       )}
     </div>
   );
