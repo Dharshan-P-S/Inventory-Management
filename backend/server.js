@@ -356,6 +356,85 @@ app.get('/api/groceries/:id', (req, res) => {
     }
 });
 
+// PUT /api/groceries/:id - Update an existing grocery item (Owners only)
+app.put('/api/groceries/:id', requireAuth, requireOwner, (req, res) => {
+    const itemId = req.params.id;
+    const { name, price, category } = req.body;
+    const userId = req.userId; // Get owner ID from authenticated request
+
+    console.log(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Owner: ${userId}, Body:`, req.body);
+
+    // --- Input Validation ---
+    let errors = [];
+    if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
+        errors.push('Invalid item name (must be a non-empty string if provided)');
+    }
+    if (price !== undefined) {
+        const priceNum = Number(price);
+        if (typeof priceNum !== 'number' || priceNum <= 0 || !Number.isFinite(priceNum)) {
+            errors.push('Price must be a positive number if provided');
+        }
+    }
+    // Category can be an empty string or null, but should be a string if provided
+    if (category !== undefined && typeof category !== 'string') {
+         errors.push('Category must be a string if provided');
+    }
+
+    if (errors.length > 0) {
+        console.warn(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Validation failed:`, errors);
+        return res.status(400).json({ message: 'Validation errors occurred', errors });
+    }
+
+    // --- Read current data ---
+    let currentGroceries = readGroceries();
+    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemId.toString());
+
+    if (itemIndex === -1) {
+        console.warn(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Item not found.`);
+        return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
+    }
+
+    // --- Apply Updates ---
+    const itemToUpdate = { ...currentGroceries[itemIndex] }; // Create a copy to modify
+    let updated = false;
+
+    if (name !== undefined && itemToUpdate.name !== name.trim()) {
+        itemToUpdate.name = name.trim();
+        updated = true;
+    }
+    if (price !== undefined && itemToUpdate.price !== parseFloat(price)) {
+        itemToUpdate.price = parseFloat(price);
+        updated = true;
+    }
+    const newCategory = category !== undefined ? (category.trim() || 'Uncategorized') : itemToUpdate.category;
+    if (itemToUpdate.category !== newCategory) {
+        itemToUpdate.category = newCategory;
+        updated = true;
+    }
+
+    if (!updated) {
+        console.log(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - No changes detected.`);
+        // Return the original item or a 304 Not Modified? For simplicity, return original with 200.
+        return res.status(200).json(itemToUpdate);
+    }
+
+    // Replace the old item with the updated one
+    currentGroceries[itemIndex] = itemToUpdate;
+
+    // --- Persist Data ---
+    const writeSuccess = writeGroceries(currentGroceries);
+
+    if (writeSuccess) {
+        groceryItems = currentGroceries; // Update cache if needed
+        console.log(`[${new Date().toISOString()}] Updated item (ID: ${itemId}) by owner ${userId}. Saved to file.`);
+        // Optional: Log this change to inventory history? Maybe not for simple edits.
+        res.status(200).json(itemToUpdate); // Return the updated item
+    } else {
+        console.error(`[${new Date().toISOString()}] FAILED TO SAVE updated item (ID: ${itemId}) TO FILE.`);
+        res.status(500).json({ message: 'Failed to save the updated item persistently. Please try again.' });
+    }
+});
+
 
 // --- Order Processing Endpoint (Requires Customer Authentication) ---
 

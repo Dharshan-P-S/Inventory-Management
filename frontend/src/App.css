@@ -779,28 +779,6 @@ main {
   line-height: 1;
 }
 
-.update-stock-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #28a745;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 50%;
-  margin: 1rem auto 0;
-  display: block;
-}
-
-.update-stock-button:hover:not(:disabled) {
-  background-color: #218838;
-}
-
-.update-stock-button:disabled {
-  background-color: #6c757d;
-  opacity: 0.65;
-  cursor: not-allowed;
-}
 
 /* Operation Buttons */
 .operation-buttons {
@@ -1027,4 +1005,163 @@ main {
 .error-message.main-error {
   margin: 1rem auto; /* Center error message */
   max-width: 800px; /* Limit width */
+}
+
+/* --- Owner Controls (Delete/Edit Buttons) --- */
+.owner-controls {
+  display: flex; /* Use flexbox for button alignment */
+  gap: 0.5rem; /* Space between buttons */
+  margin-top: auto; /* Push to bottom */
+  padding-top: 0.5rem; /* Space above buttons */
+  justify-content: flex-end; /* Align buttons to the right */
+}
+
+/* Edit Button Style (similar to delete, but blue) */
+.edit-button {
+  background-color: #007bff; /* Blue background */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+.edit-button:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* --- Product Detail Page Update Stock Button Style --- */
+.product-detail-page .update-stock-button {
+  /* Inherit styles from edit-button */
+  background-color: #ffa000; /* Orange background */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  display: inline-block;
+  text-decoration: none; /* Remove underline from Link */
+}
+
+.product-detail-page .update-stock-button:hover {
+  background-color: #ff8f00; /* Darker orange on hover */
+}
+
+
+/* --- Edit Item Modal Styles --- */
+.modal-overlay {
+  position: fixed; /* Stay in place */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  max-width: 500px; /* Limit modal width */
+  width: 90%; /* Responsive width */
+  max-height: 80vh; /* Limit height */
+  overflow-y: auto; /* Allow scrolling if content overflows */
+  position: relative; /* For potential close button positioning */
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5em;
+}
+
+/* Reuse form styles for consistency */
+.edit-item-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-item-form .form-group {
+  margin-bottom: 0; /* Remove default margin if using gap */
+}
+
+.edit-item-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.edit-item-form input[type="text"],
+.edit-item-form input[type="number"] { /* Add number if price was number input */
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+
+.edit-item-form input[aria-invalid="true"] {
+    border-color: #dc3545;
+}
+
+.edit-item-form .error-message {
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+/* Modal Action Buttons */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 0.75rem; /* Space between buttons */
+  margin-top: 1.5rem; /* Space above buttons */
+  padding-top: 1rem; /* Space above buttons */
+  border-top: 1px solid #eee; /* Separator line */
+}
+
+/* General button style for modal actions */
+.modal-actions .button {
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+/* Primary button (OK/Save) */
+.modal-actions .button.button-primary {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+.modal-actions .button.button-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Secondary/Cancel button */
+.modal-actions .button:not(.button-primary) {
+  background-color: #f8f9fa;
+  color: #333;
+  border-color: #ccc;
+}
+.modal-actions .button:not(.button-primary):hover {
+  background-color: #e2e6ea;
+  border-color: #adb5bd;
 }

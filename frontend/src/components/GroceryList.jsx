@@ -3,7 +3,8 @@ import GroceryItem from './GroceryItem';
 // Removed SearchBar import as it's now in HomePage
 
 // Simplified props: only receives the already filtered items
-function GroceryList({ items, onAddToCart, currentUser, onDeleteItem }) { // Added currentUser and onDeleteItem props
+// Added onUpdateItem prop
+function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateItem }) {
   // Removed searchTerm state and handleSearchChange function
   // Removed filtering logic as it's done in HomePage
 
@@ -20,6 +21,7 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem }) { // Add
               onAddToCart={onAddToCart}
               currentUser={currentUser} // Pass currentUser down
               onDeleteItem={onDeleteItem} // Pass onDeleteItem down
+              onUpdateItem={onUpdateItem} // Pass onUpdateItem down
             />
           ))
         ) : (

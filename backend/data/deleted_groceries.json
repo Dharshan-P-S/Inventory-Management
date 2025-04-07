@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": 1,
+    "name": "Organic Gala Apple",
+    "price": 0.75,
+    "quantityAvailable": 49,
+    "category": "Produce",
+    "deletedAt": "2025-04-06T16:42:44.901Z",
+    "deletedBy": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  }
+]

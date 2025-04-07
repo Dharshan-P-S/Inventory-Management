@@ -17,7 +17,6 @@ function Navigation({ cartItemCount = 0, currentUser, onLogout }) {
         {currentUser && currentUser.type === 'owner' && (
           <>
             <li><NavLink to="/add-item" onClick={(e) => e.stopPropagation()}>Add New Item</NavLink></li>
-            <li><NavLink to="/update-stock" onClick={(e) => e.stopPropagation()}>Update Stock</NavLink></li>
             <li><NavLink to="/inventory-history" onClick={(e) => e.stopPropagation()}>Inventory History</NavLink></li> {/* Added Inventory History Link */}
             <li><NavLink to="/deleted-items" onClick={(e) => e.stopPropagation()}>Deleted Items</NavLink></li> {/* Added Deleted Items Link */}
           </>

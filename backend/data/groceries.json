@@ -2,7 +2,7 @@
   {
     "id": 3,
     "name": "Sourdough Bread Loaf",
-    "price": 4.5,
+    "price": 5.75,
     "quantityAvailable": 24,
     "category": "Bakery"
   },
@@ -91,31 +91,24 @@
     "category": "Pantry"
   },
   {
-    "id": 16,
-    "name": "Egg",
-    "price": 6.5,
-    "quantityAvailable": 50,
-    "category": "Dairy"
-  },
-  {
     "id": "17",
     "name": "Sparkling water bottle (250 ml)",
     "price": 25,
     "quantityAvailable": 34,
-    "category": "Uncategorized"
-  },
-  {
-    "id": 1,
-    "name": "Organic Gala Apple",
-    "price": 0.75,
-    "quantityAvailable": 49,
-    "category": "Produce"
+    "category": "Soft Drinks"
   },
   {
     "id": 2,
     "name": "Whole Milk (1 Gallon)",
     "price": 3.89,
     "quantityAvailable": 3,
+    "category": "Dairy"
+  },
+  {
+    "id": 16,
+    "name": "Egg",
+    "price": 6.5,
+    "quantityAvailable": 50,
     "category": "Dairy"
   }
 ]

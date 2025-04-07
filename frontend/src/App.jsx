@@ -123,6 +123,18 @@ function App() {
     console.log(`Removed item ${itemIdStr} from frontend state.`);
   };
 
+  // --- Item Update (Frontend State Update) ---
+  // This function is called *after* the backend successfully updates the item
+  const handleUpdateItem = (updatedItem) => {
+    const updatedItemStrId = { ...updatedItem, id: updatedItem.id.toString() }; // Ensure string ID
+    setGroceryItems(prevItems =>
+      prevItems.map(item =>
+        item.id.toString() === updatedItemStrId.id ? updatedItemStrId : item
+      )
+    );
+    console.log(`Updated item ${updatedItemStrId.id} in frontend state.`);
+  };
+
   // --- Item Restoration (Frontend State Update) ---
   // This function is called *after* the backend successfully restores the item
   const handleItemRestored = (restoredItem) => {
@@ -487,6 +499,7 @@ function App() {
                    loading={loading || authLoading}
                    currentUser={currentUser} // Pass current user
                    onDeleteItem={handleDeleteItem} // Pass delete handler
+                   onUpdateItem={handleUpdateItem} // Pass update handler
                  />
                }
             />
@@ -594,12 +607,19 @@ function App() {
                     )
                 }
              />
-            <Route
-                path="/item/:id"
-                element={<ProductDetailPage onAddToCart={handleAddToCart} currentUser={currentUser} />} // Pass addToCart and currentUser
-            />
-            {/* Catch-all Route */}
-            <Route path="*" element={<h2>404 Page Not Found</h2>} />
+             <Route
+                 path="/item/:id"
+                element={
+                  <ProductDetailPage
+                    onAddToCart={handleAddToCart}
+                    currentUser={currentUser}
+                    onUpdateItem={handleUpdateItem} // Pass update handler
+                    onDeleteItem={handleDeleteItem} // Pass delete handler
+                  />
+                }
+             />
+             {/* Catch-all Route */}
+             <Route path="*" element={<h2>404 Page Not Found</h2>} />
           </Routes>
         </main>
       </div>
