@@ -1,0 +1,281 @@
+[
+  {
+    "action": "stock_increase",
+    "item": {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Free-Range Eggs (Dozen)",
+      "price": 4.2,
+      "category": "Dairy",
+      "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+    },
+    "quantityChange": 3,
+    "newQuantity": 33,
+    "timestamp": "2025-04-07T12:52:55.465Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "deleted",
+    "item": {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Free-Range Eggs (Dozen)",
+      "price": 4.2,
+      "category": "Dairy",
+      "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+    },
+    "timestamp": "2025-04-07T12:53:18.531Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "restored",
+    "item": {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Free-Range Eggs (Dozen)",
+      "price": 4.2,
+      "category": "Dairy",
+      "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+    },
+    "timestamp": "2025-04-07T12:53:34.271Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "deleted",
+    "item": {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Free-Range Eggs (Dozen)",
+      "price": 4.3,
+      "category": "Dairy",
+      "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+    },
+    "timestamp": "2025-04-07T13:00:25.690Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "restored",
+    "item": {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "name": "Free-Range Eggs (Dozen)",
+      "price": 4.3,
+      "category": "Dairy",
+      "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+    },
+    "timestamp": "2025-04-07T13:02:16.769Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "deleted",
+    "item": {
+      "id": "f3a1b2c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+      "name": "Sourdough Bread Loaf",
+      "price": 5.75,
+      "category": "Bakery",
+      "description": "Artisan sourdough bread with a tangy flavor and chewy crust, perfect for sandwiches or toast."
+    },
+    "timestamp": "2025-04-07T13:13:08.489Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "restored",
+    "item": {
+      "id": "f3a1b2c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+      "name": "Sourdough Bread Loaf",
+      "price": 5.75,
+      "category": "Bakery",
+      "description": "Artisan sourdough bread with a tangy flavor and chewy crust, perfect for sandwiches or toast."
+    },
+    "timestamp": "2025-04-07T13:13:16.219Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "deleted",
+    "item": {
+      "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "name": "Banana",
+      "price": 0.35,
+      "category": "Produce",
+      "description": "A single ripe banana, a great source of potassium and perfect for a quick snack."
+    },
+    "timestamp": "2025-04-07T13:27:33.214Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "restored",
+    "item": {
+      "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+      "name": "Banana",
+      "price": 0.35,
+      "category": "Produce",
+      "description": "A single ripe banana, a great source of potassium and perfect for a quick snack."
+    },
+    "timestamp": "2025-04-07T13:27:44.356Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "stock_decrease",
+    "item": {
+      "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
+      "name": "Crunchy Oats Cereal",
+      "price": 4.1,
+      "category": "Pantry",
+      "description": "A box of wholesome crunchy oat cereal, a delicious and healthy start to your day."
+    },
+    "quantityChange": -1,
+    "newQuantity": 18,
+    "timestamp": "2025-04-07T13:27:56.674Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (2 lb)",
+    "changes": {
+      "name": {
+        "old": "Boneless Chicken Breast (1 lb)",
+        "new": "Boneless Chicken Breast (2 lb)"
+      }
+    },
+    "timestamp": "2025-04-07T13:28:14.511Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (2 lb)",
+    "changes": {
+      "price": {
+        "old": 5.99,
+        "new": 6.49
+      }
+    },
+    "timestamp": "2025-04-07T13:29:26.899Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (3 lb)",
+    "changes": {
+      "name": {
+        "old": "Boneless Chicken Breast (2 lb)",
+        "new": "Boneless Chicken Breast (3 lb)"
+      }
+    },
+    "timestamp": "2025-04-07T13:36:56.953Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (3 lb)",
+    "changes": {
+      "description": {
+        "old": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying.",
+        "new": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying"
+      }
+    },
+    "timestamp": "2025-04-07T13:37:18.458Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (2 lb)",
+    "changes": {
+      "name": {
+        "old": "Boneless Chicken Breast (3 lb)",
+        "new": "Boneless Chicken Breast (2 lb)"
+      },
+      "price": {
+        "old": 6.49,
+        "new": 6
+      },
+      "category": {
+        "old": "Meat & Seafood",
+        "new": "Uncategorized"
+      },
+      "description": {
+        "old": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying",
+        "new": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying."
+      }
+    },
+    "timestamp": "2025-04-07T13:37:49.728Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (2 lb)",
+    "changes": {
+      "category": {
+        "old": "Uncategorized",
+        "new": "Meat & Seafood"
+      }
+    },
+    "timestamp": "2025-04-07T13:38:47.493Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "stock_decrease",
+    "item": {
+      "id": "5685cb24-7c0c-43ac-b5ae-6fb04ff55945",
+      "name": "Sanjay",
+      "price": 0.1,
+      "category": "Black",
+      "description": "absorbs light. hex code : #000000"
+    },
+    "quantityChange": -1,
+    "newQuantity": 0,
+    "timestamp": "2025-04-07T13:39:25.660Z",
+    "userId": "4bfd600f-33fe-4ecb-a932-ea3302769f7d"
+  },
+  {
+    "action": "item_edit",
+    "itemId": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "itemName": "Boneless Chicken Breast (2 lb)",
+    "changes": {
+      "price": {
+        "old": 6,
+        "new": 6.02
+      }
+    },
+    "timestamp": "2025-04-07T15:27:34.051Z",
+    "userId": "26aae2c2-c7aa-48f0-be95-1bf4e2a71143"
+  },
+  {
+    "action": "deleted",
+    "item": {
+      "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "name": "Boneless Chicken Breast (2 lb)",
+      "price": 6.02,
+      "category": "Meat & Seafood",
+      "description": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying."
+    },
+    "timestamp": "2025-04-07T15:27:38.503Z",
+    "userId": "26aae2c2-c7aa-48f0-be95-1bf4e2a71143"
+  },
+  {
+    "action": "restored",
+    "item": {
+      "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+      "name": "Boneless Chicken Breast (2 lb)",
+      "price": 6.02,
+      "category": "Meat & Seafood",
+      "description": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying."
+    },
+    "timestamp": "2025-04-07T15:27:43.455Z",
+    "userId": "26aae2c2-c7aa-48f0-be95-1bf4e2a71143"
+  },
+  {
+    "action": "stock_decrease",
+    "item": {
+      "id": "5685cb24-7c0c-43ac-b5ae-6fb04ff55945",
+      "name": "Sanjay",
+      "price": 0.1,
+      "category": "Black",
+      "description": "absorbs light. hex code : #000000"
+    },
+    "quantityChange": -1,
+    "newQuantity": 1,
+    "timestamp": "2025-04-07T15:34:57.950Z",
+    "userId": "26aae2c2-c7aa-48f0-be95-1bf4e2a71143"
+  }
+]

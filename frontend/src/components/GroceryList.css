@@ -1,0 +1,131 @@
+/* Styling for Sorting and Filtering Controls in GroceryList */
+
+.grocery-list-container {
+  padding: 15px;
+}
+
+.controls-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  align-items: center;
+  gap: 10px; /* Spacing between elements */
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f8f9fa; /* Light background for controls area */
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+}
+
+.controls-container span {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* Sorting Controls Specifics */
+.sort-controls button {
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: darkslategray;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.sort-controls button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.sort-controls button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #0056b3;
+}
+
+/* Filtering Controls Specifics */
+.filter-controls {
+  gap: 15px; /* Slightly larger gap for filter groups */
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.filter-group label {
+  font-weight: normal;
+  margin-right: 3px;
+}
+
+.filter-group input[type="number"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 70px; /* Adjust width as needed */
+}
+
+/* Hide spinner buttons on number inputs */
+.filter-group input[type="number"]::-webkit-outer-spin-button,
+.filter-group input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+.apply-button,
+.clear-button {
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.apply-button {
+  background-color: #28a745; /* Green */
+  color: white;
+  border: 1px solid #218838;
+}
+
+.apply-button:hover {
+  background-color: #218838;
+}
+
+.clear-button {
+  background-color: #dc3545; /* Red */
+  color: white;
+  border: 1px solid #c82333;
+  margin-left: 5px; /* Add some space before clear buttons */
+}
+
+.clear-button:hover {
+  background-color: #c82333;
+}
+
+/* Ensure items grid still works */
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
+    gap: 20px; /* Space between items */
+    padding: 10px 0; /* Padding above/below grid */
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filter-group {
+     width: 100%; /* Make filter groups take full width */
+     justify-content: space-between; /* Space out elements */
+  }
+   .filter-group input[type="number"] {
+     width: 35%; /* Adjust input width */
+   }
+  .apply-button, .clear-button {
+      width: auto; /* Allow buttons to size naturally */
+      margin-top: 5px;
+  }
+}

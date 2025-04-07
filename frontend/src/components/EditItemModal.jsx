@@ -7,6 +7,7 @@ function EditItemModal({ item, onClose, onSave }) {
   const [name, setName] = useState(item.name);
   const [price, setPrice] = useState(item.price.toString()); // Keep as string for input
   const [category, setCategory] = useState(item.category || ''); // Handle potentially undefined category
+  const [description, setDescription] = useState(item.description || ''); // Add description state
   const [categorySuggestions, setCategorySuggestions] = useState([]);
   const [errors, setErrors] = useState({});
 
@@ -55,6 +56,7 @@ function EditItemModal({ item, onClose, onSave }) {
         name: name.trim(),
         price: parseFloat(price),
         category: category.trim() || 'Uncategorized', // Default if empty
+        description: description.trim() // Add description
         // Note: We are NOT sending quantityAvailable back, assuming it's managed elsewhere (e.g., StockUpdatePage)
         // If quantity *should* be editable here, add it to state and the form.
       });
@@ -111,6 +113,17 @@ function EditItemModal({ item, onClose, onSave }) {
               ))}
             </datalist>
             {/* No error display for optional category */}
+          </div>
+          {/* Description Input */}
+          <div className="form-group">
+            <label htmlFor="edit-description">Description:</label>
+            <textarea
+              id="edit-description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              rows="3" // Adjust as needed
+            />
+            {/* No error display for optional description */}
           </div>
           <div className="modal-actions">
             <button type="submit" className="button button-primary">OK</button>

@@ -9,7 +9,9 @@ import StockUpdatePage from './pages/StockUpdatePage.jsx'; // Ensure .jsx extens
 import LoginPage from './pages/LoginPage.jsx'; // Import LoginPage
 import RegisterPage from './pages/RegisterPage.jsx'; // Import RegisterPage
 import OrderHistoryPage from './pages/OrderHistoryPage.jsx'; // Import OrderHistoryPage
-import InventoryHistoryPage from './pages/InventoryHistoryPage.jsx'; // Import InventoryHistoryPage
+import EditHistoryPage from './pages/EditHistoryPage.jsx'; // Renamed Import
+import SalesHistoryPage from './pages/SalesHistoryPage.jsx'; // Import Sales History Page
+import UserManagementPage from './pages/UserManagementPage.jsx'; // Import User Management Page
 import ProductDetailPage from './pages/ProductDetailPage.jsx'; // Import ProductDetailPage
 import DeletedItemsPage from './pages/DeletedItemsPage.jsx'; // Import DeletedItemsPage
 import './App.css';
@@ -546,16 +548,42 @@ function App() {
                  )
                }
              />
-            {/* Protected Route for Owners: Inventory History */}
+            {/* Protected Route for Owners: Edit History */}
             <Route
-              path="/inventory-history"
+              path="/edit-history" // Renamed path
               element={
                 currentUser && currentUser.type === 'owner' ? (
-                  <InventoryHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                  <EditHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} /> // Use renamed component
                 ) : currentUser ? (
                    <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace />
                 ) : (
-                  <Navigate to="/login" state={{ from: '/inventory-history', message: "Please log in as an owner to view inventory history." }} replace />
+                  <Navigate to="/login" state={{ from: '/edit-history', message: "Please log in as an owner to view edit history." }} replace /> // Updated message
+                )
+              }
+            />
+            {/* Protected Route for Owners: Sales History */}
+            <Route
+              path="/sales-history"
+              element={
+                currentUser && currentUser.type === 'owner' ? (
+                  <SalesHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                ) : currentUser ? (
+                   <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace />
+                ) : (
+                  <Navigate to="/login" state={{ from: '/sales-history', message: "Please log in as an owner to view sales history." }} replace />
+                )
+              }
+            />
+             {/* Protected Route for Owners: User Management */}
+             <Route
+              path="/user-management"
+              element={
+                currentUser && currentUser.type === 'owner' ? (
+                  <UserManagementPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                ) : currentUser ? (
+                   <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace />
+                ) : (
+                  <Navigate to="/login" state={{ from: '/user-management', message: "Please log in as an owner to manage users." }} replace />
                 )
               }
             />
@@ -615,6 +643,7 @@ function App() {
                     currentUser={currentUser}
                     onUpdateItem={handleUpdateItem} // Pass update handler
                     onDeleteItem={handleDeleteItem} // Pass delete handler
+                    onUpdateStock={handleStockUpdate} // Pass stock update handler
                   />
                 }
              />

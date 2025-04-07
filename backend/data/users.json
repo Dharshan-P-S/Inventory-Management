@@ -4,13 +4,34 @@
     "username": "sasi",
     "email": "sasikiranl0000@gmail.com",
     "passwordHash": "$2b$10$NcYWTnQ1g.TvmfbJqmQUMO8pcJ10b6x1BEvcqcnpSdjKPko/agZ9S",
-    "type" : "customer"
+    "type": "customer"
   },
   {
     "id": "4bfd600f-33fe-4ecb-a932-ea3302769f7d",
     "username": "dharshan",
     "email": "example@gmail.com",
     "passwordHash": "$2b$10$IM1Z7jwHGsoq2pamURUQBezbp.f7IuRPOkyPVeAVO5thnqRUGyePG",
+    "type": "owner"
+  },
+  {
+    "id": "15be2947-1734-41a3-a21e-773aaaa65b4c",
+    "username": "suvi",
+    "email": "suvi@gmail.com",
+    "passwordHash": "$2b$10$9v7uuDjgpETa.cLGDAHhmeTI67ScgP9GMnLSS2HrzqX5kxh1Tn0Ky",
+    "type": "customer"
+  },
+  {
+    "id": "26aae2c2-c7aa-48f0-be95-1bf4e2a71143",
+    "username": "saravana",
+    "email": "exampl@gamil.com",
+    "passwordHash": "$2b$10$cQoAM7wAaQqElIyCDNfmL.Ieo3PrlyuhPKj4kvywwmqtbcJKJbN1W",
+    "type": "owner"
+  },
+  {
+    "id": "7afb009c-cc66-47f5-8542-62e1054a4b31",
+    "username": "ioioio",
+    "email": "j@gmail.com",
+    "passwordHash": "$2b$10$gJpBXypdjOaO2VvhAIdqbe33UZld9rXmga7cZllZEy/SpUnoA5JHq",
     "type": "owner"
   }
 ]

@@ -1,114 +1,138 @@
 [
   {
-    "id": 3,
-    "name": "Sourdough Bread Loaf",
-    "price": 5.75,
-    "quantityAvailable": 24,
-    "category": "Bakery"
-  },
-  {
-    "id": 4,
-    "name": "Free-Range Eggs (Dozen)",
-    "price": 4.2,
-    "quantityAvailable": 30,
-    "category": "Dairy"
-  },
-  {
-    "id": 5,
-    "name": "Boneless Chicken Breast (1 lb)",
-    "price": 5.99,
-    "quantityAvailable": 0,
-    "category": "Meat & Seafood"
-  },
-  {
-    "id": 6,
-    "name": "Banana",
-    "price": 0.35,
-    "quantityAvailable": 79,
-    "category": "Produce"
-  },
-  {
-    "id": 7,
+    "id": "d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f8a",
     "name": "Crunchy Oats Cereal",
     "price": 4.1,
-    "quantityAvailable": 19,
-    "category": "Pantry"
+    "quantityAvailable": 14,
+    "category": "Pantry",
+    "description": "A box of wholesome crunchy oat cereal, a delicious and healthy start to your day."
   },
   {
-    "id": 8,
+    "id": "e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a9b",
     "name": "Hass Avocado",
     "price": 1.85,
     "quantityAvailable": 0,
-    "category": "Produce"
+    "category": "Produce",
+    "description": "Creamy Hass avocado, perfect for guacamole, salads, or spreading on toast."
   },
   {
-    "id": 9,
+    "id": "f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b0c",
     "name": "Greek Yogurt (Single Cup)",
     "price": 1.25,
-    "quantityAvailable": 49,
-    "category": "Dairy"
+    "quantityAvailable": 46,
+    "category": "Dairy",
+    "description": "A single serving cup of thick and creamy plain Greek yogurt, high in protein."
   },
   {
-    "id": 10,
+    "id": "a7b8c9d0-e1f2-4a3b-4c5d-6e7f8a9b0c1d",
     "name": "Imported Dark Chocolate Bar",
     "price": 3.5,
     "quantityAvailable": 0,
-    "category": "Snacks"
+    "category": "Snacks",
+    "description": "A rich and intense dark chocolate bar (70% cacao) imported from Belgium."
   },
   {
-    "id": 11,
+    "id": "b8c9d0e1-f2a3-4b4c-5d6e-7f8a9b0c1d2e",
     "name": "Baby Spinach (Bag)",
     "price": 3.15,
     "quantityAvailable": 15,
-    "category": "Produce"
+    "category": "Produce",
+    "description": "A bag of pre-washed baby spinach leaves, tender and ready for salads or cooking."
   },
   {
-    "id": 12,
+    "id": "c9d0e1f2-a3b4-4c5d-6e7f-8a9b0c1d2e3f",
     "name": "Orange Bell Pepper",
     "price": 1.29,
     "quantityAvailable": 26,
-    "category": "Produce"
+    "category": "Produce",
+    "description": "A crisp and sweet orange bell pepper, excellent raw in salads or cooked in various dishes."
   },
   {
-    "id": 13,
+    "id": "d0e1f2a3-b4c5-4d6e-7f8a-9b0c1d2e3f4a",
     "name": "Wild Caught Salmon (1 kg)",
     "price": 12.99,
     "quantityAvailable": 0,
-    "category": "Meat & Seafood"
+    "category": "Meat & Seafood",
+    "description": "One kilogram of wild-caught salmon fillet, known for its rich flavor and omega-3 fatty acids."
   },
   {
-    "id": 14,
+    "id": "e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b",
     "name": "Organic Quinoa (1 kg)",
     "price": 5.49,
     "quantityAvailable": 20,
-    "category": "Pantry"
+    "category": "Pantry",
+    "description": "One kilogram bag of organic white quinoa, a versatile and nutritious grain."
   },
   {
-    "id": 15,
+    "id": "f2a3b4c5-d6e7-4f8a-9b0c-1d2e3f4a5b6c",
     "name": "Extra Virgin Olive Oil",
     "price": 8.99,
     "quantityAvailable": 16,
-    "category": "Pantry"
+    "category": "Pantry",
+    "description": "A bottle of cold-pressed extra virgin olive oil, perfect for dressings, marinades, and cooking."
   },
   {
-    "id": "17",
+    "id": "a3b4c5d6-e7f8-4a9b-0c1d-2e3f4a5b6c7d",
     "name": "Sparkling water bottle (250 ml)",
     "price": 25,
     "quantityAvailable": 34,
-    "category": "Soft Drinks"
+    "category": "Soft Drinks",
+    "description": "A refreshing 250ml bottle of natural sparkling mineral water."
   },
   {
-    "id": 2,
+    "id": "b4c5d6e7-f8a9-4b0c-1d2e-3f4a5b6c7d8e",
     "name": "Whole Milk (1 Gallon)",
     "price": 3.89,
     "quantityAvailable": 3,
-    "category": "Dairy"
+    "category": "Dairy",
+    "description": "One gallon of fresh whole milk, pasteurized and homogenized."
   },
   {
-    "id": 16,
+    "id": "c5d6e7f8-a9b0-4c1d-2e3f-4a5b6c7d8e9f",
     "name": "Egg",
     "price": 6.5,
     "quantityAvailable": 50,
-    "category": "Dairy"
+    "category": "Dairy",
+    "description": "Standard large white eggs, sold individually."
+  },
+  {
+    "id": "5685cb24-7c0c-43ac-b5ae-6fb04ff55945",
+    "name": "Sanjay",
+    "price": 0.1,
+    "quantityAvailable": 1,
+    "category": "Black",
+    "description": "absorbs light. hex code : #000000"
+  },
+  {
+    "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+    "name": "Free-Range Eggs (Dozen)",
+    "price": 4.3,
+    "quantityAvailable": 33,
+    "category": "Dairy",
+    "description": "One dozen large brown eggs from free-range hens, ideal for breakfast or baking."
+  },
+  {
+    "id": "f3a1b2c4-d5e6-4f7a-8b9c-0d1e2f3a4b5c",
+    "name": "Sourdough Bread Loaf",
+    "price": 5.75,
+    "quantityAvailable": 24,
+    "category": "Bakery",
+    "description": "Artisan sourdough bread with a tangy flavor and chewy crust, perfect for sandwiches or toast."
+  },
+  {
+    "id": "c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f",
+    "name": "Banana",
+    "price": 0.35,
+    "quantityAvailable": 81,
+    "category": "Produce",
+    "description": "A single ripe banana, a great source of potassium and perfect for a quick snack."
+  },
+  {
+    "id": "b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e",
+    "name": "Boneless Chicken Breast (2 lb)",
+    "price": 6.02,
+    "quantityAvailable": 1,
+    "category": "Meat & Seafood",
+    "description": "One pound of fresh, boneless, skinless chicken breast, versatile for grilling, baking, or stir-frying."
   }
 ]

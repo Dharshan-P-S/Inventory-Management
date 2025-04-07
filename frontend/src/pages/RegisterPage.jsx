@@ -16,11 +16,12 @@ function RegisterPage({ apiError, setApiError }) {
     setApiError(null); // Clear previous errors
     setSuccessMessage(''); // Clear previous success message
 
-    // Create data object for backend, excluding confirmPassword
+    // Create data object for backend, including userType
     const registerData = {
         username: userData.username,
         email: userData.email,
-        password: userData.password
+        password: userData.password,
+        userType: userData.userType // Include userType
     };
 
     try {
@@ -40,13 +41,20 @@ function RegisterPage({ apiError, setApiError }) {
         throw new Error(data.message || `Registration failed: ${response.status}`);
       }
 
-      console.log('Registration successful:', data.user);
-      setSuccessMessage('Registration successful! Redirecting to login...');
+      console.log('Registration response:', data);
 
-      // Redirect to login page after a short delay
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000); // 2-second delay
+      if (data.pending) {
+        // Owner registration pending approval
+        setSuccessMessage(data.message || 'Owner registration successful. Account pending approval.');
+        // Optionally clear form or disable it, but don't redirect yet
+      } else {
+        // Customer registration successful
+        setSuccessMessage(data.message || 'Registration successful! Redirecting to login...');
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000); // 2-second delay
+      }
 
     } catch (error) {
       console.error('Registration error:', error);

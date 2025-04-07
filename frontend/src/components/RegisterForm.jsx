@@ -5,6 +5,7 @@ function RegisterForm({ onSubmit }) {
   const [email, setEmail] = useState(''); // added email state
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [userType, setUserType] = useState('customer'); // Add state for user type, default to customer
   // TODO: Add error handling state
 
   const handleSubmit = (event) => {
@@ -15,7 +16,12 @@ function RegisterForm({ onSubmit }) {
       alert("Passwords don't match!");
       return;
     }
-    onSubmit({ username: username.trim(), email: email.trim(), password });
+    onSubmit({
+      username: username.trim(),
+      email: email.trim(),
+      password,
+      userType // Include userType in submitted data
+    });
   };
 
   return (
@@ -60,6 +66,19 @@ function RegisterForm({ onSubmit }) {
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
         />
+      </div>
+      {/* User Type Selection */}
+      <div className="form-group">
+        <label htmlFor="register-user-type">Register as:</label>
+        <select
+          id="register-user-type"
+          value={userType}
+          onChange={(e) => setUserType(e.target.value)}
+          className="form-control" // Use consistent styling
+        >
+          <option value="customer">Customer</option>
+          <option value="owner">Owner (Requires Approval)</option>
+        </select>
       </div>
       {/* TODO: Display errors */}
       <button type="submit" className="auth-button">Register</button>

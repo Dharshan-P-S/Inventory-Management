@@ -1,30 +1,224 @@
-/* === App.css (Based on User's Preference + Specific Updates) === */
-#root{
-  width: 100%;
+/* === App.css - Enhanced Styles === */
+
+/* --- Base & Variables --- */
+:root {
+  --primary-color: #0d6efd; /* Bootstrap Blue */
+  --primary-color-dark: #0b5ed7;
+  --secondary-color: #6c757d; /* Bootstrap Secondary */
+  --secondary-color-light: #f8f9fa;
+  --success-color: #198754; /* Bootstrap Success */
+  --success-color-dark: #157347;
+  --danger-color: #dc3545; /* Bootstrap Danger */
+  --danger-color-dark: #bb2d3b;
+  --warning-color: #ffc107; /* Bootstrap Warning */
+  --warning-color-dark: #ffae00;
+  --info-color: #0dcaf0; /* Bootstrap Info */
+  --light-gray: #f8f9fa;
+  --medium-gray: #e9ecef;
+  --dark-gray: #6c757d;
+  --text-color: #212529; /* Bootstrap Default Text */
+  --text-muted: #6c757d;
+  --border-color: #dee2e6;
+  --border-radius: 0.375rem; /* Bootstrap Default Radius */
+  --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+  --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+  --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
+  --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --transition-base: all 0.25s ease-in-out; /* Smoother transition */
 }
 
+/* --- Global Styles --- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
 body {
-  font-family: sans-serif;
+  font-family: var(--font-family-sans-serif);
   margin: 0;
-  background-color: #f4f4f4;
-  color: #333; /* Keep default text color */
-  min-width: 100vh;
+  background-color: #f8f9fc; /* Slightly lighter/bluer background */
+  color: var(--text-color);
+  line-height: 1.6;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .App {
-  padding: 0 1rem; /* Base padding for mobile */
-  width: 80%; /* Ensure it tries to use full width */
-  box-sizing: border-box; /* Include padding in width calculation */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 main {
-  padding: 20px 0;
+  padding: 1.5rem 0;
+  flex-grow: 1;
 }
 
-/* --- Navigation (Old Base + Updated Hover) --- */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: var(--transition-base);
+}
+a:hover {
+  color: var(--primary-color-dark);
+  /* text-decoration: underline; /* Keep underline optional */
+}
+
+/* --- Utility Classes --- */
+.text-center { text-align: center; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+
+/* --- Base Button Style --- */
+.button {
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-color);
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
+}
+.button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow); /* Enhance shadow on hover */
+}
+.button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: var(--box-shadow-sm);
+}
+.button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Button Color Variants */
+.button-primary { color: #fff; background-color: var(--primary-color); border-color: var(--primary-color); }
+.button-primary:hover:not(:disabled) { background-color: var(--primary-color-dark); border-color: var(--primary-color-dark); }
+.button-primary:focus { box-shadow: 0 0 0 0.25rem rgba(49, 132, 253, 0.5); } /* Adjusted focus */
+
+.button-secondary { color: #fff; background-color: var(--secondary-color); border-color: var(--secondary-color); }
+.button-secondary:hover:not(:disabled) { background-color: #5a6268; border-color: #545b62; }
+.button-secondary:focus { box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, 0.5); }
+
+.button-success { color: #fff; background-color: var(--success-color); border-color: var(--success-color); }
+.button-success:hover:not(:disabled) { background-color: var(--success-color-dark); border-color: var(--success-color-dark); }
+.button-success:focus { box-shadow: 0 0 0 0.25rem rgba(60, 153, 110, 0.5); }
+
+.button-danger { color: #fff; background-color: var(--danger-color); border-color: var(--danger-color); }
+.button-danger:hover:not(:disabled) { background-color: var(--danger-color-dark); border-color: var(--danger-color-dark); }
+.button-danger:focus { box-shadow: 0 0 0 0.25rem rgba(225, 83, 97, 0.5); }
+
+.button-warning { color: #000; background-color: var(--warning-color); border-color: var(--warning-color); }
+.button-warning:hover:not(:disabled) { background-color: var(--warning-color-dark); border-color: #ffba00; }
+.button-warning:focus { box-shadow: 0 0 0 0.25rem rgba(217, 164, 6, 0.5); }
+
+.button-light { color: #000; background-color: var(--light-gray); border-color: #ced4da; }
+.button-light:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
+.button-light:focus { box-shadow: 0 0 0 0.25rem rgba(211, 212, 213, 0.5); }
+
+/* Button Outline Variants */
+.button-outline-primary { color: var(--primary-color); border-color: var(--primary-color); }
+.button-outline-primary:hover:not(:disabled) { color: #fff; background-color: var(--primary-color); border-color: var(--primary-color); }
+
+/* Button Sizes */
+.button-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.25rem; }
+.button-lg { padding: 0.75rem 1.5rem; font-size: 1.1rem; border-radius: 0.5rem; }
+
+/* --- Forms --- */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-color);
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid var(--border-color);
+  appearance: none;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+}
+.form-control:focus {
+  color: var(--text-color);
+  background-color: #fff;
+  border-color: #86b7fe; /* Lighter blue focus */
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Standard Bootstrap focus */
+}
+.form-control[aria-invalid="true"] {
+  border-color: var(--danger-color);
+}
+.form-control[aria-invalid="true"]:focus {
+  border-color: var(--danger-color);
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+textarea.form-control {
+  min-height: 90px; /* Slightly taller */
+  resize: vertical;
+}
+
+/* --- Navigation --- */
 .main-nav {
-  padding: 1rem;
+  background-color: #fff;
+  padding: 0.75rem 1rem;
+  box-shadow: var(--box-shadow); /* Use standard shadow */
+  margin-bottom: 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 1020;
 }
 
 .main-nav ul {
@@ -32,1136 +226,1036 @@ main {
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 1.5rem; /* Spacing between links */
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.main-nav a:hover{
-  color: #007bff;
-}
-.main-nav a.active { /* Add .active selector here */
-  color: #007bff; /* Link color blue ONLY on hover/active */
-  border-bottom-color: #007bff; /* Underline blue ONLY on hover/active */
-}
-
-/* Ensure the base rule for .main-nav a remains like this (color: #333) */
 .main-nav a {
   text-decoration: none;
-  color: #333; /* Default link color (NOT blue) */
-  font-weight: bold;
-  padding-bottom: 4px; /* Space for border */
-  border-bottom: 2px solid transparent; /* Prepare for hover effect */
-  transition: color 0.2s ease-in-out, border-color 0.2s ease-in-out; /* Smooth transition */
+  color: var(--text-muted); /* Use muted color */
+  font-weight: 500;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition-base);
+}
+.main-nav a:hover,
+.main-nav a.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+  transform: translateY(-1px);
 }
 
 .cart-count {
-  display: inline-flex; /* Use flex to center content */
-  justify-content: center; /* Center number horizontally */
-  align-items: center; /* Center number vertically */
-  width: 20px; /* Fixed width */
-  height: 20px; /* Fixed height (equal to width for circle) */
-  background-color: #dc3545; /* Red background */
-  color: white; /* White text */
-  border-radius: 50%; /* Makes it a circle */
-  font-size: 0.75em; /* Adjust font size as needed */
-  font-weight: bold; /* Make number bold */
-  line-height: 1; /* Ensure text stays centered vertically */
-  margin-left: 6px; /* Adjust spacing from "Cart" */
-  vertical-align: middle; /* Align circle nicely with text */
-  box-sizing: border-box; /* Include border/padding in width/height */
-  /* Remove padding as fixed dimensions are used */
-  /* padding: 2px 6px; REMOVED */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 22px;
+  height: 22px;
+  background-color: var(--danger-color);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.7em;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 5px;
+  vertical-align: middle;
 }
 
-
-/* Page Container */
+/* --- Page Container --- */
 .page-container {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-bottom: 1.5rem; /* Added consistent margin */
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-bottom: 1.5rem;
 }
 
-
-/* Search Bar */
+/* --- Search & Filter --- */
 .search-bar-container {
-  margin-bottom: 1rem; /* Reduced margin */
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: center;
 }
-/* Use user's style for the input itself */
 .search-bar-container input[type="text"] {
-  /* Remove old width/display rules that might interfere */
-  /* display: block; REMOVED */
-  /* width: 95%; REMOVED */
-
-  /* Apply better sizing and appearance */
-  max-width: 450px;     /* Limit width */
-  width: 100%;          /* Allow it to take width up to max-width */
-  padding: 0.8rem 1.2rem; /* Good padding for height/appearance */
+  max-width: 500px;
+  width: 100%;
+  padding: 0.7rem 1.3rem;
   font-size: 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 25px; /* Rounded ends */
-  box-sizing: border-box;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06); /* Subtle inner shadow */
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth focus transition */
+  border: 1px solid var(--border-color);
+  border-radius: 50px;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+  transition: var(--transition-base);
 }
-
 .search-bar-container input[type="text"]:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #86b7fe;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075), 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
-/* Category Filter */
 .category-filter-container {
   display: flex;
-  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.75rem; /* Space between buttons */
-  margin-bottom: 2rem; /* Space below filters */
+  gap: 0.75rem;
+  margin-bottom: 2rem;
 }
-
 .category-button {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  background-color: #f8f9fa; /* Light background */
-  color: #333;
-  border-radius: 20px; /* Rounded pill shape */
-  cursor: pointer;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border-color);
+  background-color: #fff;
+  color: var(--secondary-color);
+  border-radius: 20px;
   font-size: 0.9em;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
 }
-
 .category-button:hover {
-  background-color: #e9ecef; /* Slightly darker on hover */
+  background-color: var(--medium-gray);
   border-color: #adb5bd;
+  color: var(--text-color);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
 }
-
 .category-button.active {
-  background-color: #007bff; /* Blue background for active */
+  background-color: var(--primary-color);
   color: white;
-  border-color: #0056b3; /* Darker blue border */
+  border-color: var(--primary-color);
+  box-shadow: none;
+  transform: translateY(0);
 }
 
-
-/* Grocery List */
-.grocery-list-container h2, /* Keep h2 styling if used */
-.cart-container h2,
-.add-item-form-container h2 { /* Apply consistent heading style */
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* Use items-grid directly on grocery-list now */
+/* --- Grocery List & Items --- */
 .grocery-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); /* Adjusted minmax */
-  gap: 1.5rem; /* Consistent gap */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Slightly smaller min */
+  gap: 1.5rem;
 }
 
-/* Grocery Item */
 .grocery-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   background-color: #fff;
-  /* text-align: center; */ /* Remove center alignment for better layout with controls */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  display: flex; /* Use flex for better control alignment */
+  box-shadow: var(--box-shadow-sm);
+  display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  transition: box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out;
-  position: relative; /* Needed for absolute positioning of link if used differently */
-  text-decoration: none; /* Remove default link underline from outer div */
-  color: inherit; /* Inherit text color */
+  transition: var(--transition-base);
+  text-decoration: none;
+  color: inherit;
+  overflow: hidden;
+  border-left: 4px solid transparent; /* Prepare for accent */
 }
-
 .grocery-item:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Keep or adjust shadow */
-  transform: translateY(-3px); /* Keep the lift effect */
+  box-shadow: var(--box-shadow);
+  transform: translateY(-5px);
+  border-left-color: var(--primary-color); /* Accent on hover */
 }
-
-.grocery-item.out-of-stock { /* Add out of stock style */
-  background-color: #f8f9fa;
-  opacity: 0.7;
-}
-
-.grocery-item h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.1em;
-  text-align: left; /* Align text left */
-}
-
-.grocery-item p {
-  margin: 5px 0;
-  font-size: 0.9em;
-  color: #555;
-  text-align: left; /* Align text left */
-}
-.grocery-item p:last-of-type { /* Space before controls */
-    margin-bottom: 10px;
+.grocery-item.out-of-stock {
+  background-color: var(--light-gray);
+  opacity: 0.8;
+  border-left-color: var(--secondary-color);
 }
 
 .grocery-item-link {
-  text-decoration: none; /* Remove underline from link */
-  color: inherit; /* Inherit text color */
-  display: block; /* Make link take up space */
-  padding-bottom: 10px; /* Add some space before controls start */
-  flex-grow: 1; /* Allow link area to grow */
+  padding: 1rem 1.25rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+.grocery-item-link:hover h3 {
+  color: var(--primary-color);
 }
 
-.grocery-item-link:hover h3 { /* Example hover effect */
-  color: #007bff;
+.grocery-item h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.15em;
+  font-weight: 500;
+}
+.grocery-item p {
+  margin: 0.2rem 0;
+  font-size: 0.9em;
+  color: var(--text-muted);
+}
+.item-category {
+  font-size: 0.8em;
+  color: var(--secondary-color);
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+.item-price {
+  font-weight: bold;
+  color: var(--success-color);
+  margin-top: auto;
+  padding-top: 0.5rem;
 }
 
-.item-category { /* Style for category display on item card */
-    font-size: 0.8em;
-    color: #6c757d;
-    text-align: left;
-    margin-top: 5px;
-}
-
-/* --- Quantity Adjuster Controls Styling (Applied to GroceryItem) --- */
 .item-controls-wrapper {
-  margin-top: auto; /* Push controls to the bottom */
+  padding: 0.75rem 1.25rem;
+  background-color: var(--light-gray);
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
 }
 
 .grocery-item .item-controls {
-  margin-top: auto; /* Push controls to bottom */
   display: flex;
-  justify-content: flex-end; /* Space out controls and add button */
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 10px; /* Gap between adjuster and add button */
-  position: relative;
-  z-index: 1;
+  gap: 10px;
 }
 
 .grocery-item .quantity-adjuster {
   display: flex;
   align-items: center;
-  gap: 5px; /* Gap between -, span, + */
+  gap: 5px;
 }
-
-/* --- Apply Cart Button Style to Grocery Item +/- Buttons --- */
 .grocery-item .quantity-adjuster button {
-  padding: 5px 10px;
-  margin: 0; /* Remove margin from cart style */
-  cursor: pointer;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  border-radius: 4px; /* Add border-radius */
-  line-height: 1; /* Ensure consistent height */
-  min-width: 28px;
-  font-size: 1rem;
+  padding: 3px 8px;
+  font-size: 0.9rem;
+  line-height: 1;
+  min-width: 24px;
+  color: var(--secondary-color);
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  transition: var(--transition-base); /* Add transition */
 }
 .grocery-item .quantity-adjuster button:hover:not(:disabled) {
-  background-color: #e0e0e0; /* Consistent hover */
+  background-color: var(--medium-gray);
+  border-color: #adb5bd;
 }
 .grocery-item .quantity-adjuster button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
+  cursor: not-allowed;
+  opacity: 0.5;
 }
-
-/* Style for the quantity display number */
 .grocery-item .quantity-display {
   min-width: 25px;
   text-align: center;
-  font-weight: bold;
+  font-weight: 500;
   padding: 0 5px;
   font-size: 1rem;
-  line-height: 1;
 }
 
-/* --- Keep Original Green 'Add to Cart' Button Style --- */
-.grocery-item .add-to-cart-button { /* Target specific add button */
-  padding: 8px 15px;
-  background-color: #5cb85c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  /* margin-top: 10px; Removed margin-top, use flex gap */
-  transition: background-color 0.2s ease;
-  font-size: 0.9em; /* Adjust font size if needed */
-  line-height: 1.2; /* Adjust line height */
+.grocery-item .add-to-cart-button {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.9rem;
 }
 
-.grocery-item .add-to-cart-button:hover:not(:disabled) {
-  background-color: #4cae4c;
+.grocery-item .stock-message {
+  margin-top: 0.5rem;
+  color: var(--danger-color);
+  font-weight: 500;
+  text-align: center;
+  font-size: 0.9em;
+  width: 100%;
 }
-.grocery-item .add-to-cart-button:disabled {
-    background-color: #6c757d; /* Consistent disabled */
-    opacity: 0.65;
-}
-
-.grocery-item .stock-message { /* Style for out of stock message */
-    margin-top: 10px;
-    color: #dc3545;
-    font-weight: bold;
-    text-align: center;
-    font-size: 0.9em;
-    width: 100%;
-}
-
 
 /* --- Product Detail Page --- */
-.product-detail-page {
-  padding: 1.5rem;
-}
-
-.back-link {
+.product-detail-page .back-link {
   display: inline-block;
   margin-bottom: 1.5rem;
-  color: #007bff;
-  text-decoration: none;
-  font-weight: bold;
-}
-.back-link:hover {
-  text-decoration: underline;
+  font-weight: 500;
 }
 
 .product-detail-content {
-  display: flex; /* Use flex for potential image + info layout */
-  flex-direction: column; /* Stack image/info vertically for now */
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
 }
-
-/* TODO: Add styles for product image container if added */
-
-.product-info {
-  flex-grow: 1;
+@media (min-width: 768px) {
+  .product-detail-content {
+    grid-template-columns: 1fr 1.2fr; /* Give info slightly more space */
+  }
 }
 
 .product-info h1 {
-  margin-top: 0;
   margin-bottom: 0.5rem;
   font-size: 2em;
+  font-weight: 600;
 }
-
 .product-category {
   font-size: 0.9em;
-  color: #6c757d;
+  color: var(--text-muted);
   margin-bottom: 1rem;
+  display: block;
 }
-
 .product-price {
-  font-size: 1.4em;
+  font-size: 1.6em;
   font-weight: bold;
-  color: #28a745; /* Green price */
+  color: var(--success-color);
   margin-bottom: 0.5rem;
 }
-
 .product-stock {
   font-size: 1em;
   margin-bottom: 1.5rem;
-  font-weight: bold;
+  font-weight: 500;
 }
-.product-stock.in-stock {
-  color: #198754; /* Darker green for in stock */
-}
-.product-stock.out-of-stock {
-  color: #dc3545; /* Red for out of stock */
-}
+.product-stock.in-stock { color: var(--success-color); }
+.product-stock.out-of-stock { color: var(--danger-color); }
 
-.product-description {
-  line-height: 1.6;
-  color: #555;
-  margin-bottom: 1.5rem;
-}
+.product-description-section { margin-top: 1.5rem; }
+.product-description-section h3 { margin-bottom: 0.5rem; font-size: 1.2em; color: var(--secondary-color); }
+.product-description { line-height: 1.7; color: var(--text-color); }
 
 .product-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   flex-wrap: wrap;
 }
-
-/* Placeholder style - replace with actual adjuster */
-.quantity-adjuster-placeholder {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+.product-actions .quantity-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
+.product-actions .quantity-adjuster button {
+  padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
+  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  transition: var(--transition-base);
+}
+.product-actions .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); }
+.product-actions .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
+.product-actions .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
 
-.add-to-cart-button-detail { /* Style specifically for detail page button */
-  padding: 0.75rem 1.5rem;
-  background-color: #5cb85c;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.add-to-cart-button-detail {
+  padding: 0.6rem 1.2rem;
   font-size: 1rem;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
+  font-weight: 500;
 }
 
-.add-to-cart-button-detail:hover:not(:disabled) {
-  background-color: #4cae4c;
-}
-
-.add-to-cart-button-detail:disabled {
-    background-color: #6c757d;
-    opacity: 0.65;
-    cursor: not-allowed;
-}
-
-/* Reuse stock message style */
 .product-detail-page .stock-message {
-    margin-top: 1rem;
-    color: #dc3545;
-    font-weight: bold;
-    font-size: 1em;
+  margin-top: 1rem; color: var(--danger-color); font-weight: 500; font-size: 1em;
 }
 
+/* Product Detail Owner Section */
+.product-detail-page .owner-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+.product-detail-page .owner-section h4 {
+  margin-bottom: 1rem; font-size: 1.3em; color: var(--secondary-color);
+}
+.product-detail-page .owner-stock-update {
+  margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
+}
+.product-detail-page .owner-stock-update label { font-weight: 500; }
+.product-detail-page .owner-stock-update .quantity-adjuster {
+  display: flex; align-items: center; gap: 5px;
+}
+.product-detail-page .owner-stock-update .quantity-adjuster button {
+  padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
+  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  transition: var(--transition-base);
+}
+.product-detail-page .owner-stock-update .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); }
+.product-detail-page .owner-stock-update .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
+.product-detail-page .owner-stock-update .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
+.product-detail-page .owner-stock-update .projected-stock { font-size: 0.9em; color: var(--text-muted); margin-top: 0.25rem; font-weight: 500; }
+.product-detail-page .owner-stock-update .update-stock-button.save {
+  padding: 0.6rem 1.2rem; font-size: 0.95rem; align-self: flex-start;
+}
+.product-detail-page .owner-stock-update .error-message { margin-top: 0.5rem; align-self: flex-start; }
+.product-detail-page .owner-item-management { display: flex; gap: 0.75rem; margin-top: 1rem; }
+.product-detail-page .edit-button { padding: 0.5rem 1rem; font-size: 0.9rem; }
+.product-detail-page .delete-button { padding: 0.5rem 1rem; font-size: 0.9rem; }
 
-/* --- Cart (Using Specific Button Style) --- */
+/* --- Cart Page --- */
 .cart-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee; /* Border below each item */
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border-color);
   gap: 1rem;
+  transition: background-color 0.2s ease; /* Add subtle hover */
 }
-
-.cart-item:last-child {
-    border-bottom: none; /* NO border below the LAST item */
+.cart-item:hover {
+  background-color: rgba(0, 123, 255, 0.03); /* Very light blue hover */
 }
-
-
-.cart-item span:first-child { /* Item name/price */
-    flex-grow: 1; /* Allow name to grow */
-}
-
-.cart-item-controls {
-  display: flex;
-  align-items: center;
-  gap: 5px; /* Gap between buttons/span */
-  flex-shrink: 0;
-}
-
-/* --- Apply Specific Cart Button Style --- */
+.cart-item:last-child { border-bottom: none; }
+.cart-item span:first-child { flex-grow: 1; font-weight: 500; }
+.cart-item-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .cart-item-controls button {
-  padding: 5px 10px;
-  margin: 0; /* Remove default margins if any */
-  cursor: pointer;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  border-radius: 4px; /* Added border-radius */
-  line-height: 1; /* Consistent height */
-  min-width: 28px; /* Ensure minimum size */
-  font-size: 1rem;
-  transition: background-color 0.2s;
+  padding: 4px 8px; font-size: 0.9rem; line-height: 1; min-width: 26px;
+  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  transition: var(--transition-base); /* Add transition */
 }
-.cart-item-controls button:hover:not(:disabled) {
-  background-color: #e0e0e0; /* Consistent hover */
-}
-.cart-item-controls button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* Specific Remove Button Style */
+.cart-item-controls button:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
+.cart-item-controls button:disabled { cursor: not-allowed; opacity: 0.5; }
 .cart-item-controls .remove-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    margin-left: 15px; /* Keep margin for spacing */
-    font-size: 0.85em; /* Adjust size */
-    padding: 6px 10px; /* Adjust padding */
+  margin-left: 10px; font-size: 0.85em; padding: 5px 9px;
 }
-.cart-item-controls .remove-button:hover {
-    background-color: #d32f2f;
-}
+.cart-item-controls span { min-width: 25px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1rem; }
+.cart-empty-message { text-align: center; font-style: italic; color: var(--text-muted); padding: 2rem 0; }
+.cart-summary { display: flex; flex-direction: column; align-items: flex-end; padding-top: 1.5rem; margin-top: 1rem; }
+.cart-total { font-size: 1.3em; font-weight: bold; margin-bottom: 1rem; }
+.buy-button { padding: 0.7rem 1.4rem; font-size: 1.05rem; font-weight: 500; }
 
-.cart-item-controls span { /* Quantity display */
-  min-width: 25px; /* Ensure space */
-  text-align: center;
-  font-weight: bold;
-  padding: 0 5px; /* Add padding */
-  font-size: 1rem;
-  line-height: 1;
-}
-
-.cart-empty-message { /* Style for empty cart */
-    text-align: center;
-    font-style: italic;
-    color: #6c757d;
-    padding: 2rem 0;
-}
-
-.cart-total {
-  padding-top: 0.5rem;      /* Space between border and text */
-  text-align: right;        /* <<< THIS ALIGNS THE CONTENT RIGHT */
-  font-size: 1.2em;
-  font-weight: bold;        /* Make total stand out */
-  /* text-align: right; /* Removed, handled by flex container */
-}
-
-/* --- Cart Summary (Total + Buy Button Wrapper) --- */
-.cart-summary {
-  display: flex;
-  flex-direction: column; /* Stack total and button vertically */
-  align-items: flex-end; /* Align items to the right */
-  padding-top: 1rem; /* Space above the total within the block */
-}
-
-/* --- Buy Button Styling --- */
-.buy-button {
-  padding: 0.6rem 1.2rem;
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-  background-color: #007bff; /* Blue */
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s ease-in-out;
-  margin-top: 0.75rem; /* Space between total and button */
-}
-
-.buy-button:hover:not(:disabled) {
-  background-color: #0056b3; /* Darker blue on hover */
-}
-
-.buy-button:disabled {
-  background-color: #6c757d; /* Grey when disabled */
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-
-/* --- Add Item Form (Keep Old Style) --- */
-.add-item-form-container { /* Apply page-container */
-  max-width: 500px;
+/* --- Add/Edit Forms --- */
+.add-item-form-container,
+.edit-item-form-container {
+  max-width: 600px;
   margin: 2rem auto;
-  /* Inherits base style from .page-container */
-}
-
-.add-item-form .form-group {
-  margin-bottom: 1rem;
-}
-
-.add-item-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.add-item-form input[type="text"],
-.add-item-form input[type="number"],
-.add-item-form input[type="email"],
-.add-item-form select { /* Add select if you style dropdowns */
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1rem; /* Ensure font size consistency */
-  font-family: inherit; /* Inherit font */
-  -webkit-appearance: none; /* Reset appearance for WebKit browsers */
-  -moz-appearance: none;    /* Reset appearance for Firefox */
-  appearance: none;        /* Standard reset */
-}
-/* Style for datalist suggestions dropdown */
-.add-item-form input[type="text"]::-webkit-calendar-picker-indicator {
-  display: none; /* Hide default arrow in Chrome/Safari */
-}
-.add-item-form input[type="text"]::-webkit-list-button {
-  display: none; /* Also try to hide the button if it appears */
-}
-/* You might need to style the datalist options if needed, but defaults are usually fine */
-
-.add-item-form input[aria-invalid="true"] {
-    border-color: #dc3545; /* Red border for invalid inputs */
-    background-color: #f8d7da; /* Optional: light red background */
-}
-
-.add-item-form button[type="submit"] { /* Target submit button */
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 50%; /* Make button full width */
-  margin-top: 1rem; /* Space above */
-  display: block; /* Make it a block-level element */
-  margin-left: auto;  /* Automatic left margin */
-  margin-right: auto; /* Automatic right margin */
-}
-
-.add-item-form button[type="submit"]:hover {
-  background-color: #0056b3;
-}
-
-/* --- Authentication Forms & Pages --- */
-.auth-page {
-  max-width: 450px; /* Limit width */
-  margin: 2rem auto; /* Center the form */
-}
-
-.auth-page h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* Space between form groups */
-}
-
-/* Use existing form-group styles */
-.auth-form .form-group {
-  margin-bottom: 0; /* Remove default margin if using gap */
-}
-
-.auth-form label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-}
-
-.auth-form input[type="text"],
-.auth-form input[type="password"],
-.auth-form input[type="email"] {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1rem;
-}
-
-.auth-button { /* Style for Login/Register buttons */
-  padding: 0.75rem 1.5rem;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%; /* Make button full width */
-  margin-top: 0.5rem; /* Space above button */
-  transition: background-color 0.2s ease;
-}
-
-.auth-button:hover {
-  background-color: #0056b3;
-}
-
-
-/* --- Error Messages (Keep Old + API Error) --- */
-.error-message {
-  color: #dc3545;
-  font-size: 0.875em;
-  margin-top: 0.25rem;
-  display: block; /* Ensure it takes space */
-}
-
-.api-error { /* Keep specific API error style */
-    background-color: #f8d7da;
-    color: #721c24;
-    padding: 0.75rem 1.25rem;
-    margin-bottom: 1rem;
-    border: 1px solid #f5c6cb;
-    border-radius: 0.25rem;
-    text-align: center;
-}
-
-/* Stock Updater Styles */
-.stock-updater-container {
-  max-width: 500px;
-  margin: 2rem auto;
-}
-
-.stock-update-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.stock-update-form select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-.stock-update-form .form-group {
-  position: relative; /* Enables absolute positioning for suggestions */
-}
-
-.stock-update-form input[type="text"] {
-  max-width: 450px;
-  width: 100%;
-  padding: 0.8rem 1.2rem;
-  font-size: 1rem;
-  border: 1px solid #ced4da;
-  border-radius: 25px;
-  box-sizing: border-box;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.stock-update-form input[type="text"]:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.06), 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.suggestions-container {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  border: 1px solid #ced4da;
-  border-top: none;
-  background-color: #fff;
-  z-index: 1000;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.suggestion-item {
-  padding: 0.8rem 1.2rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.suggestion-item:hover {
-  background-color: #f1f3f4;
-}
-
-.stock-update-form .quantity-adjuster {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0.5rem 0;
-}
-
-.stock-update-form .quantity-adjuster button {
-  padding: 5px 10px;
-  margin: 0;
-  cursor: pointer;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  line-height: 1;
-  min-width: 28px;
-  font-size: 1rem;
-}
-
-.stock-update-form .quantity-adjuster button:hover:not(:disabled) {
-  background-color: #e0e0e0;
-}
-
-.stock-update-form .quantity-adjuster button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.stock-update-form .quantity-display {
-  min-width: 25px;
-  text-align: center;
-  font-weight: bold;
-  padding: 0 5px;
-  font-size: 1rem;
-  line-height: 1;
-}
-
-
-/* Operation Buttons */
-.operation-buttons {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.operation-button {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  background-color: #f0f0f0;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.operation-button.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
-}
-
-.operation-button:hover:not(.active) {
-  background-color: #e0e0e0;
-}
-
-/* Update the update-stock-button for remove operation */
-.update-stock-button.remove {
-  background-color: #dc3545;
-}
-
-.update-stock-button.remove:hover:not(:disabled) {
-  background-color: #c82333;
-}
-
-.stock-button-group {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-/* --- Order History Page --- */
-.order-history-page h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.order-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem; /* Space between order items */
-}
-
-.order-history-item {
-  background-color: #fff;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap; /* Allow wrapping on small screens */
-  gap: 0.5rem 1rem; /* Row and column gap */
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.75rem;
-  border-bottom: 1px solid #eee;
-}
-
-.order-header h3 {
-  margin: 0;
-  font-size: 1.2em;
-  flex-basis: 100%; /* Take full width initially */
-}
-
-.order-date,
-.order-total {
-  font-size: 0.9em;
-  color: #555;
-}
-
-.order-total {
-  font-weight: bold;
-  color: #333;
-}
-
-.order-item-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem; /* Space between items in the order */
-}
-
-.order-item-detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9em;
-  padding: 0.25rem 0;
-  gap: 1rem; /* Space between elements within a line item */
-}
-
-.order-item-detail span:first-child { /* Item name */
-  flex-grow: 1; /* Allow name to take available space */
-  text-align: left;
-}
-
-.order-item-detail span:not(:first-child) { /* Quantity and price */
-  flex-shrink: 0; /* Prevent shrinking */
-  min-width: 80px; /* Ensure some minimum width */
-  text-align: right;
-}
-
-.empty-history-message,
-.loading-message {
-  text-align: center;
-  font-style: italic;
-  color: #6c757d;
-  padding: 2rem 0;
-}
-
-
-/* Media Queries */
-@media (min-width: 576px) { /* Adjust header layout on slightly larger screens */
-  .order-header h3 {
-    flex-basis: auto; /* Allow h3 to not take full width */
-  }
-}
-
-@media (min-width: 768px) {
-  .App {
-    max-width: 1140px; /* Set a max width for desktop (adjust as needed, e.g., 960px, 1140px, 1200px) */
-    margin: 0 auto;    /* Center the container */
-    padding: 0 1.5rem; /* Optional: slightly increase padding for desktop */
-  }
-
-  .add-item-form-container {
-    max-width: 600px;
-  }
-
-  .product-detail-content {
-    flex-direction: row; /* Side-by-side layout on larger screens */
-  }
-  /* TODO: Add width constraints for image/info if needed */
-}
-
-@media (min-width: 1400px) {
-  .App {
-    max-width: 1320px;
-  }
-}
-
-/* --- Delete/Restore Button Styles --- */
-.delete-button,
-.restore-button {
-  background-color: #ff4d4d; /* Red background */
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 0.9rem;
-  display: inline-block; /* Ensure button respects padding */
-}
-
-.delete-button:hover {
-  background-color: #e60000; /* Darker red on hover */
-}
-
-.restore-button {
-  background-color: #4CAF50; /* Green background */
-}
-
-.restore-button:hover:not(:disabled) {
-  background-color: #367c39; /* Darker green on hover */
-}
-
-.restore-button:disabled {
-  background-color: #cccccc; /* Grey out when disabled */
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-
-/* --- Deleted Items Page Specific Styles --- */
-.deleted-items-page h2 {
-  text-align: center;
-  margin-bottom: 1.5rem;
-}
-
-.deleted-items-list {
-  /* Reuse items-grid styles */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.5rem;
-}
-
-.deleted-item {
-  /* Inherits grocery-item styles */
-  border-left: 5px solid #ff4d4d; /* Add a red indicator */
-  position: relative; /* For potential absolute positioning inside */
-}
-
-.deleted-item p {
-  margin: 0.3rem 0; /* Adjust spacing */
-}
-
-/* Ensure owner controls wrapper behaves well */
-.owner-controls {
-  margin-top: auto; /* Push controls to the bottom if needed */
-  padding-top: 0.5rem; /* Add some space above buttons */
-}
-
-/* Adjust error message centering */
-.error-message.main-error {
-  margin: 1rem auto; /* Center error message */
-  max-width: 800px; /* Limit width */
-}
-
-/* --- Owner Controls (Delete/Edit Buttons) --- */
-.owner-controls {
-  display: flex; /* Use flexbox for button alignment */
-  gap: 0.5rem; /* Space between buttons */
-  margin-top: auto; /* Push to bottom */
-  padding-top: 0.5rem; /* Space above buttons */
-  justify-content: flex-end; /* Align buttons to the right */
-}
-
-/* Edit Button Style (similar to delete, but blue) */
-.edit-button {
-  background-color: #007bff; /* Blue background */
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 0.9rem;
-  display: inline-block;
-}
-
-.edit-button:hover {
-  background-color: #0056b3; /* Darker blue on hover */
-}
-
-/* --- Product Detail Page Update Stock Button Style --- */
-.product-detail-page .update-stock-button {
-  /* Inherit styles from edit-button */
-  background-color: #ffa000; /* Orange background */
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 0.9rem;
-  display: inline-block;
-  text-decoration: none; /* Remove underline from Link */
-}
-
-.product-detail-page .update-stock-button:hover {
-  background-color: #ff8f00; /* Darker orange on hover */
-}
-
-
-/* --- Edit Item Modal Styles --- */
-.modal-overlay {
-  position: fixed; /* Stay in place */
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000; /* Ensure it's on top */
-}
-
-.modal-content {
   background-color: #fff;
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  max-width: 500px; /* Limit modal width */
-  width: 90%; /* Responsive width */
-  max-height: 80vh; /* Limit height */
-  overflow-y: auto; /* Allow scrolling if content overflows */
-  position: relative; /* For potential close button positioning */
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
 }
-
-.modal-content h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 1.5em;
-}
-
-/* Reuse form styles for consistency */
+.add-item-form,
 .edit-item-form {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
-
-.edit-item-form .form-group {
-  margin-bottom: 0; /* Remove default margin if using gap */
-}
-
+.add-item-form label,
 .edit-item-form label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: bold;
+  font-weight: 500;
+}
+.add-item-form input,
+.add-item-form textarea,
+.add-item-form select,
+.edit-item-form input,
+.edit-item-form textarea,
+.edit-item-form select {
+  display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem;
+  border: 1px solid var(--border-color); border-radius: var(--border-radius);
+  transition: var(--transition-base);
+}
+.add-item-form textarea,
+.edit-item-form textarea { min-height: 90px; resize: vertical; }
+.add-item-form input:focus,
+.add-item-form textarea:focus,
+.add-item-form select:focus,
+.edit-item-form input:focus,
+.edit-item-form textarea:focus,
+.edit-item-form select:focus {
+  border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+.add-item-form button[type="submit"] {
+  padding: 0.75rem 1.5rem; font-size: 1rem; width: auto;
+  margin-top: 1rem; align-self: center;
 }
 
-.edit-item-form input[type="text"],
-.edit-item-form input[type="number"] { /* Add number if price was number input */
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 1rem;
-}
+/* --- Auth Forms --- */
+.auth-page { max-width: 450px; margin: 3rem auto; }
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+.auth-form .form-group { margin-bottom: 0; }
+.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.auth-form input { display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); transition: var(--transition-base); }
+.auth-form input:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+.auth-button { padding: 0.75rem 1.5rem; font-size: 1rem; width: 100%; margin-top: 0.5rem; }
 
-.edit-item-form input[aria-invalid="true"] {
-    border-color: #dc3545;
-}
-
-.edit-item-form .error-message {
-  color: #dc3545;
+/* --- Error Messages --- */
+.error-message {
+  color: var(--danger-color);
   font-size: 0.875em;
   margin-top: 0.25rem;
+  display: block;
+}
+.api-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--border-radius);
+  text-align: center;
 }
 
-/* Modal Action Buttons */
-.modal-actions {
+/* --- Stock Updater Page --- */
+.stock-updater-container { max-width: 550px; margin: 2rem auto; }
+.stock-update-form { display: flex; flex-direction: column; gap: 1.25rem; }
+.stock-update-form .form-group { position: relative; }
+.stock-update-form input[type="text"] {
+  display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem;
+  border: 1px solid var(--border-color); border-radius: var(--border-radius);
+  transition: var(--transition-base);
+}
+.stock-update-form input[type="text"]:focus {
+  border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+.suggestions-container {
+  position: absolute; top: 100%; left: 0; right: 0;
+  border: 1px solid var(--border-color); border-top: none; background-color: #fff;
+  z-index: 1000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  list-style: none; padding: 0; margin: 0; border-radius: 0 0 var(--border-radius) var(--border-radius);
+  max-height: 200px; overflow-y: auto;
+}
+.suggestion-item { padding: 0.75rem 1rem; cursor: pointer; transition: background-color 0.2s ease; }
+.suggestion-item:hover { background-color: var(--light-gray); }
+.stock-update-form .clear-selection-button {
+  padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-left: 0.5rem; vertical-align: middle;
+}
+.stock-update-form .stock-info { background-color: var(--light-gray); padding: 0.75rem 1rem; border-radius: var(--border-radius); margin-bottom: 0; }
+.stock-update-form .stock-info p { margin: 0.25rem 0; font-size: 0.95em; }
+.stock-update-form .quantity-adjuster {
+  display: flex; align-items: center; gap: 5px; margin: 0.5rem 0;
+}
+.stock-update-form .quantity-adjuster button {
+  padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
+  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  transition: var(--transition-base);
+}
+.stock-update-form .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
+.stock-update-form .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
+.stock-update-form .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
+.stock-update-form .projected-stock { font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; font-weight: 500; }
+.stock-button-group { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+.stock-updater-container .update-stock-button.save {
+  padding: 0.75rem 1.5rem; font-size: 1rem;
+}
+
+/* --- History Pages (Order/Edit) --- */
+.order-history-page h2,
+.edit-history-page h2 { /* Shared styles */
+  text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);
+}
+.order-list,
+.edit-history-list { /* Shared list styles */
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.order-history-item,
+.edit-history-item { /* Shared item styles */
+  background-color: #fff; border: 1px solid var(--border-color);
+  border-radius: var(--border-radius); padding: 1rem 1.5rem; box-shadow: var(--box-shadow-sm);
+  transition: var(--transition-base);
+}
+.order-history-item:hover,
+.edit-history-item:hover {
+  border-left: 4px solid var(--info-color); /* Add accent on hover */
+  box-shadow: var(--box-shadow);
+  transform: translateX(2px);
+}
+
+/* --- Sales History Page --- */
+.sales-history-page h2 {
+  color: var(--success-color); /* Use success color for sales */
+}
+
+.monthly-sales-list {
   display: flex;
-  justify-content: flex-end; /* Align buttons to the right */
-  gap: 0.75rem; /* Space between buttons */
-  margin-top: 1.5rem; /* Space above buttons */
-  padding-top: 1rem; /* Space above buttons */
-  border-top: 1px solid #eee; /* Separator line */
+  flex-direction: column;
+  gap: 2rem; /* Space between months */
 }
 
-/* General button style for modal actions */
-.modal-actions .button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
+.monthly-sales-section {
+  background-color: #fff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.monthly-sales-section h3 {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 1.4em;
+  color: var(--secondary-color);
+}
+
+.sales-order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Space between orders */
+}
+
+.sales-order-item {
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  background-color: var(--light-gray);
+}
+
+.sales-order-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem; /* Increase column gap */
+  font-size: 0.9em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--border-color);
+}
+.sales-order-header span:last-child {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.sales-item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9em;
+}
+
+.sales-item-detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sales-item-detail span:first-child {
+  flex-grow: 1;
+}
+.sales-item-detail span:not(:first-child) {
+  flex-shrink: 0;
+  min-width: 70px;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+
+/* Style specific action types */
+.history-table .action-stock_increase,
+.history-table .action-restored { color: var(--success-color); font-weight: 500; }
+.history-table .action-stock_decrease,
+.history-table .action-deleted { color: var(--danger-color); font-weight: 500; }
+.history-table .action-item_edit { color: var(--info-color); font-weight: 500; }
+
+/* Styling for edit details list */
+.history-table td .edit-details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.9em;
+}
+.history-table td .edit-details-list li {
+  margin-bottom: 0.25rem;
+}
+.history-table td .edit-details-list li:last-child {
+  margin-bottom: 0;
+}
+.history-table td .edit-details-list strong {
+  color: var(--secondary-color); /* Dim the field name slightly */
+}
+.history-table td .edit-details-list .old-value {
+  color: var(--text-muted);
+  /* text-decoration: line-through; /* Optional: strike through old value */
+}
+.history-table td .edit-details-list .new-value {
+  color: var(--text-color);
+  font-weight: 500; /* Make new value slightly bolder */
+}
+
+
+.order-header {
+  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+  gap: 0.5rem 1rem; padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #eee;
+}
+.order-header h3 { margin: 0; font-size: 1.2em; flex-basis: 100%; }
+.order-date, .order-total { font-size: 0.9em; color: var(--text-muted); }
+.order-total { font-weight: bold; color: var(--text-color); }
+.order-item-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.order-item-detail { display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; padding: 0.25rem 0; gap: 1rem; }
+.order-item-detail span:first-child { flex-grow: 1; text-align: left; }
+.order-item-detail span:not(:first-child) { flex-shrink: 0; min-width: 80px; text-align: right; }
+
+.edit-history-item p { margin: 0.3rem 0; font-size: 0.95em; } /* Assuming this class might be used inside */
+.edit-history-item .history-timestamp { font-size: 0.85em; color: var(--text-muted); }
+.edit-history-item .history-details { margin-top: 0.5rem; padding-left: 1rem; border-left: 3px solid var(--medium-gray); font-size: 0.9em; }
+.edit-history-item .history-details strong { color: var(--text-color); }
+
+.empty-history-message, .loading-message {
+  text-align: center; font-style: italic; color: var(--text-muted); padding: 2rem 0;
+}
+
+/* --- Deleted Items Page --- */
+.deleted-items-page h2 { text-align: center; margin-bottom: 1.5rem; color: var(--danger-color); }
+.deleted-items-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+.deleted-item {
+  border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: #fff;
+  box-shadow: var(--box-shadow-sm); display: flex; flex-direction: column;
+  transition: var(--transition-base); color: inherit; overflow: hidden;
+  border-left: 5px solid var(--danger-color);
+  opacity: 0.9;
+}
+.deleted-item:hover { box-shadow: var(--box-shadow); transform: translateY(-4px); opacity: 1; }
+.deleted-item .grocery-item-link { padding: 1rem 1.25rem; flex-grow: 1; }
+.deleted-item h3 { margin-bottom: 0.5rem; font-size: 1.1em; }
+.deleted-item p { margin: 0.2rem 0; font-size: 0.9em; color: var(--text-muted); }
+.deleted-item .deleted-info { font-size: 0.8em; color: var(--danger-color); margin-top: 0.5rem; }
+.deleted-item .owner-controls {
+  padding: 0.75rem 1.25rem; background-color: var(--light-gray); border-top: 1px solid var(--border-color);
+  margin-top: auto; display: flex; justify-content: flex-end;
+}
+.deleted-item .restore-button { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+
+/* --- Edit Item Modal --- */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex; justify-content: center; align-items: center;
+  z-index: 1050;
+  padding: 1rem;
+}
+.modal-content {
+  background-color: #fff; padding: 2rem; border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow-lg); /* Larger shadow for modal */
+  max-width: 550px; width: 100%;
+  max-height: 90vh; overflow-y: auto;
+  position: relative;
+}
+.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.5em; color: var(--primary-color); }
+.edit-item-form { /* Styles inherited */ }
+.modal-actions {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;
+}
+.modal-actions .button { padding: 0.6rem 1.2rem; font-size: 0.95rem; font-weight: 500; }
+
+/* --- Media Queries --- */
+@media (min-width: 576px) {
+  .order-header h3 { flex-basis: auto; }
+}
+@media (min-width: 768px) {
+  .App { padding: 0 1.5rem; }
+  .add-item-form-container, .edit-item-form-container { padding: 2.5rem; }
+}
+
+/* --- User Management Page --- */
+.user-management-page h2 {
+  color: var(--secondary-color); /* Use secondary color */
+}
+.user-management-page h3 { /* Style for section headings */
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.4em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+.user-management-page .pending-users-section h3 {
+  color: var(--warning-color-dark); /* Make pending header stand out */
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem; /* Reduced top margin */
+  box-shadow: var(--box-shadow-sm);
+  font-size: 0.95em; /* Slightly smaller table font */
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 0.9rem; /* Adjust padding */
+  text-align: left;
+  vertical-align: middle;
+}
+
+.user-table thead th {
+  background-color: var(--light-gray);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.user-table tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.user-table tbody tr:nth-child(even) {
+  background-color: var(--light-gray);
+}
+
+.user-table tbody tr:hover {
+  background-color: var(--medium-gray);
+}
+
+.user-table td:first-child { /* Style User ID */
+  font-family: monospace;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  max-width: 150px; /* Prevent long IDs from stretching */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-table .action-cell {
+  text-align: right; /* Align buttons to the right */
+  white-space: nowrap; /* Prevent buttons wrapping */
+}
+
+.user-table .action-cell .button {
+  margin-left: 0.5rem; /* Space between buttons */
+}
+
+/* --- User Management Page --- */
+.user-management-page h2 {
+  color: var(--secondary-color); /* Use secondary color */
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  box-shadow: var(--box-shadow-sm);
+}
+
+.user-table th,
+.user-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.user-table thead th {
+  background-color: var(--light-gray);
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.user-table tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.user-table tbody tr:nth-child(even) {
+  background-color: var(--light-gray);
+}
+
+.user-table tbody tr:hover {
+  background-color: var(--medium-gray);
+}
+
+.user-table td:first-child { /* Style User ID / Timestamp */
+  font-family: monospace;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  white-space: nowrap; /* Prevent timestamp wrapping */
+}
+
+/* --- Edit History Page Specific Styles --- */
+.edit-history-page h2 {
+  color: var(--info-color); /* Use info color for edit history */
+}
+
+/* Container for all filter controls */
+.filter-controls-area {
+  background-color: var(--secondary-color-light);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+}
+
+/* Style for each row of filters */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center; /* Center items horizontally */
+  gap: 0.75rem; /* Gap between buttons */
+}
+.filter-row:not(:last-child) {
+  margin-bottom: 1rem; /* Space between filter rows */
+}
+
+.filter-label {
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-right: 0.5rem;
+  flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+/* Remove specific centering rules now handled by .filter-row */
+/* .category-filter-container { */
+/*   justify-content: center; */
+/* } */
+/* .action-filter-container { */
+/*   justify-content: center; */
+/* } */
+
+/* Action Filter Buttons */
+.action-filter-button {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--border-color);
+  background-color: #fff;
+  color: var(--secondary-color);
+  border-radius: var(--border-radius); /* Square-rounded */
+  font-size: 0.9em;
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
   cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: bold;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-  border: 1px solid transparent;
+  text-transform: capitalize; /* Nicer display */
 }
-
-/* Primary button (OK/Save) */
-.modal-actions .button.button-primary {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-.modal-actions .button.button-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
-}
-
-/* Secondary/Cancel button */
-.modal-actions .button:not(.button-primary) {
-  background-color: #f8f9fa;
-  color: #333;
-  border-color: #ccc;
-}
-.modal-actions .button:not(.button-primary):hover {
-  background-color: #e2e6ea;
+.action-filter-button:hover {
+  background-color: var(--medium-gray);
   border-color: #adb5bd;
+  color: var(--text-color);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+}
+.action-filter-button.active {
+  color: white;
+  box-shadow: none;
+  transform: translateY(0);
+  /* Keep border color consistent with background */
+}
+
+/* Specific colors for active action buttons */
+.action-filter-button.action-btn-all.active { background-color: var(--primary-color); border-color: var(--primary-color); }
+.action-filter-button.action-btn-item_edit.active { background-color: var(--info-color); border-color: var(--info-color); color: #000; } /* Darker text on info */
+.action-filter-button.action-btn-stock_increase.active,
+.action-filter-button.action-btn-restored.active { background-color: var(--success-color); border-color: var(--success-color); }
+.action-filter-button.action-btn-stock_decrease.active,
+.action-filter-button.action-btn-deleted.active { background-color: var(--danger-color); border-color: var(--danger-color); }
+/* Add more specific styles if other actions appear */
+
+/* Use user-table styles as a base for history-table */
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  box-shadow: var(--box-shadow-sm);
+  font-size: 0.9em; /* Slightly smaller font for history */
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 0.8rem; /* Adjust padding */
+  text-align: left;
+  vertical-align: middle;
+}
+
+.history-table thead th {
+  background-color: var(--light-gray);
+  font-weight: 500;
+  color: var(--text-muted);
+  position: sticky; /* Make header sticky */
+  top: 60px; /* Adjust based on nav height */
+  z-index: 10;
+}
+
+.history-table tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: var(--light-gray);
+}
+
+.history-table tbody tr:hover {
+  background-color: #e6f7ff; /* Light blue hover for info */
+}
+
+/* Style specific columns */
+.history-table td:nth-child(1) { /* Timestamp */
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.history-table td:nth-child(3), /* Item ID */
+.history-table td:nth-child(7) { /* User ID */
+  font-family: monospace;
+  font-size: 0.9em;
+  color: var(--text-muted);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.history-table td:nth-child(5) { /* Category */
+  font-style: italic;
+  color: var(--secondary-color);
+}
+
+
+/* Style specific action types */
+.history-table .action-stock_increase,
+.history-table .action-restored { color: var(--success-color); font-weight: 500; }
+.history-table .action-stock_decrease,
+.history-table .action-deleted { color: var(--danger-color); font-weight: 500; }
+.history-table .action-item_edit { color: var(--info-color); font-weight: 500; }
+
+/* Styling for edit details list */
+.history-table td .edit-details-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.95em; /* Slightly larger than base table font */
+}
+.history-table td .edit-details-list li {
+  margin-bottom: 0.3rem;
+  line-height: 1.4;
+}
+.history-table td .edit-details-list li:last-child {
+  margin-bottom: 0;
+}
+.history-table td .edit-details-list strong {
+  color: var(--secondary-color); /* Dim the field name slightly */
+  margin-right: 0.3em;
+}
+.history-table td .edit-details-list .old-value {
+  color: var(--text-muted);
+  /* text-decoration: line-through; /* Optional: strike through old value */
+  margin-right: 0.2em;
+}
+.history-table td .edit-details-list .new-value {
+  color: var(--text-color);
+  font-weight: 500; /* Make new value slightly bolder */
+  background-color: #e6f7ff; /* Highlight new value slightly */
+  padding: 0 2px;
+  border-radius: 2px;
+}
+.history-table td .no-details {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Style quantity changes */
+.history-table .positive-change {
+  color: var(--success-color);
+  font-weight: 500;
+}
+.history-table .negative-change {
+  color: var(--danger-color);
+  font-weight: 500;
+}
+
+.empty-history-message { /* Ensure this is styled */
+  text-align: center;
+  font-style: italic;
+  color: var(--text-muted);
+  padding: 2rem 0;
+  background-color: #fff;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  margin-top: 1.5rem;
+}
+
+/* --- User Management Page Grouping --- */
+.user-group {
+  margin-top: 2rem; /* Add space above each user type group */
+  padding-top: 1rem;
+  border-top: 2px solid var(--primary-color); /* Separator line */
+}
+
+.user-group:first-of-type {
+  margin-top: 0; /* No extra top margin for the first group */
+  padding-top: 0;
+  border-top: none; /* No separator line for the first group */
+}
+
+.user-type-heading {
+  font-size: 1.2em;
+  color: var(--primary-color);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.25rem;
+  /* Optional: Add a subtle background or border */
+  /* background-color: var(--light-gray); */
+  /* padding: 0.3rem 0.6rem; */
+  /* border-radius: 4px; */
+  /* display: inline-block; */
 }

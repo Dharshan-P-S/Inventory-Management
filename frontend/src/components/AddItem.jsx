@@ -5,6 +5,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
   const [price, setPrice] = useState('');
   const [quantityAvailable, setQuantityAvailable] = useState('');
   const [category, setCategory] = useState(''); // Added category state
+  const [description, setDescription] = useState(''); // Added description state
   const [errors, setErrors] = useState({});
 
   const validateForm = () => {
@@ -36,7 +37,8 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
         name: name.trim(),
         price: parseFloat(price),
         quantityAvailable: parseInt(quantityAvailable, 10),
-        category: category.trim() || 'Uncategorized' // Default to "Uncategorized" if empty
+        category: category.trim() || 'Uncategorized', // Default to "Uncategorized" if empty
+        description: description.trim() // Add description
       });
     }
   };
@@ -103,6 +105,20 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             ))}
           </datalist>
         </div>
+
+        {/* Description Input */}
+        <div className="form-group">
+          <label htmlFor="description">Description (optional):</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows="3" // Adjust rows as needed
+          />
+          {/* Add error display if validation is implemented */}
+          {/* {errors.description && <p id="description-error" className="error-message">{errors.description}</p>} */}
+        </div>
+
 
         <button type="submit">Add Item to grocery list</button>
       </form>
