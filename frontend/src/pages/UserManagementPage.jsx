@@ -7,7 +7,10 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
   const [users, setUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [actionLoading, setActionLoading] = useState(null); // Track loading state for approve/reject actions
+  const [actionLoading, setActionLoading] = useState(null); // Track loading state for approve/reject/remove/save actions
+  // const [editLoading, setEditLoading] = useState(null); // Replaced by editingUserId state
+  const [editingUserId, setEditingUserId] = useState(null); // ID of the user being edited
+  const [editFormData, setEditFormData] = useState({ username: '', email: '' }); // Form data for editing
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser || currentUser.type !== 'owner') {
@@ -119,6 +122,88 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
     }
   };
 
+  // --- Edit User Handlers ---
+
+  const handleEditUser = (user) => {
+    setEditingUserId(user.id);
+    setEditFormData({ username: user.username, email: user.email });
+    setActionLoading(null); // Ensure other actions aren't marked as loading
+  };
+
+  const handleCancelEdit = () => {
+    setEditingUserId(null);
+    setEditFormData({ username: '', email: '' });
+    setActionLoading(null);
+  };
+
+  const handleEditFormChange = (event) => {
+    const { name, value } = event.target;
+    setEditFormData(prevData => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSaveUser = async (userIdToSave) => {
+    setActionLoading(userIdToSave); // Use actionLoading to indicate save in progress
+    setApiError(null);
+    console.log(`Attempting to save changes for user: ${userIdToSave}`);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userIdToSave}`, { // Assuming PUT /api/users/:id endpoint for updates
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editFormData), // Send updated data
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || `Save failed: ${response.status}`);
+      }
+      alert(data.message || 'User updated successfully!');
+      setEditingUserId(null); // Exit edit mode
+      fetchUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Save error:', error);
+      setApiError(`Save failed: ${error.message}`);
+      // Optionally keep edit mode open on error, or close it
+      // setEditingUserId(null);
+    } finally {
+      setActionLoading(null); // Clear loading state
+    }
+  };
+
+  // --- Remove User Handler ---
+  const handleRemoveUser = async (user) => { // Pass the whole user object
+    const userTypeDisplay = user.type ? user.type.charAt(0).toUpperCase() + user.type.slice(1) : 'User';
+    if (!window.confirm(`Are you sure you want to delete the ${userTypeDisplay} '${user.username}'? This action cannot be undone.`)) {
+      return;
+    }
+    setActionLoading(user.id); // Use actionLoading for remove
+    setApiError(null);
+    console.log(`Attempting to remove user: ${user.id} (${user.username})`);
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${user.id}`, { // Use user.id
+        method: 'DELETE',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      // Check for different success statuses or no content
+      if (response.status === 204) { // No Content success
+        alert('User removed successfully!');
+      } else {
+        const data = await response.json(); // Try parsing JSON for messages
+        if (!response.ok) {
+          throw new Error(data.message || `Removal failed: ${response.status}`);
+        }
+        alert(data.message || 'User removed successfully!');
+      }
+      fetchUsers(); // Refresh user lists
+    } catch (error) {
+      console.error('Removal error:', error);
+      setApiError(`Removal failed: ${error.message}`);
+    } finally {
+      setActionLoading(null); // Clear loading state
+    }
+  };
+
+
   // --- Group Approved Users by Type ---
   const groupedUsers = users.reduce((acc, user) => {
     const type = user.type || 'unknown'; // Handle cases where type might be missing
@@ -202,25 +287,84 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                    <thead>
                      <tr>
                        <th>User ID</th>
-                       <th>Username</th>
-                       <th>Email</th>
-                       {/* Type column might be redundant now, but keep for consistency or remove */}
-                       {/* <th>Type</th> */}
-                       {/* Add Actions column if needed later */}
-                     </tr>
-                   </thead>
-                   <tbody>
-                     {/* Map users within this specific type group */}
-                     {groupedUsers[type].map((user) => (
-                       <tr key={user.id}>
-                         <td>{user.id}</td>
-                         <td>{user.username}</td>
-                         <td>{user.email}</td>
-                         {/* <td>{user.type}</td> */}
-                         {/* Add action cell if needed */}
-                       </tr>
-                     ))}
-                   </tbody>
+                        <th>Username</th>
+                        <th>Email</th>
+                        {/* <th>Type</th> */}
+                        <th>Actions</th> {/* Add Actions column header */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Map users within this specific type group */}
+                      {groupedUsers[type].map((user) => (
+                        <tr key={user.id} className={editingUserId === user.id ? 'editing-row' : ''}>
+                          <td>{user.id}</td>
+                          <td>
+                            {editingUserId === user.id ? (
+                              <input
+                                type="text"
+                                name="username"
+                                value={editFormData.username}
+                                onChange={handleEditFormChange}
+                                className="form-input form-input-sm"
+                              />
+                            ) : (
+                              user.username
+                            )}
+                          </td>
+                          <td>
+                            {editingUserId === user.id ? (
+                              <input
+                                type="email"
+                                name="email"
+                                value={editFormData.email}
+                                onChange={handleEditFormChange}
+                                className="form-input form-input-sm"
+                              />
+                            ) : (
+                              user.email
+                            )}
+                          </td>
+                          {/* <td>{user.type}</td> */}
+                          <td className="action-cell">
+                            {editingUserId === user.id ? (
+                              <>
+                                <button
+                                  onClick={() => handleSaveUser(user.id)}
+                                  className="button button-success button-sm"
+                                  disabled={actionLoading === user.id}
+                                >
+                                  {actionLoading === user.id ? 'Saving...' : 'Save'}
+                                </button>
+                                <button
+                                  onClick={handleCancelEdit}
+                                  className="button button-secondary button-sm"
+                                  disabled={actionLoading === user.id}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => handleEditUser(user)} // Pass the whole user object
+                                  className="button button-primary button-sm"
+                                  disabled={actionLoading !== null} // Disable if any action is loading
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleRemoveUser(user)} // Pass the whole user object
+                                  className="button button-danger button-sm"
+                                  disabled={actionLoading !== null} // Disable if any action is loading
+                                >
+                                  Remove
+                                </button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
                  </table>
                </div>
              )
@@ -229,21 +373,89 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
          {/* Handle users with 'unknown' type if necessary */}
          {groupedUsers['unknown'] && groupedUsers['unknown'].length > 0 && (
             <div key="unknown" className="user-group">
-              <h4 className="user-type-heading">Unknown Type</h4>
-              {/* Render table for unknown users similarly */}
-              <table className="user-table">
-                {/* ... table structure ... */}
-                <tbody>
-                  {groupedUsers['unknown'].map(user => (
-                    <tr key={user.id}>
-                      <td>{user.id}</td>
-                      <td>{user.username}</td>
-                      <td>{user.email}</td>
-                      <td>{user.type || 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+               <h4 className="user-type-heading">Unknown Type</h4>
+               <table className="user-table">
+                 <thead>
+                   <tr>
+                     <th>User ID</th>
+                     <th>Username</th>
+                     <th>Email</th>
+                     <th>Type</th>
+                     <th>Actions</th> {/* Add Actions column header */}
+                   </tr>
+                 </thead>
+                 <tbody>
+                   {groupedUsers['unknown'].map(user => (
+                    <tr key={user.id} className={editingUserId === user.id ? 'editing-row' : ''}>
+                       <td>{user.id}</td>
+                       <td>
+                         {editingUserId === user.id ? (
+                           <input
+                             type="text"
+                             name="username"
+                             value={editFormData.username}
+                             onChange={handleEditFormChange}
+                             className="form-input form-input-sm"
+                           />
+                         ) : (
+                           user.username
+                         )}
+                       </td>
+                       <td>
+                         {editingUserId === user.id ? (
+                           <input
+                             type="email"
+                             name="email"
+                             value={editFormData.email}
+                             onChange={handleEditFormChange}
+                             className="form-input form-input-sm"
+                           />
+                         ) : (
+                           user.email
+                         )}
+                       </td>
+                       <td>{user.type || 'N/A'}</td>
+                       <td className="action-cell">
+                         {editingUserId === user.id ? (
+                           <>
+                             <button
+                               onClick={() => handleSaveUser(user.id)}
+                               className="button button-success button-sm"
+                               disabled={actionLoading === user.id}
+                             >
+                               {actionLoading === user.id ? 'Saving...' : 'Save'}
+                             </button>
+                             <button
+                               onClick={handleCancelEdit}
+                               className="button button-secondary button-sm"
+                               disabled={actionLoading === user.id}
+                             >
+                               Cancel
+                             </button>
+                           </>
+                         ) : (
+                           <>
+                             <button
+                               onClick={() => handleEditUser(user)} // Pass user object
+                               className="button button-primary button-sm"
+                               disabled={actionLoading !== null}
+                             >
+                               Edit
+                             </button>
+                             <button
+                               onClick={() => handleRemoveUser(user)} // Pass user object
+                               className="button button-danger button-sm"
+                               disabled={actionLoading !== null}
+                             >
+                               Remove
+                             </button>
+                           </>
+                         )}
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
             </div>
          )}
        </section>

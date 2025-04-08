@@ -1011,6 +1011,106 @@ app.post('/api/approve-user/:userId', requireAuth, requireOwner, (req, res) => {
     }
 });
 
+// PUT /api/users/:userId - Update an existing user's details (username, email)
+app.put('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
+    const userIdToUpdate = req.params.userId;
+    const { username, email } = req.body;
+    const updatingOwnerId = req.userId;
+
+    console.log(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Owner: ${updatingOwnerId}, Body:`, req.body);
+
+    // Basic validation
+    if (!username || !email || typeof username !== 'string' || typeof email !== 'string' || username.trim() === '' || email.trim() === '') {
+        return res.status(400).json({ message: 'Username and email are required and must be non-empty strings.' });
+    }
+    // Basic email format check (can be more robust)
+    if (!/\S+@\S+\.\S+/.test(email)) {
+         return res.status(400).json({ message: 'Invalid email format.' });
+    }
+
+    let users = readUsers();
+    const userIndex = users.findIndex(u => u.id === userIdToUpdate);
+
+    if (userIndex === -1) {
+        console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Check for conflicts with other users (excluding the user being updated)
+    const conflictingUser = users.find(u => u.id !== userIdToUpdate && (u.username === username.trim() || u.email === email.trim()));
+    if (conflictingUser) {
+        const conflictField = conflictingUser.username === username.trim() ? 'Username' : 'Email';
+        console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Conflict: ${conflictField} '${conflictingUser[conflictField.toLowerCase()]}' already exists.`);
+        return res.status(409).json({ message: `${conflictField} already in use by another user.` });
+    }
+
+    // Update user details (keep original ID and passwordHash)
+    const originalUser = users[userIndex];
+    users[userIndex] = {
+        ...originalUser,
+        username: username.trim(),
+        email: email.trim()
+        // Do NOT update passwordHash or type here
+    };
+
+    const writeSuccess = writeUsers(users);
+
+    if (writeSuccess) {
+        console.log(`[${new Date().toISOString()}] User ${originalUser.username} (ID: ${userIdToUpdate}) updated by owner ${updatingOwnerId}. New details: { username: '${username.trim()}', email: '${email.trim()}' }`);
+        // Return the updated user object (excluding password hash)
+        const { passwordHash, ...updatedUserResponse } = users[userIndex];
+        res.status(200).json({ message: 'User updated successfully.', user: updatedUserResponse });
+    } else {
+        console.error(`[${new Date().toISOString()}] FAILED TO WRITE users file after updating user ID ${userIdToUpdate}.`);
+        // Attempt to revert in-memory change? Difficult.
+        res.status(500).json({ message: 'Failed to save updated user data.' });
+    }
+});
+
+
+// DELETE /api/users/:userId - Delete an approved user
+app.delete('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
+    const userIdToDelete = req.params.userId;
+    const deletingOwnerId = req.userId;
+
+    console.log(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Owner: ${deletingOwnerId}`);
+
+    // Prevent owner from deleting themselves
+    if (userIdToDelete === deletingOwnerId) {
+        console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Owner attempted to delete themselves.`);
+        return res.status(403).json({ message: 'Owners cannot delete their own account.' });
+    }
+
+    let users = readUsers();
+    const initialLength = users.length;
+    const userToDelete = users.find(u => u.id === userIdToDelete); // Find user before filtering
+
+    if (!userToDelete) {
+        console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found.`);
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const updatedUsers = users.filter(u => u.id !== userIdToDelete);
+
+    if (updatedUsers.length === initialLength) {
+        // This case should be caught by the find check above, but keep as safeguard
+        console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found (filter check).`);
+        return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const writeSuccess = writeUsers(updatedUsers);
+
+    if (writeSuccess) {
+        console.log(`[${new Date().toISOString()}] User ${userToDelete.username} (ID: ${userIdToDelete}) deleted by owner ${deletingOwnerId}.`);
+        // Return 204 No Content for successful deletion is common practice
+        res.status(204).send();
+    } else {
+        console.error(`[${new Date().toISOString()}] FAILED TO WRITE users file after deleting user ID ${userIdToDelete}.`);
+        res.status(500).json({ message: 'Failed to save changes after deleting user.' });
+    }
+});
+
+
 // DELETE /api/reject-user/:userId - Reject and delete a pending owner account
 app.delete('/api/reject-user/:userId', requireAuth, requireOwner, (req, res) => {
     const userToRejectId = req.params.userId;

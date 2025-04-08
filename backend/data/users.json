@@ -9,7 +9,7 @@
   {
     "id": "4bfd600f-33fe-4ecb-a932-ea3302769f7d",
     "username": "dharshan",
-    "email": "example@gmail.com",
+    "email": "dharshan@gmail.com",
     "passwordHash": "$2b$10$IM1Z7jwHGsoq2pamURUQBezbp.f7IuRPOkyPVeAVO5thnqRUGyePG",
     "type": "owner"
   },
@@ -28,10 +28,10 @@
     "type": "owner"
   },
   {
-    "id": "7afb009c-cc66-47f5-8542-62e1054a4b31",
-    "username": "ioioio",
-    "email": "j@gmail.com",
-    "passwordHash": "$2b$10$gJpBXypdjOaO2VvhAIdqbe33UZld9rXmga7cZllZEy/SpUnoA5JHq",
+    "id": "4f4514ad-f6ac-40b3-b47b-5af39462f6d9",
+    "username": "sarathi",
+    "email": "sarathi@gmail.com",
+    "passwordHash": "$2b$10$E4SiLEY8tbRtuxYlJk1qHeI48Q03YXvcH1caKlgZ2Pao0IT9RElM2",
     "type": "owner"
   }
 ]
