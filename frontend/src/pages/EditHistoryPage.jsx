@@ -251,8 +251,8 @@ function EditHistoryPage({ currentUser, apiError, setApiError }) {
                   <td className={`action-${action.toLowerCase()}`}>{action.replace('_', ' ').toUpperCase()}</td>
                   <td>{itemId}</td>
                   <td>{itemName}</td>
-                  <td>{itemCategory}</td> {/* Display Category */}
-                  <td>{detailsContent || <span className="no-details">-</span>}</td> {/* Fallback for empty details */}
+                  <td>{itemCategory}</td>
+                  <td>{detailsContent || <span className="no-details">-</span>}</td>
                   <td>{entry.userId || 'N/A'}</td>
                 </tr>
               );
