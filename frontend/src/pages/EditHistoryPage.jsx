@@ -197,15 +197,7 @@ function EditHistoryPage({ currentUser, apiError, setApiError }) {
       ) : (
         <table className="history-table user-table">
           <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Action</th>
-              <th>Item ID</th>
-              <th>Item Name</th>
-              <th>Category</th> {/* Added Category Column */}
-              <th>Details</th>
-              <th>User ID</th>
-            </tr>
+            <tr><th>Timestamp</th><th>Action</th><th>Item ID</th><th>Item Name</th><th>Category</th><th>Details</th><th>User ID</th></tr>
           </thead>
           <tbody>
             {filteredHistory.map((entry, index) => {

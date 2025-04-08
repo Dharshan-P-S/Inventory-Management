@@ -1,99 +1,53 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose'); // Added Mongoose
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid'); // For generating unique IDs
+
+// --- Import Mongoose Models ---
+const Grocery = require('./models/Grocery');
+const User = require('./models/User');
+const Order = require('./models/Order');
+const EditHistory = require('./models/EditHistory');
+const SalesHistory = require('./models/SalesHistory');
+const PendingUser = require('./models/PendingUser');
+const DeletedGrocery = require('./models/DeletedGrocery');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const SALT_ROUNDS = 10; // For bcrypt hashing
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-very-secret-key'; // Use environment variable in production
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/inventory_management'; // MongoDB connection string
 
-// --- File Paths ---
-const groceriesFilePath = path.join(__dirname, 'data', 'groceries.json');
-const usersFilePath = path.join(__dirname, 'data', 'users.json');
-const orderHistoryFilePath = path.join(__dirname, 'data', 'order_history.json');
-const editHistoryFilePath = path.join(__dirname, 'data', 'edit_history.json'); // Renamed history file path
-const salesHistoryFilePath = path.join(__dirname, 'data', 'sales_history.json'); // Sales history file path
-const pendingUsersFilePath = path.join(__dirname, 'data', 'pending_users.json'); // Pending users file path
-const deletedGroceriesFilePath = path.join(__dirname, 'data', 'deleted_groceries.json'); // Deleted groceries file path
+// --- MongoDB Connection ---
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('MongoDB connected successfully.'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
-// --- Helper Functions ---
+mongoose.connection.on('error', err => {
+  console.error(`MongoDB connection error: ${err}`);
+});
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected.');
+});
 
-// Generic function to read JSON data
-const readJsonFile = (filePath) => {
+// --- Helper Function (Optional - for logging edits) ---
+const logEdit = async (action, userId, details) => {
     try {
-        if (fs.existsSync(filePath)) {
-            const jsonData = fs.readFileSync(filePath);
-            // Handle empty file case gracefully
-            return jsonData.length > 0 ? JSON.parse(jsonData) : [];
-        }
-        console.warn(`File not found: ${filePath}. Returning empty array.`);
-        return [];
+        const entry = {
+            action,
+            userId,
+            timestamp: new Date(),
+            ...details
+        };
+        await EditHistory.create(entry);
+        console.log(`[${entry.timestamp.toISOString()}] Edit logged: Action=${action}, User=${userId}`);
     } catch (error) {
-        console.error(`Error reading file ${filePath}:`, error);
-        return []; // Return empty array on error
+        console.error(`[${new Date().toISOString()}] FAILED TO LOG EDIT: Action=${action}, User=${userId}`, error);
+        // Decide if you need to handle this failure more actively
     }
 };
-
-// Generic function to write JSON data
-const writeJsonFile = (filePath, data) => {
-    try {
-        fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-        return true;
-    } catch (error) {
-        console.error(`Error writing file ${filePath}:`, error);
-        return false;
-    }
-};
-
-// Specific read/write functions using the generic helpers
-const readGroceries = () => readJsonFile(groceriesFilePath);
-const writeGroceries = (data) => writeJsonFile(groceriesFilePath, data);
-const readUsers = () => readJsonFile(usersFilePath);
-const writeUsers = (data) => writeJsonFile(usersFilePath, data);
-const readOrderHistory = () => readJsonFile(orderHistoryFilePath);
-const writeOrderHistory = (data) => writeJsonFile(orderHistoryFilePath, data);
-const readEditHistory = () => readJsonFile(editHistoryFilePath); // Renamed read function
-const writeEditHistory = (data) => writeJsonFile(editHistoryFilePath, data); // Renamed write function
-const readSalesHistory = () => readJsonFile(salesHistoryFilePath); // Read sales history
-const writeSalesHistory = (data) => writeJsonFile(salesHistoryFilePath, data); // Write sales history
-const readPendingUsers = () => readJsonFile(pendingUsersFilePath); // Read pending users
-const writePendingUsers = (data) => writeJsonFile(pendingUsersFilePath, data); // Write pending users
-const readDeletedGroceries = () => readJsonFile(deletedGroceriesFilePath); // Read deleted groceries
-const writeDeletedGroceries = (data) => writeJsonFile(deletedGroceriesFilePath, data); // Write deleted groceries
-
-
-// Helper function to read data from JSON file - DEPRECATED, use readGroceries
-const readData = () => {
-    // This function is kept for backward compatibility if needed, but prefer readGroceries
-    return readGroceries();
-};
-
-// Helper function to write data to JSON file - DEPRECATED, use writeGroceries
-const writeData = (data) => {
-    // This function is kept for backward compatibility if needed, but prefer writeGroceries
-    return writeGroceries(data);
-};
-
-// Helper function to read orders from JSON file - DEPRECATED, use readOrderHistory
-const readOrders = () => {
-    // This function is kept for backward compatibility if needed, but prefer readOrderHistory
-    return readOrderHistory();
-};
-
-// Helper function to write orders to JSON file - DEPRECATED, use writeOrderHistory
-const writeOrders = (orders) => {
-    // This function is kept for backward compatibility if needed, but prefer writeOrderHistory
-    return writeOrderHistory(orders);
-};
-
-
-// --- Load initial data (less critical now as we read fresh on requests) ---
-let groceryItems = readGroceries(); // Keep for potential reference if needed elsewhere
-let nextId = groceryItems.length > 0 ? Math.max(...groceryItems.map(item => parseInt(item.id) || 0)) + 1 : 1; // Ensure IDs are numbers for max()
 
 // --- Middleware setup ---
 app.use(cors({
@@ -104,37 +58,48 @@ app.use(express.json()); // Parse JSON request bodies
 app.use(cookieParser(COOKIE_SECRET)); // Parse cookies, use secret for signing
 
 // --- Authentication Middleware ---
-const requireAuth = (req, res, next) => {
+const requireAuth = async (req, res, next) => { // Made async
     const userId = req.signedCookies.userId; // Use signed cookies
     if (!userId) {
-        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt to ${req.path}`);
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt to ${req.path} - No userId cookie`);
         return res.status(401).json({ message: 'Authentication required. Please log in.' });
     }
-    // Attach user ID to request for later use in route handlers
-    req.userId = userId;
-    console.log(`[${new Date().toISOString()}] Authenticated access by user ${userId} to ${req.path}`);
-    next();
+
+    try {
+        // Fetch user from DB based on cookie ID
+        const user = await User.findOne({ id: userId });
+        if (!user) {
+            console.warn(`[${new Date().toISOString()}] Unauthorized access attempt to ${req.path} - User ID ${userId} not found in DB.`);
+            res.clearCookie('userId'); // Clear invalid cookie
+            return res.status(401).json({ message: 'Invalid session. Please log in again.' });
+        }
+        // Attach user object (or just ID and type) to request
+        req.user = user; // Attach the full user document
+        req.userId = user.id; // Keep userId for compatibility if needed
+        console.log(`[${new Date().toISOString()}] Authenticated access by user ${user.username} (ID: ${userId}, Type: ${user.type}) to ${req.path}`);
+        next();
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error during authentication check for user ID ${userId}:`, error);
+        res.status(500).json({ message: 'Internal server error during authentication.' });
+    }
 };
 
 // --- User Type Middleware ---
+// These now assume requireAuth has run and attached req.user
 const requireCustomer = (req, res, next) => {
-    const users = readUsers();
-    const user = users.find(u => u.id === req.userId);
-    if (user && user.type === 'customer') {
+    if (req.user && req.user.type === 'customer') {
         next(); // User is a customer, proceed
     } else {
-        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.userId} (not customer) to ${req.path}`);
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.user?.username || req.userId} (not customer) to ${req.path}`);
         res.status(403).json({ message: 'Unauthorized: Customers only.' });
     }
 };
 
 const requireOwner = (req, res, next) => {
-    const users = readUsers();
-    const user = users.find(u => u.id === req.userId);
-    if (user && user.type === 'owner') {
+    if (req.user && req.user.type === 'owner') {
         next(); // User is an owner, proceed
     } else {
-        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.userId} (not owner) to ${req.path}`);
+        console.warn(`[${new Date().toISOString()}] Unauthorized access attempt by user ${req.user?.username || req.userId} (not owner) to ${req.path}`);
         res.status(403).json({ message: 'Unauthorized: Owners only.' });
     }
 };
@@ -158,20 +123,17 @@ app.post('/api/register', async (req, res) => {
     }
     const type = userType === 'owner' ? 'owner' : 'customer'; // Default to customer
 
-    const users = readUsers();
-    const pendingUsers = readPendingUsers();
-
-    // Check for existing user in both lists
-    const existingUser = users.find(u => u.username === username || u.email === email);
-    const existingPendingUser = pendingUsers.find(u => u.username === username || u.email === email);
-
-    if (existingUser || existingPendingUser) {
-        const conflictField = (existingUser?.username === username || existingPendingUser?.username === username) ? 'Username' : 'Email';
-        console.warn(`[${new Date().toISOString()}] Registration failed: ${conflictField} already exists (in users or pending).`);
-        return res.status(409).json({ message: `${conflictField} already exists.` });
-    }
-
     try {
+        // Check for existing user in both active and pending collections
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        const existingPendingUser = await PendingUser.findOne({ $or: [{ username }, { email }] });
+
+        if (existingUser || existingPendingUser) {
+            const conflictField = (existingUser?.username === username || existingPendingUser?.username === username) ? 'Username' : 'Email';
+            console.warn(`[${new Date().toISOString()}] Registration failed: ${conflictField} already exists (in users or pending).`);
+            return res.status(409).json({ message: `${conflictField} already exists.` });
+        }
+
         // Hash password
         const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
 
@@ -181,38 +143,37 @@ app.post('/api/register', async (req, res) => {
             username,
             email,
             passwordHash, // Store the hash
+            id: uuidv4(), // Generate unique ID
+            username,
+            email,
+            passwordHash, // Store the hash
             type: type
         };
 
         if (type === 'owner') {
-            // Add to pending users list
-            pendingUsers.push(newUser);
-            const writeSuccess = writePendingUsers(pendingUsers);
-            if (writeSuccess) {
-                console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${newUser.id})`);
-                // Exclude password hash from the response
-                const { passwordHash: _, ...userResponse } = newUser;
-                res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
-            } else {
-                console.error(`[${new Date().toISOString()}] FAILED TO SAVE pending owner ${username} TO FILE.`);
-                res.status(500).json({ message: 'Failed to save pending user data. Please try again.' });
-            }
+            // Add to pending users collection
+            const createdPendingUser = await PendingUser.create(newUser);
+            console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
+            // Exclude password hash from the response
+            const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
+            res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
         } else {
-            // Add directly to users list (customer)
-            users.push(newUser);
-            const writeSuccess = writeUsers(users);
-            if (writeSuccess) {
-                console.log(`[${new Date().toISOString()}] Customer registered successfully: ${username} (ID: ${newUser.id})`);
-                // Exclude password hash from the response
-                const { passwordHash: _, ...userResponse } = newUser;
-                res.status(201).json({ message: 'User registered successfully.', user: userResponse, pending: false });
-            } else {
-                console.error(`[${new Date().toISOString()}] FAILED TO SAVE new customer ${username} TO FILE.`);
-                res.status(500).json({ message: 'Failed to save user data. Please try again.' });
-            }
+            // Add directly to users collection (customer)
+            const createdUser = await User.create(newUser);
+            console.log(`[${new Date().toISOString()}] Customer registered successfully: ${username} (ID: ${createdUser.id})`);
+            // Exclude password hash from the response
+            const { passwordHash: _, ...userResponse } = createdUser.toObject();
+            res.status(201).json({ message: 'User registered successfully.', user: userResponse, pending: false });
         }
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Error during registration for ${username}:`, error);
+        // Check for Mongoose validation errors or duplicate key errors
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+        if (error.code === 11000) { // Duplicate key error
+             return res.status(409).json({ message: 'Username or email already exists.' });
+        }
         res.status(500).json({ message: 'An internal server error occurred during registration.' });
     }
 });
@@ -226,38 +187,37 @@ app.post('/api/login', async (req, res) => {
         return res.status(400).json({ message: 'Username and password are required.' });
     }
 
-    const users = readUsers(); // Read active users
-    const pendingUsers = readPendingUsers(); // Read pending users
-    let user = users.find(u => u.username === username); // Check active users first
-    let isPending = false;
-
-    if (!user) {
-        // If not found in active users, check pending users
-        user = pendingUsers.find(u => u.username === username);
-        if (user) {
-            isPending = true; // Mark as pending if found here
-        }
-    }
-
-    if (!user) {
-        // If not found in either list
-        console.warn(`[${new Date().toISOString()}] Login failed: User not found in active or pending lists - ${username}`);
-        return res.status(401).json({ message: 'Invalid username or password.' }); // Generic message
-    }
-
     try {
+        // Check active users first
+        let user = await User.findOne({ username });
+        let isPending = false;
+
+        if (!user) {
+            // If not found in active users, check pending users
+            user = await PendingUser.findOne({ username });
+            if (user) {
+                isPending = true; // Mark as pending if found here
+            }
+        }
+
+        if (!user) {
+            // If not found in either list
+            console.warn(`[${new Date().toISOString()}] Login failed: User not found in active or pending lists - ${username}`);
+            return res.status(401).json({ message: 'Invalid username or password.' }); // Generic message
+        }
+
         // Compare provided password with stored hash
         const match = await bcrypt.compare(password, user.passwordHash);
 
         if (match) {
-             // Check if the user is pending approval
+            // Check if the user is pending approval
             if (isPending) {
                 console.warn(`[${new Date().toISOString()}] Login attempt failed: Account pending approval - ${username}`);
                 return res.status(403).json({ message: 'Account pending approval.' }); // Forbidden status
             }
 
             // Proceed with login for approved users
-            console.log(`[${new Date().toISOString()}] Login successful for user: ${username} (ID: ${user.id})`);
+            console.log(`[${new Date().toISOString()}] Login successful for user: ${username} (ID: ${user.id}, Type: ${user.type})`);
             // Set a signed, HTTP-only cookie for session management
             res.cookie('userId', user.id, {
                 httpOnly: true, // Prevents client-side JS access
@@ -267,9 +227,9 @@ app.post('/api/login', async (req, res) => {
                 // sameSite: 'Lax' // Or 'Strict' depending on requirements
             });
 
-            // Return user info (excluding password hash and type)
-            const { passwordHash: _, type: __, ...userResponse } = user;
-            res.status(200).json({ message: 'Login successful.', user: { ...userResponse, type: user.type } });
+            // Return user info (excluding password hash)
+            const { passwordHash: _, ...userResponse } = user.toObject(); // Use toObject()
+            res.status(200).json({ message: 'Login successful.', user: userResponse }); // type is already included
         } else {
             console.warn(`[${new Date().toISOString()}] Login failed: Invalid password for user - ${username}`);
             res.status(401).json({ message: 'Invalid username or password.' });
@@ -290,42 +250,41 @@ app.post('/api/logout', (req, res) => {
 });
 
 // GET /api/session - Check current login status
-app.get('/api/session', requireAuth, (req, res) => {
-    // requireAuth middleware already validated the cookie and attached req.userId
-    console.log(`[${new Date().toISOString()}] GET /api/session - User: ${req.userId}`);
-    const users = readUsers();
-    const user = users.find(u => u.id === req.userId);
+app.get('/api/session', requireAuth, (req, res) => { // requireAuth now attaches req.user
+    // requireAuth middleware already validated the cookie and fetched the user
+    console.log(`[${new Date().toISOString()}] GET /api/session - User: ${req.user.username} (ID: ${req.userId})`);
 
-    if (user) {
-        // Return user info (excluding password hash and type)
-        const { passwordHash: _, type: __, ...userResponse } = user;
-        res.status(200).json({ user: { ...userResponse, type: user.type } });
-    } else {
-        // This case should ideally not happen if requireAuth works correctly
-        console.error(`[${new Date().toISOString()}] Session check failed: User ID ${req.userId} from cookie not found in database.`);
-        res.clearCookie('userId'); // Clear invalid cookie
-        res.status(404).json({ message: 'User session data not found.' });
-    }
+    // User object is already available in req.user from requireAuth
+    // Return user info (excluding password hash)
+    const { passwordHash: _, ...userResponse } = req.user.toObject();
+    res.status(200).json({ user: userResponse });
 });
 
 
 // --- Grocery Endpoints ---
 
 // GET /api/groceries - Retrieve all grocery items (No auth needed for browsing)
-app.get('/api/groceries',  (req, res) => {
+app.get('/api/groceries', async (req, res) => { // Made async
     console.log(`[${new Date().toISOString()}] GET /api/groceries`);
-    const currentGroceries = readGroceries();
-    res.json(currentGroceries);
+    try {
+        const currentGroceries = await Grocery.find({}); // Fetch from DB
+        res.json(currentGroceries);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error fetching groceries:`, error);
+        res.status(500).json({ message: 'Failed to retrieve groceries.' });
+    }
 });
 
 // POST /api/groceries - Add a new grocery item (Owners only)
-app.post('/api/groceries', requireAuth, requireOwner, (req, res) => { // Added requireOwner middleware
-    console.log(`[${new Date().toISOString()}] POST /api/groceries - Body:`, req.body);
+app.post('/api/groceries', requireAuth, requireOwner, async (req, res) => { // Made async
+    console.log(`[${new Date().toISOString()}] POST /api/groceries - User: ${req.user.username}, Body:`, req.body);
     // Destructure category and description, make them optional
     const { name, price, quantityAvailable, category, description } = req.body;
-    let currentGroceries = readGroceries(); // Read fresh data
+    const userId = req.user.id; // Get user ID from authenticated request
 
-    // --- Input Validation ---
+    // --- Input Validation (Mongoose schema handles some validation) ---
+    // You can add extra validation here if needed, but rely on Mongoose first
+    // Example: Check if name already exists (though schema might enforce uniqueness if needed)
     let errors = [];
     // (Validation logic remains largely the same)
     if (!name || typeof name !== 'string' || name.trim() === '') {
@@ -353,63 +312,73 @@ app.post('/api/groceries', requireAuth, requireOwner, (req, res) => { // Added r
     }
 
     // --- Create and Add Item ---
-    const newItem = {
-        id: uuidv4(), // Use UUID for new items
-        name: name.trim(),
-        price: price,
-        quantityAvailable: quantityAvailable,
-        // Add category, trim whitespace, default to 'Uncategorized' if empty
-        category: category ? category.trim() : 'Uncategorized',
-        description: description ? description.trim() : "" // Add description, default to empty string
-    };
+    try {
+        const newItemData = {
+            id: uuidv4(), // Use UUID for new items
+            name: name?.trim(), // Use optional chaining and trim
+            price: price,
+            quantityAvailable: quantityAvailable,
+            category: category ? category.trim() : 'Uncategorized',
+            description: description ? description.trim() : ""
+        };
 
-    currentGroceries.push(newItem);
+        const newGrocery = new Grocery(newItemData);
+        const savedItem = await newGrocery.save(); // Save to DB
 
-    // --- Persist Data ---
-    const writeSuccess = writeGroceries(currentGroceries);
+        console.log(`[${new Date().toISOString()}] Added new item (ID: ${savedItem.id}) by user ${userId}.`);
 
-    if (writeSuccess) {
-        groceryItems = currentGroceries; // Update in-memory cache if needed
-        console.log(`[${new Date().toISOString()}] Added new item (ID: ${newItem.id}) and saved to file.`);
-        res.status(201).json(newItem); // Return the newly created item
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO SAVE new item (ID: ${newItem.id}) TO FILE.`);
-        res.status(500).json({ message: 'Failed to save the new item persistently. Please try again.' });
+        // Log the addition
+        await logEdit('item_add', userId, {
+             item: { // Log details of the added item
+                id: savedItem.id,
+                name: savedItem.name,
+                price: savedItem.price,
+                category: savedItem.category,
+                description: savedItem.description
+            }
+        });
+
+        res.status(201).json(savedItem); // Return the newly created item from DB
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error adding grocery item by user ${userId}:`, error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+        res.status(500).json({ message: 'Failed to save the new item. Please try again.' });
     }
 });
 
 // GET /api/groceries/:id - Retrieve a single grocery item by ID (No auth needed)
-app.get('/api/groceries/:id', (req, res) => {
-    const itemId = req.params.id; // Keep as string or parse depending on data format
+app.get('/api/groceries/:id', async (req, res) => { // Made async
+    const itemId = req.params.id;
     console.log(`[${new Date().toISOString()}] GET /api/groceries/${itemId}`);
 
-    // Basic validation if parsing ID
-    // if (isNaN(parseInt(itemId, 10))) {
-    //     return res.status(400).json({ message: 'Invalid item ID provided.' });
-    // }
+    try {
+        const item = await Grocery.findOne({ id: itemId }); // Find by custom 'id' field
 
-    const currentGroceries = readGroceries();
-    // Adjust find logic if IDs are stored as numbers vs strings
-    const item = currentGroceries.find(g => g.id.toString() === itemId);
-
-    if (item) {
-        res.json(item);
-    } else {
-        console.warn(`[${new Date().toISOString()}] GET /api/groceries/${itemId} - Item not found.`);
-        res.status(404).json({ message: `Item with ID ${itemId} not found.` });
+        if (item) {
+            res.json(item);
+        } else {
+            console.warn(`[${new Date().toISOString()}] GET /api/groceries/${itemId} - Item not found.`);
+            res.status(404).json({ message: `Item with ID ${itemId} not found.` });
+        }
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error fetching grocery item ${itemId}:`, error);
+        res.status(500).json({ message: 'Failed to retrieve grocery item.' });
     }
 });
 
 // PUT /api/groceries/:id - Update an existing grocery item (Owners only)
-app.put('/api/groceries/:id', requireAuth, requireOwner, (req, res) => {
+app.put('/api/groceries/:id', requireAuth, requireOwner, async (req, res) => { // Made async
     const itemId = req.params.id;
     // Include description in the destructured body
     const { name, price, category, description } = req.body;
-    const userId = req.userId; // Get owner ID from authenticated request
+    const userId = req.user.id; // Get owner ID from authenticated request
 
     console.log(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Owner: ${userId}, Body:`, req.body);
 
-    // --- Input Validation ---
+    // --- Input Validation (Mongoose handles some, add more if needed) ---
     let errors = [];
     if (name !== undefined && (typeof name !== 'string' || name.trim() === '')) {
         errors.push('Invalid item name (must be a non-empty string if provided)');
@@ -435,84 +404,81 @@ app.put('/api/groceries/:id', requireAuth, requireOwner, (req, res) => {
         return res.status(400).json({ message: 'Validation errors occurred', errors });
     }
 
-    // --- Read current data ---
-    let currentGroceries = readGroceries();
-    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemId.toString());
+    // --- Find and Update Item ---
+    try {
+        const originalItem = await Grocery.findOne({ id: itemId });
 
-    if (itemIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Item not found.`);
-        return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
-    }
-
-    const originalItem = { ...currentGroceries[itemIndex] }; // Store original item data
-    const updatedItem = { ...originalItem }; // Create a copy to modify
-    const changes = {}; // Object to store detected changes
-
-    // --- Apply Updates and Track Changes ---
-    if (name !== undefined && updatedItem.name !== name.trim()) {
-        changes.name = { old: updatedItem.name, new: name.trim() };
-        updatedItem.name = name.trim();
-    }
-    const newPrice = price !== undefined ? parseFloat(price) : updatedItem.price;
-    if (price !== undefined && updatedItem.price !== newPrice) {
-        changes.price = { old: updatedItem.price, new: newPrice };
-        updatedItem.price = newPrice;
-    }
-    const newCategory = category !== undefined ? (category.trim() || 'Uncategorized') : updatedItem.category;
-    if (updatedItem.category !== newCategory) {
-        changes.category = { old: updatedItem.category, new: newCategory };
-        updatedItem.category = newCategory;
-    }
-    const newDescription = description !== undefined ? description.trim() : updatedItem.description;
-    if (updatedItem.description !== newDescription) {
-        changes.description = { old: updatedItem.description, new: newDescription };
-        updatedItem.description = newDescription;
-    }
-
-    const hasChanges = Object.keys(changes).length > 0;
-
-    if (!hasChanges) {
-        console.log(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - No changes detected.`);
-        return res.status(200).json(updatedItem); // Return the (unmodified) item
-    }
-
-    // Replace the old item with the updated one
-    currentGroceries[itemIndex] = updatedItem;
-
-    // --- Persist Grocery Data ---
-    const writeGroceriesSuccess = writeGroceries(currentGroceries);
-
-    if (writeGroceriesSuccess) {
-        groceryItems = currentGroceries; // Update cache if needed
-        console.log(`[${new Date().toISOString()}] Updated item (ID: ${itemId}) by owner ${userId}. Saved to file.`);
-
-        // --- Log Edit to Edit History ---
-        const historyEntry = {
-            action: 'item_edit',
-            itemId: updatedItem.id, // ID of the item edited
-            itemName: updatedItem.name, // Current name for context
-            changes: changes, // Detailed changes object
-            timestamp: new Date().toISOString(),
-            userId: userId // Logged-in user ID
-        };
-
-        let currentEditHistory = readEditHistory(); // Use renamed function
-        currentEditHistory.push(historyEntry);
-        const historyWriteSuccess = writeEditHistory(currentEditHistory); // Use renamed function
-
-        if (!historyWriteSuccess) {
-            console.error(`[${new Date().toISOString()}] Item ID ${itemId} updated, but FAILED TO SAVE edit history for edit.`);
-            // Decide if this should change the response status (e.g., 207 Multi-Status)
-            // For now, still return success for the item update itself
-        } else {
-             console.log(`[${new Date().toISOString()}] Edit of item ID ${itemId} logged to edit history.`);
+        if (!originalItem) {
+            console.warn(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Item not found.`);
+            return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
         }
 
+        // Build update object and track changes
+        const updateData = {};
+        const changes = {};
+
+        if (name !== undefined && originalItem.name !== name.trim()) {
+            changes.name = { old: originalItem.name, new: name.trim() };
+            updateData.name = name.trim();
+        }
+        const newPrice = price !== undefined ? parseFloat(price) : originalItem.price;
+        if (price !== undefined && originalItem.price !== newPrice) {
+             // Basic validation for price
+            if (typeof newPrice !== 'number' || newPrice <= 0 || !Number.isFinite(newPrice)) {
+                 return res.status(400).json({ message: 'Price must be a positive number.' });
+            }
+            changes.price = { old: originalItem.price, new: newPrice };
+            updateData.price = newPrice;
+        }
+        const newCategory = category !== undefined ? (category.trim() || 'Uncategorized') : originalItem.category;
+        if (originalItem.category !== newCategory) {
+            changes.category = { old: originalItem.category, new: newCategory };
+            updateData.category = newCategory;
+        }
+        const newDescription = description !== undefined ? description.trim() : originalItem.description;
+         if (originalItem.description !== newDescription) {
+            changes.description = { old: originalItem.description, new: newDescription };
+            updateData.description = newDescription;
+        }
+
+
+        const hasChanges = Object.keys(changes).length > 0;
+
+        if (!hasChanges) {
+            console.log(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - No changes detected.`);
+            return res.status(200).json(originalItem); // Return the original item
+        }
+
+        // Perform the update
+        const updatedItem = await Grocery.findOneAndUpdate(
+            { id: itemId },
+            { $set: updateData },
+            { new: true, runValidators: true } // Return updated doc, run schema validators
+        );
+
+        if (!updatedItem) {
+             // Should not happen if findOne worked, but good practice
+             console.error(`[${new Date().toISOString()}] PUT /api/groceries/${itemId} - Update failed after finding item.`);
+             return res.status(404).json({ message: `Item with ID ${itemId} not found during update.` });
+        }
+
+        console.log(`[${new Date().toISOString()}] Updated item (ID: ${itemId}) by owner ${userId}.`);
+
+        // --- Log Edit to Edit History ---
+        await logEdit('item_edit', userId, {
+            itemId: updatedItem.id,
+            itemName: updatedItem.name, // Current name for context
+            changes: changes
+        });
+
         res.status(200).json(updatedItem); // Return the updated item
-    } else {
-        // Attempt to roll back in-memory change if write failed? Difficult.
-        console.error(`[${new Date().toISOString()}] FAILED TO SAVE updated item (ID: ${itemId}) TO FILE.`);
-        res.status(500).json({ message: 'Failed to save the updated item persistently. Please try again.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error updating grocery item ${itemId} by user ${userId}:`, error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+        res.status(500).json({ message: 'Failed to update the item. Please try again.' });
     }
 });
 
@@ -520,10 +486,13 @@ app.put('/api/groceries/:id', requireAuth, requireOwner, (req, res) => {
 // --- Order Processing Endpoint (Requires Customer Authentication) ---
 
 // POST /api/buy - Process a purchase request (Customers only)
-app.post('/api/buy', requireAuth, requireCustomer, (req, res) => { // Added requireCustomer middleware
-    const userId = req.userId; // Get user ID from authenticated request
-    console.log(`[${new Date().toISOString()}] POST /api/buy - User: ${userId}, Body:`, req.body);
-    const itemsToBuy = req.body; // Expecting an array: [{ id: string/number, quantity: number, name: string, price: number }, ...]
+// IMPORTANT: This implementation lacks proper transactionality. In a real-world scenario,
+// use MongoDB transactions to ensure stock update and order creation are atomic.
+app.post('/api/buy', requireAuth, requireCustomer, async (req, res) => { // Made async
+    const userId = req.user.id; // Get user ID from authenticated request
+    const username = req.user.username; // Get username
+    console.log(`[${new Date().toISOString()}] POST /api/buy - User: ${username} (ID: ${userId}), Body:`, req.body);
+    const itemsToBuy = req.body; // Expecting an array: [{ id: string, quantity: number, name: string, price: number }, ...]
 
     // --- Basic Request Validation ---
     if (!Array.isArray(itemsToBuy)) {
@@ -533,108 +502,107 @@ app.post('/api/buy', requireAuth, requireCustomer, (req, res) => { // Added requ
         return res.status(400).json({ message: 'Cannot process empty purchase request.' });
     }
 
-    // --- Read current data (critical for stock check) ---
-    let currentGroceries = readGroceries();
+    // --- Fetch items from DB and Validate Stock ---
+    // This approach fetches all items at once, which is generally better than one by one.
+    const itemIds = itemsToBuy.map(item => item.id);
     let validationErrors = [];
-    let stockUpdates = []; // Store intended updates: { index: number, quantityToDeduct: number, name: string }
-    let orderTotal = 0; // Calculate total for the order
+    let orderTotal = 0;
+    let stockUpdateOperations = []; // For bulkWrite
 
-    // --- Validate each item and check stock atomically ---
-    for (const itemToBuy of itemsToBuy) {
-        // Validate item format in the request
-        if (!itemToBuy || itemToBuy.id == null || typeof itemToBuy.quantity !== 'number' || itemToBuy.quantity <= 0 || !Number.isInteger(itemToBuy.quantity) || typeof itemToBuy.price !== 'number' || typeof itemToBuy.name !== 'string') {
-            validationErrors.push(`Invalid item format or quantity/price/name for item ID ${itemToBuy?.id || 'unknown'}.`);
-            continue;
+    try {
+        const currentGroceries = await Grocery.find({ id: { $in: itemIds } });
+        const groceryMap = new Map(currentGroceries.map(item => [item.id, item])); // For easy lookup
+
+        for (const itemToBuy of itemsToBuy) {
+            // Validate item format in the request
+            if (!itemToBuy || itemToBuy.id == null || typeof itemToBuy.quantity !== 'number' || itemToBuy.quantity <= 0 || !Number.isInteger(itemToBuy.quantity) || typeof itemToBuy.price !== 'number' || typeof itemToBuy.name !== 'string') {
+                validationErrors.push(`Invalid item format or quantity/price/name for item ID ${itemToBuy?.id || 'unknown'}.`);
+                continue;
+            }
+
+            const groceryItem = groceryMap.get(itemToBuy.id);
+
+            if (!groceryItem) {
+                validationErrors.push(`Item with ID ${itemToBuy.id} not found.`);
+                continue;
+            }
+
+            // Verify price matches (optional, but good practice)
+            if (groceryItem.price !== itemToBuy.price) {
+                 console.warn(`[${new Date().toISOString()}] Price mismatch for item ${itemToBuy.id}. Client: ${itemToBuy.price}, Server: ${groceryItem.price}`);
+                 // Decide how to handle: reject, use server price, etc. For now, reject.
+                 validationErrors.push(`Price mismatch for item ID ${itemToBuy.id} (${groceryItem.name}). Please refresh and try again.`);
+                 continue; // Skip stock check if price is wrong
+            }
+
+
+            if (groceryItem.quantityAvailable < itemToBuy.quantity) {
+                validationErrors.push(`Insufficient stock for item ID ${itemToBuy.id} (${groceryItem.name}). Requested: ${itemToBuy.quantity}, Available: ${groceryItem.quantityAvailable}.`);
+            } else {
+                // Prepare stock update operation for bulkWrite
+                stockUpdateOperations.push({
+                    updateOne: {
+                        filter: { id: itemToBuy.id, quantityAvailable: { $gte: itemToBuy.quantity } }, // Add quantity check for atomicity
+                        update: { $inc: { quantityAvailable: -itemToBuy.quantity } }
+                    }
+                });
+                orderTotal += itemToBuy.price * itemToBuy.quantity;
+            }
         }
 
-        // Find item, handling potential string/number ID differences
-        const groceryItemIndex = currentGroceries.findIndex(item => item.id.toString() === itemToBuy.id.toString());
-
-        if (groceryItemIndex === -1) {
-            validationErrors.push(`Item with ID ${itemToBuy.id} not found.`);
-            continue;
+        if (validationErrors.length > 0) {
+            console.warn(`[${new Date().toISOString()}] POST /api/buy - Validation failed for user ${userId}:`, validationErrors);
+            const statusCode = validationErrors.some(err => err.includes('Insufficient stock') || err.includes('Price mismatch')) ? 409 : 400;
+            return res.status(statusCode).json({ message: 'Purchase validation failed.', errors: validationErrors });
         }
 
-        const groceryItem = currentGroceries[groceryItemIndex];
-
-        if (groceryItem.quantityAvailable < itemToBuy.quantity) {
-            validationErrors.push(`Insufficient stock for item ID ${itemToBuy.id} (${groceryItem.name}). Requested: ${itemToBuy.quantity}, Available: ${groceryItem.quantityAvailable}.`);
+        // --- Apply stock updates using bulkWrite for better atomicity ---
+        if (stockUpdateOperations.length > 0) {
+            const bulkResult = await Grocery.bulkWrite(stockUpdateOperations);
+            console.log(`[${new Date().toISOString()}] Stock update bulkWrite result for user ${userId}:`, bulkResult);
+            // Check if all updates were successful (matched and modified count should match)
+            if (bulkResult.modifiedCount !== stockUpdateOperations.length) {
+                 console.error(`[${new Date().toISOString()}] CRITICAL: Stock update mismatch during purchase for user ${userId}. Expected ${stockUpdateOperations.length} updates, got ${bulkResult.modifiedCount}. Potential race condition or stock changed.`);
+                 // Attempt to find which items failed? Difficult without transactions.
+                 // For now, fail the entire order.
+                 return res.status(500).json({ message: 'Failed to update stock for all items consistently. Order cancelled. Please try again.' });
+            }
         } else {
-            stockUpdates.push({
-                index: groceryItemIndex,
-                quantityToDeduct: itemToBuy.quantity,
-                name: groceryItem.name
-            });
-            orderTotal += itemToBuy.price * itemToBuy.quantity;
+             // Should not happen if validation passed, but safeguard
+             return res.status(400).json({ message: 'No valid items to purchase.' });
         }
-    }
 
-    if (validationErrors.length > 0) {
-        console.warn(`[${new Date().toISOString()}] POST /api/buy - Validation failed for user ${userId}:`, validationErrors);
-        const statusCode = validationErrors.some(err => err.includes('Insufficient stock')) ? 409 : 400;
-        return res.status(statusCode).json({ message: 'Purchase validation failed.', errors: validationErrors });
-    }
 
-    // --- Apply stock updates ---
-    stockUpdates.forEach(update => {
-        currentGroceries[update.index].quantityAvailable -= update.quantityToDeduct;
-        console.log(`[${new Date().toISOString()}] User ${userId} buying: Reducing stock for ${update.name} (ID: ${currentGroceries[update.index].id}) by ${update.quantityToDeduct}. New stock: ${currentGroceries[update.index].quantityAvailable}`);
-    });
-
-    // --- Persist the updated grocery data ---
-    const groceryWriteSuccess = writeGroceries(currentGroceries);
-
-    if (groceryWriteSuccess) {
-        groceryItems = currentGroceries; // Update cache if needed
         console.log(`[${new Date().toISOString()}] Purchase by user ${userId} successful. Updated stock saved.`);
 
-        // --- Create and Save Order History ---
-        const users = readUsers(); // Read users to get username
-        const currentUser = users.find(u => u.id === userId);
-        const username = currentUser ? currentUser.username : 'Unknown User'; // Get username
-
-        const newOrder = {
+        // --- Create and Save Order History & Sales History ---
+        const newOrderData = {
             orderId: uuidv4(), // Generate unique order ID
-            userId: userId, // Link order to the logged-in user
-            username: username, // Add username
-            date: new Date().toISOString(),
-            items: itemsToBuy.map(item => ({ // Store details of items bought
-                id: item.id.toString(), // Ensure consistent ID format
+            userId: userId,
+            username: username, // Add username from authenticated user
+            date: new Date(), // Use Date object, Mongoose handles conversion
+            items: itemsToBuy.map(item => ({
+                id: item.id,
                 name: item.name,
                 price: item.price,
                 quantity: item.quantity
             })),
-            total: parseFloat(orderTotal.toFixed(2)) // Store calculated total
+            total: parseFloat(orderTotal.toFixed(2))
         };
 
-        // --- Save to Order History (for customer) ---
-        let currentOrderHistory = readOrderHistory();
-        currentOrderHistory.push(newOrder);
-        const orderWriteSuccess = writeOrderHistory(currentOrderHistory);
+        // Save to both collections (ideally within a transaction)
+        const [savedOrder, savedSale] = await Promise.all([
+            Order.create(newOrderData),
+            SalesHistory.create(newOrderData) // Use the same data
+        ]);
 
-        // --- Save to Sales History (for owner) ---
-        let currentSalesHistory = readSalesHistory();
-        currentSalesHistory.push(newOrder); // Use the same order object
-        const salesWriteSuccess = writeSalesHistory(currentSalesHistory);
+        console.log(`[${new Date().toISOString()}] Order (ID: ${savedOrder.orderId}) for user ${userId} saved to Order and Sales History.`);
+        res.status(200).json({ message: 'Purchase successful and order saved!', orderId: savedOrder.orderId });
 
-        if (orderWriteSuccess && salesWriteSuccess) {
-            console.log(`[${new Date().toISOString()}] Order (ID: ${newOrder.orderId}) for user ${userId} saved to Order and Sales History.`);
-            res.status(200).json({ message: 'Purchase successful and order saved!', orderId: newOrder.orderId });
-        } else {
-            // CRITICAL: Stock updated, but one or both history files failed to save.
-            console.error(`[${new Date().toISOString()}] CRITICAL: Purchase by user ${userId} successful BUT FAILED TO SAVE history. Order History Write: ${orderWriteSuccess}, Sales History Write: ${salesWriteSuccess}`);
-            // Inform user about the partial failure.
-            let failureMessage = 'Purchase successful, but failed to save ';
-            if (!orderWriteSuccess && !salesWriteSuccess) failureMessage += 'order and sales history.';
-            else if (!orderWriteSuccess) failureMessage += 'order history.';
-            else failureMessage += 'sales history.';
-            failureMessage += ' Please contact support.';
-            res.status(207).json({ message: failureMessage, purchaseStatus: 'success', orderStatus: orderWriteSuccess, salesStatus: salesWriteSuccess });
-        }
-    } else {
-        console.error(`[${new Date().toISOString()}] Purchase by user ${userId} processed BUT FAILED TO SAVE updated stock TO FILE.`);
-        // Don't proceed to save order if stock update failed
-        res.status(500).json({ message: 'Purchase processed but failed to save updated stock persistently. Order not created.' });
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error processing purchase for user ${userId}:`, error);
+        // Attempt to rollback stock changes would be ideal here if possible (requires transactions)
+        res.status(500).json({ message: 'An internal server error occurred during purchase processing.' });
     }
 });
 
@@ -642,15 +610,14 @@ app.post('/api/buy', requireAuth, requireCustomer, (req, res) => { // Added requ
 // --- Stock Update Endpoint (Owners only, Requires Authentication) ---
 
 // PATCH /api/groceries/:id/stock - Update stock for a specific item (Owners only)
-app.patch('/api/groceries/:id/stock', requireAuth, requireOwner, async (req, res) => { // Added requireOwner and requireAuth middleware
+app.patch('/api/groceries/:id/stock', requireAuth, requireOwner, async (req, res) => { // Made async
     const itemId = req.params.id;
     const { quantityChange } = req.body;
-    const userId = req.userId; // Get user ID from authenticated request
+    const userId = req.user.id; // Get user ID from authenticated request
 
     console.log(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - User: ${userId}, Body:`, req.body);
 
     // --- Input Validation ---
-    // (Keep existing validation for itemId format if needed)
     if (quantityChange == null || typeof quantityChange !== 'number' || !Number.isInteger(quantityChange)) {
         return res.status(400).json({ message: 'Invalid quantityChange provided. Must be an integer.' });
     }
@@ -658,68 +625,54 @@ app.patch('/api/groceries/:id/stock', requireAuth, requireOwner, async (req, res
         return res.status(400).json({ message: 'Quantity change cannot be zero.' });
     }
 
-    // --- Read current data ---
-    let currentGroceries = readGroceries();
-    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemId.toString());
+    try {
+        // --- Find and Update Atomically ---
+        // Use findOneAndUpdate with $inc and validation for non-negative result
+        const updatedItem = await Grocery.findOneAndUpdate(
+            { id: itemId, quantityAvailable: { $gte: (quantityChange < 0 ? -quantityChange : 0) } }, // Ensure enough stock if decreasing
+            { $inc: { quantityAvailable: quantityChange } },
+            { new: true, runValidators: true } // Return updated doc, run schema validators
+        );
 
-    if (itemIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Item not found.`);
-        return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
-    }
-
-    const itemToUpdate = currentGroceries[itemIndex];
-    const originalQuantity = itemToUpdate.quantityAvailable;
-    const newQuantity = originalQuantity + quantityChange;
-
-    if (newQuantity < 0) {
-        console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Cannot remove ${Math.abs(quantityChange)}. Only ${originalQuantity} available.`);
-        return res.status(409).json({ message: `Cannot remove ${Math.abs(quantityChange)} of ${itemToUpdate.name}. Only ${originalQuantity} available.` });
-    }
-
-    // --- Apply the update ---
-    currentGroceries[itemIndex].quantityAvailable = newQuantity;
-    console.log(`[${new Date().toISOString()}] Updating stock for ${itemToUpdate.name} (ID: ${itemId}) from ${originalQuantity} to ${newQuantity}.`);
-
-    // --- Persist the updated data ---
-    const writeSuccess = writeGroceries(currentGroceries);
-
-    if (writeSuccess) {
-        groceryItems = currentGroceries; // Update cache if needed
-        console.log(`[${new Date().toISOString()}] Stock update successful for item ID ${itemId}. Saved to file.`);
-
-        // --- Log to inventory history ---
-        const historyEntry = {
-            action: quantityChange > 0 ? 'stock_increase' : 'stock_decrease', // More specific action
-            item: { // Store full item details at the time of change
-                id: itemToUpdate.id,
-                name: itemToUpdate.name,
-                price: itemToUpdate.price,
-                category: itemToUpdate.category,
-                description: itemToUpdate.description
-            },
-            quantityChange: quantityChange,
-            newQuantity: newQuantity, // Store the resulting quantity
-            timestamp: new Date().toISOString(),
-            userId: userId // Logged-in user ID
-        };
-        let currentEditHistory = readEditHistory(); // Use renamed function
-        currentEditHistory.push(historyEntry);
-        const historyWriteSuccess = writeEditHistory(currentEditHistory); // Use renamed function
-
-        if (historyWriteSuccess) {
-            console.log(`[${new Date().toISOString()}] Edit history updated for stock change on item ID ${itemId}.`); // Updated log message
-            res.status(200).json(currentGroceries[itemIndex]); // Return the updated item
-        } else {
-            console.error(`[${new Date().toISOString()}] Stock updated, but FAILED TO SAVE edit history for item ID ${itemId}.`); // Updated log message
-            res.status(207).json({ message: 'Stock updated successfully, but failed to save edit history.', stockUpdateStatus: 'success', historyStatus: 'failed' }); // Updated message
+        if (!updatedItem) {
+            // If null, either item not found OR not enough stock for decrease
+            const itemExists = await Grocery.findOne({ id: itemId });
+            if (!itemExists) {
+                console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Item not found.`);
+                return res.status(404).json({ message: `Item with ID ${itemId} not found.` });
+            } else {
+                console.warn(`[${new Date().toISOString()}] PATCH /api/groceries/${itemId}/stock - Cannot remove ${Math.abs(quantityChange)}. Only ${itemExists.quantityAvailable} available.`);
+                return res.status(409).json({ message: `Cannot remove ${Math.abs(quantityChange)} of ${itemExists.name}. Only ${itemExists.quantityAvailable} available.` });
+            }
         }
 
+        console.log(`[${new Date().toISOString()}] Stock update successful for item ${updatedItem.name} (ID: ${itemId}) by user ${userId}. New quantity: ${updatedItem.quantityAvailable}.`);
 
-    } else {
-        // Roll back in-memory change if write failed
-        currentGroceries[itemIndex].quantityAvailable = originalQuantity;
-        console.error(`[${new Date().toISOString()}] Stock update processed BUT FAILED TO SAVE updated stock TO FILE for item ID ${itemId}.`);
-        res.status(500).json({ message: 'Stock update processed but failed to save persistently. Please check server logs.' });
+        // --- Log to edit history ---
+        await logEdit(
+            quantityChange > 0 ? 'stock_increase' : 'stock_decrease',
+            userId,
+            {
+                item: { // Store snapshot of item details
+                    id: updatedItem.id,
+                    name: updatedItem.name,
+                    price: updatedItem.price,
+                    category: updatedItem.category,
+                    description: updatedItem.description
+                },
+                quantityChange: quantityChange,
+                newQuantity: updatedItem.quantityAvailable
+            }
+        );
+
+        res.status(200).json(updatedItem); // Return the updated item
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error updating stock for item ${itemId} by user ${userId}:`, error);
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+        res.status(500).json({ message: 'Stock update processed but failed to save persistently.' });
     }
 });
 
@@ -727,91 +680,85 @@ app.patch('/api/groceries/:id/stock', requireAuth, requireOwner, async (req, res
 // --- Order History Endpoint (Requires Authentication) ---
 
 // GET /api/orders - Retrieve order history for the logged-in user
-app.get('/api/orders', requireAuth, (req, res) => {
-    const userId = req.userId;
+app.get('/api/orders', requireAuth, async (req, res) => { // Made async
+    const userId = req.user.id; // Get user ID from authenticated request
     console.log(`[${new Date().toISOString()}] GET /api/orders - User: ${userId}`);
 
-    const allOrderHistory = readOrderHistory();
-    // Filter orders to return only those belonging to the logged-in user
-    const userOrderHistory = allOrderHistory.filter(order => order.userId === userId);
+    try {
+        // Fetch orders for the specific user from the DB, sort by date descending
+        const userOrderHistory = await Order.find({ userId: userId }).sort({ date: -1 });
 
-    console.log(`[${new Date().toISOString()}] Found ${userOrderHistory.length} orders for user ${userId}.`);
-    res.json(userOrderHistory);
+        console.log(`[${new Date().toISOString()}] Found ${userOrderHistory.length} orders for user ${userId}.`);
+        res.json(userOrderHistory);
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error fetching order history for user ${userId}:`, error);
+        res.status(500).json({ message: 'Failed to retrieve order history.' });
+    }
 });
 
 
 // --- Grocery Deletion Endpoint (Owners only, Requires Authentication) ---
 
-// DELETE /api/groceries/delete/:id - Delete a grocery item (move to deleted_groceries.json)
-app.delete('/api/groceries/delete/:id', requireAuth, requireOwner, (req, res) => {
+// DELETE /api/groceries/delete/:id - Delete a grocery item (move to deleted_groceries collection)
+app.delete('/api/groceries/delete/:id', requireAuth, requireOwner, async (req, res) => { // Made async
     const itemIdToDelete = req.params.id;
-    const userId = req.userId; // Get user ID from authenticated request
+    const userId = req.user.id; // Get user ID from authenticated request
 
     console.log(`[${new Date().toISOString()}] DELETE /api/groceries/delete/${itemIdToDelete} - Owner: ${userId}`);
 
-    let currentGroceries = readGroceries();
-    const itemIndex = currentGroceries.findIndex(item => item.id.toString() === itemIdToDelete.toString());
+    // Ideally, use a transaction here to ensure atomicity
+    try {
+        // Find the item to delete
+        const itemToDelete = await Grocery.findOne({ id: itemIdToDelete });
 
-    if (itemIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] DELETE /api/groceries/delete/${itemIdToDelete} - Item not found.`);
-        return res.status(404).json({ message: `Item with ID ${itemIdToDelete} not found.` });
-    }
+        if (!itemToDelete) {
+            console.warn(`[${new Date().toISOString()}] DELETE /api/groceries/delete/${itemIdToDelete} - Item not found.`);
+            return res.status(404).json({ message: `Item with ID ${itemIdToDelete} not found.` });
+        }
 
-    const itemToDelete = currentGroceries[itemIndex];
+        // Create entry for deleted items collection
+        const deletedItemEntryData = {
+            ...itemToDelete.toObject(), // Get plain JS object
+            _id: undefined, // Remove original MongoDB _id if present
+            deletedAt: new Date(),
+            // deletedBy: userId // Optional: track who deleted it (add to schema if needed)
+        };
 
-    // Prepare the entry for deleted items
-    const deletedItemEntry = {
-        ...itemToDelete,
-        deletedAt: new Date().toISOString(),
-        deletedBy: userId // Optional: track who deleted it
-    };
+        // Perform deletion from groceries and insertion into deleted_groceries
+        // Using Promise.all for concurrency (though transaction is safer)
+        const [deleteResult, createDeletedResult] = await Promise.all([
+            Grocery.deleteOne({ id: itemIdToDelete }),
+            DeletedGrocery.create(deletedItemEntryData)
+        ]);
 
-    // Read current deleted items
-    let currentDeletedGroceries = readDeletedGroceries();
-    currentDeletedGroceries.push(deletedItemEntry);
+        // Check results (deleteOne result has deletedCount)
+        if (deleteResult.deletedCount === 0) {
+             // This shouldn't happen if findOne succeeded, but safeguard
+             console.error(`[${new Date().toISOString()}] Delete failed for item ID ${itemIdToDelete} after finding it.`);
+             // Attempt to remove the potentially created deletedGrocery entry? Complex without transactions.
+             return res.status(500).json({ message: 'Failed to delete item from active list after finding it.' });
+        }
 
-    // Remove item from the main groceries list
-    currentGroceries.splice(itemIndex, 1);
-
-    // Write both files
-    const writeGroceriesSuccess = writeGroceries(currentGroceries);
-    const writeDeletedSuccess = writeDeletedGroceries(currentDeletedGroceries);
-
-    if (writeGroceriesSuccess && writeDeletedSuccess) {
-        groceryItems = currentGroceries; // Update cache if needed
         console.log(`[${new Date().toISOString()}] Item ID ${itemIdToDelete} deleted by owner ${userId} and moved to deleted items.`);
 
-        // --- Log deletion to inventory history ---
-        const historyEntry = {
-            action: 'deleted',
-            item: { // Store full item details at the time of deletion
+        // --- Log deletion to edit history ---
+        await logEdit('deleted', userId, {
+            item: { // Store snapshot of item details
                 id: itemToDelete.id,
                 name: itemToDelete.name,
                 price: itemToDelete.price,
                 category: itemToDelete.category,
                 description: itemToDelete.description
-            },
-            timestamp: deletedItemEntry.deletedAt, // Use the deletion timestamp
-            userId: userId
-        };
-        let currentEditHistory = readEditHistory(); // Use renamed function
-        currentEditHistory.push(historyEntry);
-        const historyWriteSuccess = writeEditHistory(currentEditHistory); // Use renamed function
-
-        if (!historyWriteSuccess) {
-            console.error(`[${new Date().toISOString()}] Item ID ${itemIdToDelete} deleted, but FAILED TO SAVE edit history.`);
-            // Decide if this should change the response status (e.g., 207 Multi-Status)
-        } else {
-             console.log(`[${new Date().toISOString()}] Deletion of item ID ${itemIdToDelete} logged to edit history.`);
-        }
+            }
+            // timestamp is added by logEdit
+        });
 
         res.status(200).json({ message: `Item '${itemToDelete.name}' deleted successfully.` });
-    } else {
-        // Attempt to roll back if possible (tricky with file writes)
-        // For simplicity, log the error and return a server error
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE FILES during delete operation for item ID ${itemIdToDelete}. Groceries write: ${writeGroceriesSuccess}, Deleted write: ${writeDeletedSuccess}`);
-        // If one write succeeded and the other failed, the data is inconsistent.
-        res.status(500).json({ message: 'Failed to complete delete operation due to a server error. Data might be inconsistent.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error deleting item ${itemIdToDelete} by user ${userId}:`, error);
+        // If error occurred, data might be inconsistent (e.g., deleted from one place but not added to other)
+        res.status(500).json({ message: 'Failed to complete delete operation due to a server error.' });
     }
 });
 
@@ -819,12 +766,13 @@ app.delete('/api/groceries/delete/:id', requireAuth, requireOwner, (req, res) =>
 // --- Deleted Groceries Endpoint (Owners only, Requires Authentication) ---
 
 // GET /api/deleted-groceries - Retrieve all deleted grocery items
-app.get('/api/deleted-groceries', requireAuth, requireOwner, (req, res) => {
-    const userId = req.userId; // Get user ID from authenticated request
+app.get('/api/deleted-groceries', requireAuth, requireOwner, async (req, res) => { // Made async
+    const userId = req.user.id; // Get user ID from authenticated request
     console.log(`[${new Date().toISOString()}] GET /api/deleted-groceries - Owner: ${userId}`);
 
     try {
-        const deletedGroceries = readDeletedGroceries();
+        // Fetch deleted items, sort by deletion date descending
+        const deletedGroceries = await DeletedGrocery.find({}).sort({ deletedAt: -1 });
         console.log(`[${new Date().toISOString()}] Retrieved ${deletedGroceries.length} deleted grocery records for owner ${userId}.`);
         res.status(200).json(deletedGroceries);
     } catch (error) {
@@ -834,80 +782,64 @@ app.get('/api/deleted-groceries', requireAuth, requireOwner, (req, res) => {
 });
 
 // POST /api/deleted-groceries/restore/:id - Restore a deleted grocery item
-app.post('/api/deleted-groceries/restore/:id', requireAuth, requireOwner, (req, res) => {
+app.post('/api/deleted-groceries/restore/:id', requireAuth, requireOwner, async (req, res) => { // Made async
     const itemIdToRestore = req.params.id;
-    const userId = req.userId;
+    const userId = req.user.id;
 
     console.log(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Owner: ${userId}`);
 
-    let currentDeletedGroceries = readDeletedGroceries();
-    const itemIndex = currentDeletedGroceries.findIndex(item => item.id.toString() === itemIdToRestore.toString());
+    // Ideally, use a transaction
+    try {
+        // Find the item in the deleted collection
+        const itemToRestore = await DeletedGrocery.findOne({ id: itemIdToRestore });
 
-    if (itemIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item not found in deleted items.`);
-        return res.status(404).json({ message: `Item with ID ${itemIdToRestore} not found in deleted items.` });
-    }
-
-    const itemToRestore = currentDeletedGroceries[itemIndex];
-
-    // Remove metadata added during deletion
-    const { deletedAt, deletedBy, ...restoredItemData } = itemToRestore;
-
-    // Read current active groceries
-    let currentGroceries = readGroceries();
-
-    // Check if an item with the same ID already exists in the active list (edge case)
-    const existingActiveItem = currentGroceries.find(item => item.id.toString() === restoredItemData.id.toString());
-    if (existingActiveItem) {
-        console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item with ID ${restoredItemData.id} already exists in active groceries. Cannot restore duplicate.`);
-        // Decide how to handle: overwrite? return error? For now, return error.
-        return res.status(409).json({ message: `Cannot restore item '${restoredItemData.name}'. An item with ID ${restoredItemData.id} already exists in the active list.` });
-    }
-
-    // Add the item back to the active list
-    currentGroceries.push(restoredItemData);
-
-    // Remove the item from the deleted list
-    currentDeletedGroceries.splice(itemIndex, 1);
-
-    // Write both files
-    const writeGroceriesSuccess = writeGroceries(currentGroceries);
-    const writeDeletedSuccess = writeDeletedGroceries(currentDeletedGroceries);
-
-    if (writeGroceriesSuccess && writeDeletedSuccess) {
-        groceryItems = currentGroceries; // Update cache if needed
-        console.log(`[${new Date().toISOString()}] Item ID ${itemIdToRestore} restored by owner ${userId}.`);
-
-        // --- Log restoration to inventory history ---
-        const historyEntry = {
-            action: 'restored',
-            item: { // Store full item details at the time of restoration
-                id: restoredItemData.id,
-                name: restoredItemData.name,
-                price: restoredItemData.price,
-                category: restoredItemData.category,
-                description: restoredItemData.description
-            },
-            timestamp: new Date().toISOString(),
-            userId: userId
-        };
-        let currentEditHistory = readEditHistory(); // Use renamed function
-        currentEditHistory.push(historyEntry);
-        const historyWriteSuccess = writeEditHistory(currentEditHistory); // Use renamed function
-
-        if (!historyWriteSuccess) {
-            console.error(`[${new Date().toISOString()}] Item ID ${itemIdToRestore} restored, but FAILED TO SAVE edit history.`);
-            // Decide if this should change the response status (e.g., 207 Multi-Status)
-        } else {
-             console.log(`[${new Date().toISOString()}] Restoration of item ID ${itemIdToRestore} logged to edit history.`);
+        if (!itemToRestore) {
+            console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item not found in deleted items.`);
+            return res.status(404).json({ message: `Item with ID ${itemIdToRestore} not found in deleted items.` });
         }
 
-        // Also need to update the main grocery list state in App.jsx after successful restore
-        // The frontend will need to handle this based on the response
-        res.status(200).json({ message: `Item '${restoredItemData.name}' restored successfully.`, restoredItem: restoredItemData });
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE FILES during restore operation for item ID ${itemIdToRestore}. Groceries write: ${writeGroceriesSuccess}, Deleted write: ${writeDeletedSuccess}`);
-        res.status(500).json({ message: 'Failed to complete restore operation due to a server error. Data might be inconsistent.' });
+        // Prepare data for the active groceries collection
+        const { deletedAt, deletedBy, _id, ...restoredItemData } = itemToRestore.toObject(); // Exclude Mongo _id and deletion metadata
+
+        // Check if an item with the same ID already exists in the active list
+        const existingActiveItem = await Grocery.findOne({ id: restoredItemData.id });
+        if (existingActiveItem) {
+            console.warn(`[${new Date().toISOString()}] POST /api/deleted-groceries/restore/${itemIdToRestore} - Item with ID ${restoredItemData.id} already exists in active groceries. Cannot restore duplicate.`);
+            return res.status(409).json({ message: `Cannot restore item '${restoredItemData.name}'. An item with ID ${restoredItemData.id} already exists in the active list.` });
+        }
+
+        // Perform restoration: create in groceries, delete from deleted_groceries
+        const [createdGrocery, deleteResult] = await Promise.all([
+             Grocery.create(restoredItemData),
+             DeletedGrocery.deleteOne({ id: itemIdToRestore })
+        ]);
+
+        if (deleteResult.deletedCount === 0) {
+            // Should not happen if findOne succeeded, but safeguard
+            console.error(`[${new Date().toISOString()}] Restore failed for item ID ${itemIdToRestore}: Could not remove from deleted collection after finding it.`);
+            // Attempt to remove the newly created grocery item? Complex without transactions.
+            await Grocery.deleteOne({ id: restoredItemData.id }); // Attempt rollback
+            return res.status(500).json({ message: 'Failed to remove item from deleted list during restore.' });
+        }
+
+        console.log(`[${new Date().toISOString()}] Item ID ${itemIdToRestore} restored by owner ${userId}.`);
+
+        // --- Log restoration to edit history ---
+        await logEdit('restored', userId, {
+            item: { // Store snapshot of restored item details
+                id: createdGrocery.id,
+                name: createdGrocery.name,
+                price: createdGrocery.price,
+                category: createdGrocery.category,
+                description: createdGrocery.description
+            }
+        });
+
+        res.status(200).json({ message: `Item '${createdGrocery.name}' restored successfully.`, restoredItem: createdGrocery });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error restoring item ${itemIdToRestore} by user ${userId}:`, error);
+        res.status(500).json({ message: 'Failed to complete restore operation due to a server error.' });
     }
 });
 
@@ -915,14 +847,13 @@ app.post('/api/deleted-groceries/restore/:id', requireAuth, requireOwner, (req, 
 // --- Edit History Endpoint (Owners only, Requires Authentication) ---
 
 // GET /api/edit-history - Retrieve all edit history records
-app.get('/api/edit-history', requireAuth, requireOwner, (req, res) => { // Renamed endpoint
-    const userId = req.userId; // Get user ID from authenticated request
+app.get('/api/edit-history', requireAuth, requireOwner, async (req, res) => { // Made async
+    const userId = req.user.id; // Get user ID from authenticated request
     console.log(`[${new Date().toISOString()}] GET /api/edit-history - Owner: ${userId}`);
 
     try {
-        const editHistory = readEditHistory(); // Use renamed function
-        // Optional: Enhance history data (e.g., add item names if needed, though might be slow)
-        // For now, just return the raw history
+        // Fetch history, sort by timestamp descending
+        const editHistory = await EditHistory.find({}).sort({ timestamp: -1 });
         console.log(`[${new Date().toISOString()}] Retrieved ${editHistory.length} edit history records for owner ${userId}.`);
         res.status(200).json(editHistory);
     } catch (error) {
@@ -935,16 +866,15 @@ app.get('/api/edit-history', requireAuth, requireOwner, (req, res) => { // Renam
 // --- User Management Endpoint (Owners only, Requires Authentication) ---
 
 // GET /api/users - Retrieve all users (excluding sensitive info)
-app.get('/api/users', requireAuth, requireOwner, (req, res) => {
-    const userId = req.userId;
+app.get('/api/users', requireAuth, requireOwner, async (req, res) => { // Made async
+    const userId = req.user.id;
     console.log(`[${new Date().toISOString()}] GET /api/users - Owner: ${userId}`);
 
     try {
-        const users = readUsers();
-        // Map users to exclude passwordHash before sending
-        const safeUsers = users.map(({ passwordHash, ...user }) => user);
-        console.log(`[${new Date().toISOString()}] Retrieved ${safeUsers.length} user records for owner ${userId}.`);
-        res.status(200).json(safeUsers);
+        // Fetch users, explicitly exclude passwordHash field
+        const users = await User.find({}, { passwordHash: 0 });
+        console.log(`[${new Date().toISOString()}] Retrieved ${users.length} user records for owner ${userId}.`);
+        res.status(200).json(users);
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Error reading users for owner ${userId}:`, error);
         res.status(500).json({ message: 'Failed to retrieve user list.' });
@@ -952,14 +882,14 @@ app.get('/api/users', requireAuth, requireOwner, (req, res) => {
 });
 
 // GET /api/pending-users - Retrieve pending owner accounts
-app.get('/api/pending-users', requireAuth, requireOwner, (req, res) => {
-    const userId = req.userId;
+app.get('/api/pending-users', requireAuth, requireOwner, async (req, res) => { // Made async
+    const userId = req.user.id;
     console.log(`[${new Date().toISOString()}] GET /api/pending-users - Owner: ${userId}`);
     try {
-        const pendingUsers = readPendingUsers();
-        const safePendingUsers = pendingUsers.map(({ passwordHash, ...user }) => user);
-        console.log(`[${new Date().toISOString()}] Retrieved ${safePendingUsers.length} pending user records for owner ${userId}.`);
-        res.status(200).json(safePendingUsers);
+        // Fetch pending users, explicitly exclude passwordHash
+        const pendingUsers = await PendingUser.find({}, { passwordHash: 0 });
+        console.log(`[${new Date().toISOString()}] Retrieved ${pendingUsers.length} pending user records for owner ${userId}.`);
+        res.status(200).json(pendingUsers);
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Error reading pending users for owner ${userId}:`, error);
         res.status(500).json({ message: 'Failed to retrieve pending user list.' });
@@ -967,55 +897,60 @@ app.get('/api/pending-users', requireAuth, requireOwner, (req, res) => {
 });
 
 // POST /api/approve-user/:userId - Approve a pending owner account
-app.post('/api/approve-user/:userId', requireAuth, requireOwner, (req, res) => {
+app.post('/api/approve-user/:userId', requireAuth, requireOwner, async (req, res) => { // Made async
     const userToApproveId = req.params.userId;
-    const approvingOwnerId = req.userId;
+    const approvingOwnerId = req.user.id;
     console.log(`[${new Date().toISOString()}] POST /api/approve-user/${userToApproveId} - Approving Owner: ${approvingOwnerId}`);
 
-    let pendingUsers = readPendingUsers();
-    let users = readUsers();
+    // Ideally use a transaction
+    try {
+        // Find the pending user
+        const userToApprove = await PendingUser.findOne({ id: userToApproveId });
 
-    const userIndex = pendingUsers.findIndex(u => u.id === userToApproveId);
+        if (!userToApprove) {
+            console.warn(`[${new Date().toISOString()}] Approval failed: User ID ${userToApproveId} not found in pending list.`);
+            return res.status(404).json({ message: 'User not found in pending list.' });
+        }
 
-    if (userIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] Approval failed: User ID ${userToApproveId} not found in pending list.`);
-        return res.status(404).json({ message: 'User not found in pending list.' });
-    }
+        // Check if user already exists in main users list
+        const existingUser = await User.findOne({ $or: [{ id: userToApproveId }, { username: userToApprove.username }, { email: userToApprove.email }] });
+        if (existingUser) {
+            console.warn(`[${new Date().toISOString()}] Approval failed: User ID ${userToApproveId} or username/email already exists in active users.`);
+            // Remove from pending anyway to clean up
+            await PendingUser.deleteOne({ id: userToApproveId });
+            return res.status(409).json({ message: 'User already exists or conflicts with an existing user.' });
+        }
 
-    const userToApprove = pendingUsers[userIndex];
+        // Create user in active collection and delete from pending collection
+        const userData = userToApprove.toObject();
+        delete userData._id; // Remove MongoDB _id before creating new user
 
-    // Check if user already exists in main users list (shouldn't happen if registration check is correct, but good safeguard)
-    if (users.some(u => u.id === userToApproveId || u.username === userToApprove.username || u.email === userToApprove.email)) {
-        console.warn(`[${new Date().toISOString()}] Approval failed: User ID ${userToApproveId} or username/email already exists in active users.`);
-        // Remove from pending anyway to clean up
-        pendingUsers.splice(userIndex, 1);
-        writePendingUsers(pendingUsers);
-        return res.status(409).json({ message: 'User already exists or conflicts with an existing user.' });
-    }
+        const [createdUser, deleteResult] = await Promise.all([
+            User.create(userData),
+            PendingUser.deleteOne({ id: userToApproveId })
+        ]);
 
-    // Move user from pending to active
-    users.push(userToApprove);
-    pendingUsers.splice(userIndex, 1);
+        if (deleteResult.deletedCount === 0) {
+             console.error(`[${new Date().toISOString()}] User approval inconsistency: User ${userToApproveId} created but not deleted from pending.`);
+             // Attempt rollback?
+             await User.deleteOne({ id: userToApproveId });
+             return res.status(500).json({ message: 'Failed to remove user from pending list after approval.' });
+        }
 
-    // Write both files
-    const writeUsersSuccess = writeUsers(users);
-    const writePendingSuccess = writePendingUsers(pendingUsers);
-
-    if (writeUsersSuccess && writePendingSuccess) {
         console.log(`[${new Date().toISOString()}] User ${userToApprove.username} (ID: ${userToApproveId}) approved by owner ${approvingOwnerId}.`);
         res.status(200).json({ message: `User '${userToApprove.username}' approved successfully.` });
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE FILES during user approval for ID ${userToApproveId}. Users write: ${writeUsersSuccess}, Pending write: ${writePendingSuccess}`);
-        // Attempt to roll back? Complex. Log error and inform client.
-        res.status(500).json({ message: 'Failed to complete user approval due to a server error. Data might be inconsistent.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error approving user ${userToApproveId}:`, error);
+        res.status(500).json({ message: 'Failed to complete user approval due to a server error.' });
     }
 });
 
 // PUT /api/users/:userId - Update an existing user's details (username, email)
-app.put('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
+app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { // Made async
     const userIdToUpdate = req.params.userId;
     const { username, email } = req.body;
-    const updatingOwnerId = req.userId;
+    const updatingOwnerId = req.user.id;
 
     console.log(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Owner: ${updatingOwnerId}, Body:`, req.body);
 
@@ -1023,55 +958,57 @@ app.put('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
     if (!username || !email || typeof username !== 'string' || typeof email !== 'string' || username.trim() === '' || email.trim() === '') {
         return res.status(400).json({ message: 'Username and email are required and must be non-empty strings.' });
     }
-    // Basic email format check (can be more robust)
+    // Basic email format check
     if (!/\S+@\S+\.\S+/.test(email)) {
          return res.status(400).json({ message: 'Invalid email format.' });
     }
 
-    let users = readUsers();
-    const userIndex = users.findIndex(u => u.id === userIdToUpdate);
+    try {
+        // Check for conflicts with other users (excluding the user being updated)
+        const conflictingUser = await User.findOne({
+            _id: { $ne: userIdToUpdate }, // Exclude the current user by MongoDB _id if possible, otherwise use custom id
+            id: { $ne: userIdToUpdate }, // Assuming custom id is used
+            $or: [{ username: username.trim() }, { email: email.trim() }]
+        });
 
-    if (userIndex === -1) {
-        console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
-        return res.status(404).json({ message: 'User not found.' });
-    }
+        if (conflictingUser) {
+            const conflictField = conflictingUser.username === username.trim() ? 'Username' : 'Email';
+            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Conflict: ${conflictField} '${conflictingUser[conflictField.toLowerCase()] }' already exists.`);
+            return res.status(409).json({ message: `${conflictField} already in use by another user.` });
+        }
 
-    // Check for conflicts with other users (excluding the user being updated)
-    const conflictingUser = users.find(u => u.id !== userIdToUpdate && (u.username === username.trim() || u.email === email.trim()));
-    if (conflictingUser) {
-        const conflictField = conflictingUser.username === username.trim() ? 'Username' : 'Email';
-        console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Conflict: ${conflictField} '${conflictingUser[conflictField.toLowerCase()]}' already exists.`);
-        return res.status(409).json({ message: `${conflictField} already in use by another user.` });
-    }
+        // Find and update user details
+        const updatedUser = await User.findOneAndUpdate(
+            { id: userIdToUpdate },
+            { $set: { username: username.trim(), email: email.trim() } },
+            { new: true, runValidators: true, projection: { passwordHash: 0 } } // Return updated, validate, exclude hash
+        );
 
-    // Update user details (keep original ID and passwordHash)
-    const originalUser = users[userIndex];
-    users[userIndex] = {
-        ...originalUser,
-        username: username.trim(),
-        email: email.trim()
-        // Do NOT update passwordHash or type here
-    };
+        if (!updatedUser) {
+            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
+            return res.status(404).json({ message: 'User not found.' });
+        }
 
-    const writeSuccess = writeUsers(users);
+        console.log(`[${new Date().toISOString()}] User (ID: ${userIdToUpdate}) updated by owner ${updatingOwnerId}. New details: { username: '${updatedUser.username}', email: '${updatedUser.email}' }`);
+        res.status(200).json({ message: 'User updated successfully.', user: updatedUser });
 
-    if (writeSuccess) {
-        console.log(`[${new Date().toISOString()}] User ${originalUser.username} (ID: ${userIdToUpdate}) updated by owner ${updatingOwnerId}. New details: { username: '${username.trim()}', email: '${email.trim()}' }`);
-        // Return the updated user object (excluding password hash)
-        const { passwordHash, ...updatedUserResponse } = users[userIndex];
-        res.status(200).json({ message: 'User updated successfully.', user: updatedUserResponse });
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE users file after updating user ID ${userIdToUpdate}.`);
-        // Attempt to revert in-memory change? Difficult.
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error updating user ${userIdToUpdate}:`, error);
+         if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+         if (error.code === 11000) { // Duplicate key error during update
+             return res.status(409).json({ message: 'Username or email already exists.' });
+        }
         res.status(500).json({ message: 'Failed to save updated user data.' });
     }
 });
 
 
 // DELETE /api/users/:userId - Delete an approved user
-app.delete('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
+app.delete('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { // Made async
     const userIdToDelete = req.params.userId;
-    const deletingOwnerId = req.userId;
+    const deletingOwnerId = req.user.id;
 
     console.log(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Owner: ${deletingOwnerId}`);
 
@@ -1081,59 +1018,45 @@ app.delete('/api/users/:userId', requireAuth, requireOwner, (req, res) => {
         return res.status(403).json({ message: 'Owners cannot delete their own account.' });
     }
 
-    let users = readUsers();
-    const initialLength = users.length;
-    const userToDelete = users.find(u => u.id === userIdToDelete); // Find user before filtering
+    try {
+        const deleteResult = await User.deleteOne({ id: userIdToDelete });
 
-    if (!userToDelete) {
-        console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found.`);
-        return res.status(404).json({ message: 'User not found.' });
-    }
+        if (deleteResult.deletedCount === 0) {
+            console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found.`);
+            return res.status(404).json({ message: 'User not found.' });
+        }
 
-    const updatedUsers = users.filter(u => u.id !== userIdToDelete);
-
-    if (updatedUsers.length === initialLength) {
-        // This case should be caught by the find check above, but keep as safeguard
-        console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found (filter check).`);
-        return res.status(404).json({ message: 'User not found.' });
-    }
-
-    const writeSuccess = writeUsers(updatedUsers);
-
-    if (writeSuccess) {
-        console.log(`[${new Date().toISOString()}] User ${userToDelete.username} (ID: ${userIdToDelete}) deleted by owner ${deletingOwnerId}.`);
-        // Return 204 No Content for successful deletion is common practice
+        console.log(`[${new Date().toISOString()}] User (ID: ${userIdToDelete}) deleted by owner ${deletingOwnerId}.`);
+        // Return 204 No Content for successful deletion
         res.status(204).send();
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE users file after deleting user ID ${userIdToDelete}.`);
-        res.status(500).json({ message: 'Failed to save changes after deleting user.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error deleting user ${userIdToDelete}:`, error);
+        res.status(500).json({ message: 'Failed to delete user.' });
     }
 });
 
 
 // DELETE /api/reject-user/:userId - Reject and delete a pending owner account
-app.delete('/api/reject-user/:userId', requireAuth, requireOwner, (req, res) => {
+app.delete('/api/reject-user/:userId', requireAuth, requireOwner, async (req, res) => { // Made async
     const userToRejectId = req.params.userId;
-    const rejectingOwnerId = req.userId;
+    const rejectingOwnerId = req.user.id;
     console.log(`[${new Date().toISOString()}] DELETE /api/reject-user/${userToRejectId} - Rejecting Owner: ${rejectingOwnerId}`);
 
-    let pendingUsers = readPendingUsers();
-    const initialLength = pendingUsers.length;
-    const updatedPendingUsers = pendingUsers.filter(u => u.id !== userToRejectId);
+    try {
+        const deleteResult = await PendingUser.deleteOne({ id: userToRejectId });
 
-    if (updatedPendingUsers.length === initialLength) {
-        console.warn(`[${new Date().toISOString()}] Rejection failed: User ID ${userToRejectId} not found in pending list.`);
-        return res.status(404).json({ message: 'User not found in pending list.' });
-    }
+        if (deleteResult.deletedCount === 0) {
+            console.warn(`[${new Date().toISOString()}] Rejection failed: User ID ${userToRejectId} not found in pending list.`);
+            return res.status(404).json({ message: 'User not found in pending list.' });
+        }
 
-    const writeSuccess = writePendingUsers(updatedPendingUsers);
-
-    if (writeSuccess) {
         console.log(`[${new Date().toISOString()}] Pending user (ID: ${userToRejectId}) rejected and removed by owner ${rejectingOwnerId}.`);
         res.status(200).json({ message: 'Pending user rejected successfully.' });
-    } else {
-        console.error(`[${new Date().toISOString()}] FAILED TO WRITE pending users file after rejecting user ID ${userToRejectId}.`);
-        res.status(500).json({ message: 'Failed to save changes after rejecting user.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error rejecting pending user ${userToRejectId}:`, error);
+        res.status(500).json({ message: 'Failed to reject user.' });
     }
 });
 
@@ -1141,13 +1064,13 @@ app.delete('/api/reject-user/:userId', requireAuth, requireOwner, (req, res) => 
 // --- Sales History Endpoint (Owners only, Requires Authentication) ---
 
 // GET /api/sales-history - Retrieve all sales history records
-app.get('/api/sales-history', requireAuth, requireOwner, (req, res) => {
-    const userId = req.userId; // Get user ID from authenticated request (though not strictly needed for sales data itself)
+app.get('/api/sales-history', requireAuth, requireOwner, async (req, res) => { // Made async
+    const userId = req.user.id; // Get user ID from authenticated request
     console.log(`[${new Date().toISOString()}] GET /api/sales-history - Owner: ${userId}`);
 
     try {
-        const salesHistory = readSalesHistory();
-        // Optional: Process/aggregate data here if needed before sending
+        // Fetch sales history, sort by date descending
+        const salesHistory = await SalesHistory.find({}).sort({ date: -1 });
         console.log(`[${new Date().toISOString()}] Retrieved ${salesHistory.length} sales history records for owner ${userId}.`);
         res.status(200).json(salesHistory);
     } catch (error) {
@@ -1160,11 +1083,6 @@ app.get('/api/sales-history', requireAuth, requireOwner, (req, res) => {
 // --- Start Server ---
 app.listen(PORT, () => {
     console.log(`Backend server running at http://localhost:${PORT}`);
-    console.log(`Groceries file path: ${groceriesFilePath}`);
-    console.log(`Users file path: ${usersFilePath}`);
-    console.log(`Pending Users file path: ${pendingUsersFilePath}`); // Log pending users file path
-    console.log(`Order History file path: ${orderHistoryFilePath}`);
-    console.log(`Edit History file path: ${editHistoryFilePath}`); // Log renamed history file path
-    console.log(`Sales History file path: ${salesHistoryFilePath}`); // Log sales history file path
-    console.log(`Deleted Groceries file path: ${deletedGroceriesFilePath}`); // Log deleted groceries file path
+    console.log(`Attempting to connect to MongoDB at ${MONGO_URI}`);
+    // No longer logging file paths
 });
