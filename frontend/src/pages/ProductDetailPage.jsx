@@ -37,14 +37,14 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
         setItem(data);
       } catch (e) {
         console.error("Failed to fetch item details:", e);
-        setError(`Failed to load product details: ${e.message}`);
+        setError(`Failed toload product details: ${e.message}`);
       } finally {
         setLoading(false);
       }
     };
 
     fetchItemDetails();
-  }, [id]);
+  }, [id, onUpdateStock]);
 
   // Reset quantities/errors if item changes
   useEffect(() => {
