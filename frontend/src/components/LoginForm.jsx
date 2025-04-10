@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+
 function LoginForm({ onSubmit }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +24,7 @@ function LoginForm({ onSubmit }) {
           required
         />
       </div>
-      <div className="form-group">
+      <div className="form-group" style={{marginBottom: "25px"}}>
         <label htmlFor="login-password">Password:</label>
         <input
           type="password"

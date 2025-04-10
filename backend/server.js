@@ -51,7 +51,7 @@ const logEdit = async (action, userId, details) => {
 
 // --- Middleware setup ---
 app.use(cors({
-    origin: 'http://localhost:5173', // Allow requests from frontend dev server
+    origin: 'http://localhost:5000', // Allow requests from frontend dev server
     credentials: true // Allow cookies to be sent/received
 }));
 app.use(express.json()); // Parse JSON request bodies
