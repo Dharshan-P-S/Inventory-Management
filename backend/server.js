@@ -924,9 +924,10 @@ app.post('/api/approve-user/:userId', requireAuth, requireOwner, async (req, res
         // Create user in active collection and delete from pending collection
         const userData = userToApprove.toObject();
         delete userData._id; // Remove MongoDB _id before creating new user
+        userData.type = 'owner'; // Explicitly set the type for the new User
 
         const [createdUser, deleteResult] = await Promise.all([
-            User.create(userData),
+            User.create(userData), // Now userData includes the required 'type'
             PendingUser.deleteOne({ id: userToApproveId })
         ]);
 
@@ -966,8 +967,7 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
     try {
         // Check for conflicts with other users (excluding the user being updated)
         const conflictingUser = await User.findOne({
-            _id: { $ne: userIdToUpdate }, // Exclude the current user by MongoDB _id if possible, otherwise use custom id
-            id: { $ne: userIdToUpdate }, // Assuming custom id is used
+            id: { $ne: userIdToUpdate }, // Exclude the current user by their custom 'id' (UUID)
             $or: [{ username: username.trim() }, { email: email.trim() }]
         });
 
@@ -977,23 +977,29 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
             return res.status(409).json({ message: `${conflictField} already in use by another user.` });
         }
 
-        // Find and update user details
-        const updatedUser = await User.findOneAndUpdate(
-            { id: userIdToUpdate },
-            { $set: { username: username.trim(), email: email.trim() } },
-            { new: true, runValidators: true, projection: { passwordHash: 0 } } // Return updated, validate, exclude hash
-        );
+        // Find the user to update by their custom ID
+        const userToUpdateDoc = await User.findOne({ id: userIdToUpdate });
 
-        if (!updatedUser) {
+        if (!userToUpdateDoc) {
             console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
             return res.status(404).json({ message: 'User not found.' });
         }
 
-        console.log(`[${new Date().toISOString()}] User (ID: ${userIdToUpdate}) updated by owner ${updatingOwnerId}. New details: { username: '${updatedUser.username}', email: '${updatedUser.email}' }`);
-        res.status(200).json({ message: 'User updated successfully.', user: updatedUser });
+        // Update the document fields
+        userToUpdateDoc.username = username.trim();
+        userToUpdateDoc.email = email.trim();
+
+        // Save the updated document (this will run validators)
+        const savedUser = await userToUpdateDoc.save();
+
+        // Exclude password hash from response
+        const { passwordHash: _, ...userResponse } = savedUser.toObject();
+
+        console.log(`[${new Date().toISOString()}] User (ID: ${userIdToUpdate}) updated by owner ${updatingOwnerId}. New details: { username: '${userResponse.username}', email: '${userResponse.email}' }`);
+        res.status(200).json({ message: 'User updated successfully.', user: userResponse });
 
     } catch (error) {
-        console.error(`[${new Date().toISOString()}] Error updating user ${userIdToUpdate}:`, error);
+        console.error(`[${new Date().toISOString()}] Error updating user ${userIdToUpdate}:`, error); // Log the actual error
          if (error.name === 'ValidationError') {
             return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
         }

@@ -819,6 +819,7 @@ textarea.form-control {
 .history-table .action-stock_decrease,
 .history-table .action-deleted { color: var(--danger-color); font-weight: 500; }
 .history-table .action-item_edit { color: var(--info-color); font-weight: 500; }
+.history-table .action-item_add { color: var(--success-color); font-weight: 500; } /* Added style for item_add */
 
 /* Styling for edit details list */
 .history-table td .edit-details-list {
@@ -1106,7 +1107,8 @@ textarea.form-control {
 .action-filter-button.action-btn-all.active { background-color: var(--primary-color); border-color: var(--primary-color); }
 .action-filter-button.action-btn-item_edit.active { background-color: var(--info-color); border-color: var(--info-color); color: #000; } /* Darker text on info */
 .action-filter-button.action-btn-stock_increase.active,
-.action-filter-button.action-btn-restored.active { background-color: var(--success-color); border-color: var(--success-color); }
+.action-filter-button.action-btn-restored.active,
+.action-filter-button.action-btn-item_add.active { background-color: var(--success-color); border-color: var(--success-color); } /* Added item_add */
 .action-filter-button.action-btn-stock_decrease.active,
 .action-filter-button.action-btn-deleted.active { background-color: var(--danger-color); border-color: var(--danger-color); }
 /* Add more specific styles if other actions appear */

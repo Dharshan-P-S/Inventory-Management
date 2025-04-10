@@ -234,12 +234,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
           <h3>Pending Owner Approvals</h3>
           <table className="user-table pending-table">
             <thead>
-              <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Type</th> {/* Added Type column header */}
-                <th>Actions</th>
-              </tr>
+              <tr><th>Username</th><th>Email</th><th>Type</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {pendingUsers.map((user) => (
@@ -285,13 +280,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                  <h4 className="user-type-heading">{type.charAt(0).toUpperCase() + type.slice(1)}s</h4>
                  <table className="user-table">
                    <thead>
-                     <tr>
-                       <th>User ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        {/* <th>Type</th> */}
-                        <th>Actions</th> {/* Add Actions column header */}
-                      </tr>
+                     <tr><th>User ID</th><th>Username</th><th>Email</th><th>Actions</th></tr>
                     </thead>
                     <tbody>
                       {/* Map users within this specific type group */}
@@ -376,13 +365,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                <h4 className="user-type-heading">Unknown Type</h4>
                <table className="user-table">
                  <thead>
-                   <tr>
-                     <th>User ID</th>
-                     <th>Username</th>
-                     <th>Email</th>
-                     <th>Type</th>
-                     <th>Actions</th> {/* Add Actions column header */}
-                   </tr>
+                   <tr><th>User ID</th><th>Username</th><th>Email</th><th>Type</th><th>Actions</th></tr>
                  </thead>
                  <tbody>
                    {groupedUsers['unknown'].map(user => (
