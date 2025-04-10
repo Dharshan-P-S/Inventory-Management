@@ -13,6 +13,7 @@ const EditHistory = require('./models/EditHistory');
 const SalesHistory = require('./models/SalesHistory');
 const PendingUser = require('./models/PendingUser');
 const DeletedGrocery = require('./models/DeletedGrocery');
+const { sendPasswordResetOtp } = require('./utils/emailService'); // Import email service
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -1081,7 +1082,222 @@ app.get('/api/sales-history', requireAuth, requireOwner, async (req, res) => { /
         res.status(200).json(salesHistory);
     } catch (error) {
         console.error(`[${new Date().toISOString()}] Error reading sales history for owner ${userId}:`, error);
-        res.status(500).json({ message: 'Failed to retrieve sales history.' });
+    res.status(500).json({ message: 'Failed to retrieve sales history.' });
+    }
+});
+
+// --- Password Reset Related Endpoints ---
+
+// POST /api/check-user-exists - Check if a username or email exists for password reset
+app.post('/api/check-user-exists', async (req, res) => {
+    const { identifier } = req.body;
+    console.log(`[${new Date().toISOString()}] POST /api/check-user-exists - Identifier: ${identifier}`);
+
+    if (!identifier || typeof identifier !== 'string' || identifier.trim() === '') {
+        return res.status(400).json({ message: 'Username or email identifier is required.' });
+    }
+
+    try {
+        // Check if a user exists with the given username OR email in the active User collection
+        const user = await User.findOne({
+            $or: [
+                { username: identifier.trim() },
+                { email: identifier.trim() }
+            ]
+        });
+
+        if (user) {
+            // User found
+            console.log(`[${new Date().toISOString()}] User found for identifier: ${identifier}`);
+            // IMPORTANT: Do NOT return user details here for security reasons.
+            // Just confirm existence. The actual OTP sending logic will handle finding the user again.
+            res.status(200).json({ message: 'User found.' });
+        } else {
+            // User not found
+            console.warn(`[${new Date().toISOString()}] User not found for identifier: ${identifier}`);
+            res.status(404).json({ message: 'Incorrect username or email.' });
+        }
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error checking user existence for identifier ${identifier}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred while checking user existence.' });
+    }
+});
+
+// POST /api/send-reset-otp - Generate, save, and send a password reset OTP
+app.post('/api/send-reset-otp', async (req, res) => {
+    const { identifier } = req.body;
+    console.log(`[${new Date().toISOString()}] POST /api/send-reset-otp - Identifier: ${identifier}`);
+
+    if (!identifier || typeof identifier !== 'string' || identifier.trim() === '') {
+        return res.status(400).json({ message: 'Username or email identifier is required.' });
+    }
+
+    try {
+        // Find the user by username or email
+        const user = await User.findOne({
+            $or: [
+                { username: identifier.trim() },
+                { email: identifier.trim() }
+            ]
+        });
+
+        if (!user) {
+            console.warn(`[${new Date().toISOString()}] OTP Send failed: User not found for identifier: ${identifier}`);
+            // Return a generic success message even if user not found to prevent user enumeration attacks
+            return res.status(200).json({ message: 'If an account with that identifier exists, an OTP has been sent.' });
+        }
+
+        // Generate a 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Set OTP expiry time (e.g., 10 minutes from now)
+        const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+        // Save OTP and expiry to the user document
+        user.resetPasswordOtp = otp;
+        user.resetPasswordExpires = otpExpires;
+        await user.save();
+
+        console.log(`[${new Date().toISOString()}] Generated OTP ${otp} for user ${user.username} (Email: ${user.email}), expires at ${otpExpires.toISOString()}`);
+
+        // Send the OTP email
+        const emailSent = await sendPasswordResetOtp(user.email, otp);
+
+        if (emailSent) {
+            res.status(200).json({ message: 'If an account with that identifier exists, an OTP has been sent.' });
+        } else {
+            // If email sending failed, we should ideally not expose this directly.
+            // Log the error server-side, but maybe return a generic message or a specific error code if needed.
+            console.error(`[${new Date().toISOString()}] Failed to send OTP email to ${user.email} for identifier ${identifier}.`);
+            // Clear the OTP fields if email failed? Maybe not, allow retry? For now, leave them.
+            // user.resetPasswordOtp = undefined;
+            // user.resetPasswordExpires = undefined;
+            // await user.save();
+            res.status(500).json({ message: 'Failed to send OTP email. Please try again later.' }); // Or a more generic server error
+        }
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error processing send-reset-otp for identifier ${identifier}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+});
+
+// POST /api/change-password - Allow logged-in user to change their password
+app.post('/api/change-password', requireAuth, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+    const userId = req.user.id; // Get user ID from authenticated request (requireAuth middleware)
+    const username = req.user.username;
+
+    console.log(`[${new Date().toISOString()}] POST /api/change-password - User: ${username} (ID: ${userId})`);
+
+    // Basic validation
+    if (!oldPassword || !newPassword) {
+        return res.status(400).json({ message: 'Old password and new password are required.' });
+    }
+    if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+    }
+    if (oldPassword === newPassword) {
+        return res.status(400).json({ message: 'New password cannot be the same as the old password.' });
+    }
+
+    try {
+        // User object is already attached by requireAuth middleware (req.user)
+        const user = req.user;
+
+        // Compare provided old password with the stored hash
+        const isMatch = await bcrypt.compare(oldPassword, user.passwordHash);
+
+        if (!isMatch) {
+            console.warn(`[${new Date().toISOString()}] Change password failed: Incorrect old password for user ${username} (ID: ${userId}).`);
+            return res.status(401).json({ message: 'Incorrect old password.' });
+        }
+
+        // Hash the new password
+        const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+        // Update the user's password hash
+        user.passwordHash = newPasswordHash;
+        // Clear any lingering OTP fields just in case
+        user.resetPasswordOtp = undefined;
+        user.resetPasswordExpires = undefined;
+        await user.save();
+
+        console.log(`[${new Date().toISOString()}] Password changed successfully for user ${username} (ID: ${userId}).`);
+
+        // Optionally log the change
+        // await logEdit('password_change', userId, { source: 'user_request' });
+
+        res.status(200).json({ message: 'Password changed successfully.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error changing password for user ${username} (ID: ${userId}):`, error);
+        res.status(500).json({ message: 'An internal server error occurred while changing the password.' });
+    }
+});
+
+
+// POST /api/reset-password - Verify OTP and reset the user's password
+app.post('/api/reset-password', async (req, res) => {
+    const { identifier, otp, newPassword } = req.body;
+    console.log(`[${new Date().toISOString()}] POST /api/reset-password - Identifier: ${identifier}`);
+
+    // Basic validation
+    if (!identifier || !otp || !newPassword) {
+        return res.status(400).json({ message: 'Identifier, OTP, and new password are required.' });
+    }
+    if (newPassword.length < 6) {
+        return res.status(400).json({ message: 'New password must be at least 6 characters long.' });
+    }
+    if (typeof otp !== 'string' || otp.length !== 6 || !/^\d{6}$/.test(otp)) {
+         return res.status(400).json({ message: 'Invalid OTP format.' });
+    }
+
+
+    try {
+        // Find the user by identifier, checking OTP and expiry
+        const user = await User.findOne({
+            $or: [
+                { username: identifier.trim() },
+                { email: identifier.trim() }
+            ],
+            resetPasswordOtp: otp, // Check if OTP matches
+            resetPasswordExpires: { $gt: Date.now() } // Check if OTP is not expired
+        });
+
+        if (!user) {
+            // If user not found with matching OTP and within expiry time
+            console.warn(`[${new Date().toISOString()}] Password reset failed: Invalid or expired OTP for identifier ${identifier}.`);
+            // Check if the user exists but OTP is wrong/expired for better logging (optional)
+            const userExists = await User.findOne({ $or: [{ username: identifier.trim() }, { email: identifier.trim() }] });
+            if (userExists && (userExists.resetPasswordOtp !== otp || (userExists.resetPasswordExpires && userExists.resetPasswordExpires <= Date.now()))) {
+                 console.warn(`[${new Date().toISOString()}] Specific reason: OTP mismatch or expired for ${identifier}.`);
+                 // Clear expired/wrong OTP attempt?
+                 // userExists.resetPasswordOtp = undefined;
+                 // userExists.resetPasswordExpires = undefined;
+                 // await userExists.save();
+            }
+            return res.status(400).json({ message: 'Invalid or expired OTP.' });
+        }
+
+        // OTP is valid, hash the new password
+        const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+        // Update password and clear OTP fields
+        user.passwordHash = newPasswordHash;
+        user.resetPasswordOtp = undefined; // Clear OTP
+        user.resetPasswordExpires = undefined; // Clear expiry
+        await user.save();
+
+        console.log(`[${new Date().toISOString()}] Password successfully reset for user ${user.username} (ID: ${user.id}).`);
+
+        // Optionally: Log the password reset event (without sensitive data)
+        // await logEdit('password_reset', user.id, { source: 'otp_flow' });
+
+        res.status(200).json({ message: 'Password has been reset successfully.' });
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error processing password reset for identifier ${identifier}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred during password reset.' });
     }
 });
 

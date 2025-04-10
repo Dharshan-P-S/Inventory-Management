@@ -14,6 +14,8 @@ import SalesHistoryPage from './pages/SalesHistoryPage.jsx'; // Import Sales His
 import UserManagementPage from './pages/UserManagementPage.jsx'; // Import User Management Page
 import ProductDetailPage from './pages/ProductDetailPage.jsx'; // Import ProductDetailPage
 import DeletedItemsPage from './pages/DeletedItemsPage.jsx'; // Import DeletedItemsPage
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx'; // Import ForgotPasswordPage
+import ChangePasswordPage from './pages/ChangePasswordPage.jsx'; // Import ChangePasswordPage
 import './App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -645,8 +647,24 @@ function App() {
                     onDeleteItem={handleDeleteItem} // Pass delete handler
                     onUpdateStock={handleStockUpdate} // Pass stock update handler
                   />
-                }
+                 }
              />
+            {/* Change Password Route (Protected) */}
+            <Route
+                path="/change-password"
+                element={
+                    currentUser ? (
+                        <ChangePasswordPage />
+                    ) : (
+                        <Navigate to="/login" state={{ from: '/change-password', message: "Please log in to change your password." }} replace />
+                    )
+                }
+            />
+            {/* Forgot Password Route */}
+            <Route
+                path="/forgot-password"
+                element={<ForgotPasswordPage />} // Render the new page
+            />
              {/* Catch-all Route */}
              <Route path="*" element={<h2>404 Page Not Found</h2>} />
           </Routes>

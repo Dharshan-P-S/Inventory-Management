@@ -36,6 +36,9 @@ function LoginForm({ onSubmit }) {
       </div>
       {/* TODO: Display errors */}
       <button type="submit" className="auth-button">Login</button>
+      <div className="form-group" style={{ textAlign: 'center', marginTop: '15px' }}> {/* Centered and added top margin */}
+        <a href="/forgot-password">Forgot Password?</a>
+      </div>
     </form>
   );
 }

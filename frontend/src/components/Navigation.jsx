@@ -50,6 +50,7 @@ function Navigation({ cartItemCount = 0, currentUser, onLogout }) {
           </>
         ) : (
           <>
+            <li><NavLink to="/change-password" onClick={(e) => e.stopPropagation()}>Change Password</NavLink></li> {/* Added Change Password Link */}
             <li className="nav-welcome"><span>Welcome, {currentUser.username}!</span></li>
             <li><button onClick={handleLogoutClick} className="logout-button">Logout</button></li>
           </>
