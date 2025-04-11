@@ -152,12 +152,24 @@ app.post('/api/register', async (req, res) => {
         };
 
         if (type === 'owner') {
-            // Add to pending users collection
-            const createdPendingUser = await PendingUser.create(newUser);
-            console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
-            // Exclude password hash from the response
-            const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
-            res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
+            // Check if there are any existing owners in the system
+            const existingOwners = await User.find({ type: 'owner' });
+            
+            if (existingOwners.length === 0) {
+                // No existing owners, add directly to users collection without approval
+                const createdUser = await User.create(newUser);
+                console.log(`[${new Date().toISOString()}] First owner registered successfully without approval: ${username} (ID: ${createdUser.id})`);
+                // Exclude password hash from the response
+                const { passwordHash: _, ...userResponse } = createdUser.toObject();
+                res.status(201).json({ message: 'First owner registered successfully.', user: userResponse, pending: false });
+            } else {
+                // Existing owners found, add to pending users collection for approval
+                const createdPendingUser = await PendingUser.create(newUser);
+                console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
+                // Exclude password hash from the response
+                const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
+                res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
+            }
         } else {
             // Add directly to users collection (customer)
             const createdUser = await User.create(newUser);
@@ -966,6 +978,20 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
     }
 
     try {
+        // Find the user to update by their custom ID to check their type
+        const userToCheck = await User.findOne({ id: userIdToUpdate });
+        
+        if (!userToCheck) {
+            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        
+        // Check if the user being updated is an owner and not the current user
+        if (userToCheck.type === 'owner' && userIdToUpdate !== updatingOwnerId) {
+            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Owner ${updatingOwnerId} attempted to update another owner.`);
+            return res.status(403).json({ message: 'Owners can only edit their own accounts, not other owners.' });
+        }
+        
         // Check for conflicts with other users (excluding the user being updated)
         const conflictingUser = await User.findOne({
             id: { $ne: userIdToUpdate }, // Exclude the current user by their custom 'id' (UUID)
@@ -1026,6 +1052,20 @@ app.delete('/api/users/:userId', requireAuth, requireOwner, async (req, res) => 
     }
 
     try {
+        // Check if the user to delete is an owner
+        const userToDelete = await User.findOne({ id: userIdToDelete });
+        
+        if (!userToDelete) {
+            console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - User not found.`);
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        
+        // Prevent owners from deleting other owners
+        if (userToDelete.type === 'owner') {
+            console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Owner ${deletingOwnerId} attempted to delete another owner.`);
+            return res.status(403).json({ message: 'Owners cannot delete other owner accounts.' });
+        }
+        
         const deleteResult = await User.deleteOne({ id: userIdToDelete });
 
         if (deleteResult.deletedCount === 0) {
