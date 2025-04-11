@@ -334,19 +334,20 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                               </>
                             ) : (
                               <>
+                                {/* Only allow owners to edit themselves, not other owners */}
                                 <button
                                   onClick={() => handleEditUser(user)} // Pass the whole user object
                                   className="button button-primary button-sm"
-                                  disabled={actionLoading !== null} // Disable if any action is loading
+                                  disabled={actionLoading !== null || (user.type === 'owner' && user.id !== currentUser.id)} // Disable if any action is loading or if it's another owner
                                 >
-                                  Edit
+                                  {user.type === 'owner' && user.id !== currentUser.id ? 'Not Allowed' : 'Edit'}
                                 </button>
                                 <button
                                   onClick={() => handleRemoveUser(user)} // Pass the whole user object
                                   className="button button-danger button-sm"
-                                  disabled={actionLoading !== null} // Disable if any action is loading
+                                  disabled={actionLoading !== null || (user.type === 'owner' && user.id !== currentUser.id)} // Disable if any action is loading or if it's another owner
                                 >
-                                  Remove
+                                  {user.type === 'owner' && user.id !== currentUser.id ? 'Not Allowed' : 'Remove'}
                                 </button>
                               </>
                             )}
