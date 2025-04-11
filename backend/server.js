@@ -151,12 +151,24 @@ app.post('/api/register', async (req, res) => {
         };
 
         if (type === 'owner') {
-            // Add to pending users collection
-            const createdPendingUser = await PendingUser.create(newUser);
-            console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
-            // Exclude password hash from the response
-            const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
-            res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
+            // Check if there are any existing owners in the system
+            const existingOwners = await User.find({ type: 'owner' });
+            
+            if (existingOwners.length === 0) {
+                // No existing owners, add directly to users collection without approval
+                const createdUser = await User.create(newUser);
+                console.log(`[${new Date().toISOString()}] First owner registered successfully without approval: ${username} (ID: ${createdUser.id})`);
+                // Exclude password hash from the response
+                const { passwordHash: _, ...userResponse } = createdUser.toObject();
+                res.status(201).json({ message: 'First owner registered successfully.', user: userResponse, pending: false });
+            } else {
+                // Existing owners found, add to pending users collection for approval
+                const createdPendingUser = await PendingUser.create(newUser);
+                console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
+                // Exclude password hash from the response
+                const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
+                res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
+            }
         } else {
             // Add directly to users collection (customer)
             const createdUser = await User.create(newUser);
