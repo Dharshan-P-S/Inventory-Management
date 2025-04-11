@@ -13,10 +13,13 @@ const EditHistory = require('./models/EditHistory');
 const SalesHistory = require('./models/SalesHistory');
 const PendingUser = require('./models/PendingUser');
 const DeletedGrocery = require('./models/DeletedGrocery');
-const { sendPasswordResetOtp } = require('./utils/emailService'); // Import email service
+// Import both email functions
+const { sendPasswordResetOtp, sendRegistrationOtp } = require('./utils/emailService');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+// In-memory store for registration OTPs { email: { otp: '123456', expires: Date } }
+const registrationOtps = {};
 const SALT_ROUNDS = 10; // For bcrypt hashing
 const COOKIE_SECRET = process.env.COOKIE_SECRET || 'your-very-secret-key'; // Use environment variable in production
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/inventory_management'; // MongoDB connection string
@@ -110,28 +113,103 @@ const requireOwner = (req, res, next) => {
 
 // --- User Authentication Endpoints ---
 
-// POST /api/register - Register a new user
+// POST /api/send-register-otp - Send OTP for email verification during registration
+app.post('/api/send-register-otp', async (req, res) => {
+    const { email } = req.body;
+    console.log(`[${new Date().toISOString()}] POST /api/send-register-otp - Email: ${email}`);
+
+    if (!email || typeof email !== 'string' || !/\S+@\S+\.\S+/.test(email)) {
+        return res.status(400).json({ message: 'Valid email address is required.' });
+    }
+    const normalizedEmail = email.trim().toLowerCase(); // Normalize email
+
+    try {
+        // Check if email is already registered in active or pending users
+        const existingUser = await User.findOne({ email: normalizedEmail });
+        const existingPendingUser = await PendingUser.findOne({ email: normalizedEmail });
+
+        if (existingUser || existingPendingUser) {
+            console.warn(`[${new Date().toISOString()}] Registration OTP request failed: Email ${normalizedEmail} already exists.`);
+            return res.status(409).json({ message: 'This email address is already registered or pending approval.' });
+        }
+
+        // Generate 6-digit OTP
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+
+        // Store OTP in memory (replace if already exists for the email)
+        registrationOtps[normalizedEmail] = { otp, expires };
+        console.log(`[${new Date().toISOString()}] Generated registration OTP ${otp} for ${normalizedEmail}, expires at ${expires.toISOString()}`);
+
+        // Send OTP via email
+        const emailSent = await sendRegistrationOtp(normalizedEmail, otp);
+
+        if (emailSent) {
+            res.status(200).json({ message: 'Verification OTP sent successfully to your email address.' });
+        } else {
+            console.error(`[${new Date().toISOString()}] Failed to send registration OTP email to ${normalizedEmail}.`);
+            // Don't remove OTP from memory, allow retry?
+            res.status(500).json({ message: 'Failed to send OTP email. Please try again later.' });
+        }
+
+    } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error processing send-register-otp for ${normalizedEmail}:`, error);
+        res.status(500).json({ message: 'An internal server error occurred.' });
+    }
+});
+
+
+// POST /api/register - Register a new user (Now requires OTP)
 app.post('/api/register', async (req, res) => {
     console.log(`[${new Date().toISOString()}] POST /api/register - Body:`, req.body);
-    const { username, password, email, userType } = req.body; // Added userType
+    // Add otp to destructuring
+    const { username, password, email, userType, otp } = req.body;
 
     // Basic validation
-    if (!username || !password || !email) {
-        return res.status(400).json({ message: 'Username, password, and email are required.' });
+    if (!username || !password || !email || !otp) { // Added otp check
+        return res.status(400).json({ message: 'Username, password, email, and OTP are required.' });
+    }
+     if (typeof otp !== 'string' || !/^\d{6}$/.test(otp)) {
+         return res.status(400).json({ message: 'Invalid OTP format. Must be 6 digits.' });
     }
     if (password.length < 6) {
         return res.status(400).json({ message: 'Password must be at least 6 characters long.' });
     }
+     if (!/\S+@\S+\.\S+/.test(email)) {
+         return res.status(400).json({ message: 'Invalid email format.' });
+    }
     const type = userType === 'owner' ? 'owner' : 'customer'; // Default to customer
+    const normalizedEmail = email.trim().toLowerCase(); // Normalize email for lookup
 
     try {
-        // Check for existing user in both active and pending collections
-        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-        const existingPendingUser = await PendingUser.findOne({ $or: [{ username }, { email }] });
+        // --- OTP Verification ---
+        const storedOtpData = registrationOtps[normalizedEmail];
+        let otpVerified = false;
+
+        if (storedOtpData && storedOtpData.otp === otp && storedOtpData.expires > Date.now()) {
+            otpVerified = true;
+            // OTP is valid, remove it after verification
+            delete registrationOtps[normalizedEmail];
+            console.log(`[${new Date().toISOString()}] Registration OTP verified successfully for ${normalizedEmail}.`);
+        } else {
+            // Invalid or expired OTP
+            const reason = !storedOtpData ? 'No OTP found for email' : (storedOtpData.otp !== otp ? 'OTP mismatch' : 'OTP expired');
+            console.warn(`[${new Date().toISOString()}] Registration failed for ${normalizedEmail}: Invalid OTP. Reason: ${reason}`);
+            // Optionally remove expired OTPs here or in a separate cleanup task
+            if (storedOtpData && storedOtpData.expires <= Date.now()) {
+                delete registrationOtps[normalizedEmail];
+            }
+            return res.status(400).json({ message: 'Invalid or expired OTP.' });
+        }
+        // --- End OTP Verification ---
+
+        // Check for existing user in both active and pending collections (redundant check if OTP sent correctly, but safe)
+        const existingUser = await User.findOne({ $or: [{ username: username.trim() }, { email: normalizedEmail }] });
+        const existingPendingUser = await PendingUser.findOne({ $or: [{ username: username.trim() }, { email: normalizedEmail }] });
 
         if (existingUser || existingPendingUser) {
-            const conflictField = (existingUser?.username === username || existingPendingUser?.username === username) ? 'Username' : 'Email';
-            console.warn(`[${new Date().toISOString()}] Registration failed: ${conflictField} already exists (in users or pending).`);
+            const conflictField = (existingUser?.username === username.trim() || existingPendingUser?.username === username.trim()) ? 'Username' : 'Email';
+            console.warn(`[${new Date().toISOString()}] Registration failed post-OTP: ${conflictField} already exists (in users or pending).`);
             return res.status(409).json({ message: `${conflictField} already exists.` });
         }
 
@@ -141,12 +219,8 @@ app.post('/api/register', async (req, res) => {
         // Create new user data
         const newUser = {
             id: uuidv4(), // Generate unique ID
-            username,
-            email,
-            passwordHash, // Store the hash
-            id: uuidv4(), // Generate unique ID
-            username,
-            email,
+            username: username.trim(), // Trim username
+            email: normalizedEmail, // Use normalized email
             passwordHash, // Store the hash
             type: type
         };
@@ -154,18 +228,18 @@ app.post('/api/register', async (req, res) => {
         if (type === 'owner') {
             // Check if there are any existing owners in the system
             const existingOwners = await User.find({ type: 'owner' });
-            
+
             if (existingOwners.length === 0) {
                 // No existing owners, add directly to users collection without approval
                 const createdUser = await User.create(newUser);
-                console.log(`[${new Date().toISOString()}] First owner registered successfully without approval: ${username} (ID: ${createdUser.id})`);
+                console.log(`[${new Date().toISOString()}] First owner registered successfully without approval: ${createdUser.username} (ID: ${createdUser.id})`);
                 // Exclude password hash from the response
                 const { passwordHash: _, ...userResponse } = createdUser.toObject();
                 res.status(201).json({ message: 'First owner registered successfully.', user: userResponse, pending: false });
             } else {
                 // Existing owners found, add to pending users collection for approval
                 const createdPendingUser = await PendingUser.create(newUser);
-                console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${username} (ID: ${createdPendingUser.id})`);
+                console.log(`[${new Date().toISOString()}] Owner registration pending approval: ${createdPendingUser.username} (ID: ${createdPendingUser.id})`);
                 // Exclude password hash from the response
                 const { passwordHash: _, ...userResponse } = createdPendingUser.toObject(); // Use toObject() for plain JS object
                 res.status(201).json({ message: 'Owner registration successful. Account pending approval.', user: userResponse, pending: true });
@@ -173,7 +247,7 @@ app.post('/api/register', async (req, res) => {
         } else {
             // Add directly to users collection (customer)
             const createdUser = await User.create(newUser);
-            console.log(`[${new Date().toISOString()}] Customer registered successfully: ${username} (ID: ${createdUser.id})`);
+            console.log(`[${new Date().toISOString()}] Customer registered successfully: ${createdUser.username} (ID: ${createdUser.id})`);
             // Exclude password hash from the response
             const { passwordHash: _, ...userResponse } = createdUser.toObject();
             res.status(201).json({ message: 'User registered successfully.', user: userResponse, pending: false });
@@ -986,11 +1060,7 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
             return res.status(404).json({ message: 'User not found.' });
         }
         
-        // Check if the user being updated is an owner and not the current user
-        if (userToCheck.type === 'owner' && userIdToUpdate !== updatingOwnerId) {
-            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Owner ${updatingOwnerId} attempted to update another owner.`);
-            return res.status(403).json({ message: 'Owners can only edit their own accounts, not other owners.' });
-        }
+        // Removed check preventing owners from editing other owners
         
         // Check for conflicts with other users (excluding the user being updated)
         const conflictingUser = await User.findOne({

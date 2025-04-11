@@ -338,16 +338,18 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                                 <button
                                   onClick={() => handleEditUser(user)} // Pass the whole user object
                                   className="button button-primary button-sm"
-                                  disabled={actionLoading !== null || (user.type === 'owner' && user.id !== currentUser.id)} // Disable if any action is loading or if it's another owner
+                                  disabled={actionLoading !== null} // Only disable if another action is loading
                                 >
-                                  {user.type === 'owner' && user.id !== currentUser.id ? 'Not Allowed' : 'Edit'}
+                                  Edit
                                 </button>
                                 <button
                                   onClick={() => handleRemoveUser(user)} // Pass the whole user object
                                   className="button button-danger button-sm"
-                                  disabled={actionLoading !== null || (user.type === 'owner' && user.id !== currentUser.id)} // Disable if any action is loading or if it's another owner
+                                  // Prevent owner from deleting themselves (keep this check)
+                                  disabled={actionLoading !== null || user.id === currentUser.id}
                                 >
-                                  {user.type === 'owner' && user.id !== currentUser.id ? 'Not Allowed' : 'Remove'}
+                                  {/* Keep button text simple, backend handles self-deletion check */}
+                                  Remove
                                 </button>
                               </>
                             )}

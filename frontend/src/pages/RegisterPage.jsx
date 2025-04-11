@@ -21,7 +21,8 @@ function RegisterPage({ apiError, setApiError }) {
         username: userData.username,
         email: userData.email,
         password: userData.password,
-        userType: userData.userType // Include userType
+        userType: userData.userType, // Include userType
+        otp: userData.otp // Include the OTP
     };
 
     try {
