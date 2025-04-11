@@ -241,7 +241,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                 <tr key={user.id}>
                   <td>{user.username}</td>
                   <td>{user.email}</td>
-                  <td>{user.type}</td> {/* Display user type */}
+                  <td>{user.type}</td>
                   <td className="action-cell">
                     <button
                       onClick={() => handleApprove(user.id)}
