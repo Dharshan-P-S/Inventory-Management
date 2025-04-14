@@ -1130,11 +1130,7 @@ app.delete('/api/users/:userId', requireAuth, requireOwner, async (req, res) => 
             return res.status(404).json({ message: 'User not found.' });
         }
         
-        // Prevent owners from deleting other owners
-        if (userToDelete.type === 'owner') {
-            console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Owner ${deletingOwnerId} attempted to delete another owner.`);
-            return res.status(403).json({ message: 'Owners cannot delete other owner accounts.' });
-        }
+        // Removed check preventing owners from deleting other owners
         
         const deleteResult = await User.deleteOne({ id: userIdToDelete });
 
