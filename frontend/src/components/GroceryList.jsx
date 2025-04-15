@@ -15,7 +15,10 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
     maxPrice: null,
     minQuantityAvailable: null, // Renamed
     maxQuantityAvailable: null, // Renamed
+    availability: 'all', // 'all', 'available', 'outOfStock'
   });
+  const [availabilityFilter, setAvailabilityFilter] = useState('all'); // 'all', 'available', 'outOfStock'
+  const [showControls, setShowControls] = useState(false); // State to toggle controls visibility
 
   const handleSort = (key) => {
     let direction = 'ascending';
@@ -45,7 +48,8 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
 
   const clearFilters = () => {
     setFilterConfig({ minPrice: '', maxPrice: '', minQuantityAvailable: '', maxQuantityAvailable: '' }); // Renamed
-    setActiveFilters({ minPrice: null, maxPrice: null, minQuantityAvailable: null, maxQuantityAvailable: null }); // Renamed
+    setActiveFilters({ minPrice: null, maxPrice: null, minQuantityAvailable: null, maxQuantityAvailable: null, availability: 'all' }); // Renamed and added availability
+    setAvailabilityFilter('all'); // Reset availability filter
   };
 
   const clearSort = () => {
@@ -96,21 +100,72 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
       });
     }
 
+    // Apply Availability Filter (Out of Stock / Available)
+    if (availabilityFilter === 'available') {
+        processedItems = processedItems.filter(item => parseInt(item.quantityAvailable, 10) > 0);
+    } else if (availabilityFilter === 'outOfStock') {
+        processedItems = processedItems.filter(item => parseInt(item.quantityAvailable, 10) === 0);
+    }
+
+
+    // Apply Sorting
+    if (sortConfig.key !== null) {
+      processedItems.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        // Handle numeric vs string comparison
+        if (sortConfig.key === 'price') {
+          aValue = parseFloat(aValue);
+          bValue = parseFloat(bValue);
+        } else if (sortConfig.key === 'quantityAvailable') { // Use correct key
+          // Use parseInt for quantityAvailable (stock count)
+          aValue = parseInt(aValue, 10);
+          bValue = parseInt(bValue, 10);
+        } else if (typeof aValue === 'string') {
+          aValue = aValue.toLowerCase();
+          bValue = bValue.toLowerCase();
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
     return processedItems;
-  }, [items, sortConfig, activeFilters]); // Depend on activeFilters
+  }, [items, sortConfig, activeFilters, availabilityFilter]); // Depend on activeFilters and availabilityFilter
 
   const getSortIndicator = (key) => {
     if (sortConfig.key !== key) return '';
     return sortConfig.direction === 'ascending' ? ' ▲' : ' ▼';
   };
 
+  const handleAvailabilityFilter = (status) => {
+    // If clicking the same button again, reset to 'all'
+    setAvailabilityFilter(prev => prev === status ? 'all' : status);
+  };
 
   return (
     <div className="grocery-list-container">
       <h2>Groceries</h2>
 
-      {/* Sorting Controls */}
-      <div className="controls-container sort-controls">
+      {/* Toggle Button for Controls */}
+      <div className="toggle-controls-container">
+        <button onClick={() => setShowControls(!showControls)} className="toggle-controls-button">
+          Sort & Filter {showControls ? ' ▲' : ' ▼'}
+        </button>
+      </div>
+
+      {/* Conditionally render controls */}
+      {showControls && (
+        <>
+          {/* Sorting Controls */}
+          <div className="controls-container sort-controls">
         <span>Sort by:</span>
         <button onClick={() => handleSort('name')} className={sortConfig.key === 'name' ? 'active' : ''}>
           Name{getSortIndicator('name')}
@@ -175,8 +230,24 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
         {(activeFilters.minPrice !== null || activeFilters.maxPrice !== null || activeFilters.minQuantityAvailable !== null || activeFilters.maxQuantityAvailable !== null) && ( // Use correct state keys
             <button onClick={clearFilters} className="clear-button">Clear Filters</button>
         )}
-      </div>
-
+        {/* Wrapper for Availability Buttons to force new line */}
+        <div className="availability-buttons-wrapper">
+            <button
+                onClick={() => handleAvailabilityFilter('available')}
+                className={`available-button ${availabilityFilter === 'available' ? 'active' : ''}`}
+        >
+            Available
+        </button>
+        <button
+            onClick={() => handleAvailabilityFilter('outOfStock')}
+            className={`out-of-stock-button ${availabilityFilter === 'outOfStock' ? 'active' : ''}`}
+        >
+            Out of Stock
+            </button>
+          </div>
+          </div>
+        </>
+      )}
 
       <div className="grocery-list items-grid">
         {sortedAndFilteredItems.length > 0 ? (
