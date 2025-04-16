@@ -281,82 +281,77 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                  <table className="user-table">
                    <thead>
                      <tr><th>User ID</th><th>Username</th><th>Email</th><th>Actions</th></tr>
-                    </thead>
-                    <tbody>
-                      {/* Map users within this specific type group */}
-                      {groupedUsers[type].map((user) => (
-                        <tr key={user.id} className={editingUserId === user.id ? 'editing-row' : ''}>
-                          <td>{user.id}</td>
-                          <td>
-                            {editingUserId === user.id ? (
-                              <input
-                                type="text"
-                                name="username"
-                                value={editFormData.username}
-                                onChange={handleEditFormChange}
-                                className="form-input form-input-sm"
-                              />
-                            ) : (
-                              user.username
-                            )}
-                          </td>
-                          <td>
-                            {editingUserId === user.id ? (
-                              <input
-                                type="email"
-                                name="email"
-                                value={editFormData.email}
-                                onChange={handleEditFormChange}
-                                className="form-input form-input-sm"
-                              />
-                            ) : (
-                              user.email
-                            )}
-                          </td>
-                          {/* <td>{user.type}</td> */}
-                          <td className="action-cell">
-                            {editingUserId === user.id ? (
-                              <>
-                                <button
-                                  onClick={() => handleSaveUser(user.id)}
-                                  className="button button-success button-sm"
-                                  disabled={actionLoading === user.id}
-                                >
-                                  {actionLoading === user.id ? 'Saving...' : 'Save'}
-                                </button>
-                                <button
-                                  onClick={handleCancelEdit}
-                                  className="button button-secondary button-sm"
-                                  disabled={actionLoading === user.id}
-                                >
-                                  Cancel
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                {/* Only allow owners to edit themselves, not other owners */}
-                                <button
-                                  onClick={() => handleEditUser(user)} // Pass the whole user object
-                                  className="button button-primary button-sm"
-                                  disabled={actionLoading !== null} // Only disable if another action is loading
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => handleRemoveUser(user)} // Pass the whole user object
-                                  className="button button-danger button-sm"
-                                  // Prevent owner from deleting themselves (keep this check)
-                                  disabled={actionLoading !== null || user.id === currentUser.id}
-                                >
-                                  {/* Keep button text simple, backend handles self-deletion check */}
-                                  Remove
-                                </button>
-                              </>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
+                   </thead>
+                   <tbody>
+                     {groupedUsers[type].map((user) => (
+                       <tr key={user.id} className={editingUserId === user.id ? 'editing-row' : ''}>
+                         <td>{user.id}</td>
+                         <td>
+                           {editingUserId === user.id ? (
+                             <input
+                               type="text"
+                               name="username"
+                               value={editFormData.username}
+                               onChange={handleEditFormChange}
+                               className="form-input form-input-sm"
+                             />
+                           ) : (
+                             user.username
+                           )}
+                         </td>
+                         <td>
+                           {editingUserId === user.id ? (
+                             <input
+                               type="email"
+                               name="email"
+                               value={editFormData.email}
+                               onChange={handleEditFormChange}
+                               className="form-input form-input-sm"
+                             />
+                           ) : (
+                             user.email
+                           )}
+                         </td>
+                         <td className="action-cell">
+                           {editingUserId === user.id ? (
+                             <>
+                               <button
+                                 onClick={() => handleSaveUser(user.id)}
+                                 className="button button-success button-sm"
+                                 disabled={actionLoading === user.id}
+                               >
+                                 {actionLoading === user.id ? 'Saving...' : 'Save'}
+                               </button>
+                               <button
+                                 onClick={handleCancelEdit}
+                                 className="button button-secondary button-sm"
+                                 disabled={actionLoading === user.id}
+                               >
+                                 Cancel
+                               </button>
+                             </>
+                           ) : (
+                             <>
+                               <button
+                                 onClick={() => handleEditUser(user)} // Pass the whole user object
+                                 className="button button-primary button-sm"
+                                 disabled={actionLoading !== null || (currentUser.type === 'owner' && user.type === 'owner' && user.id !== currentUser.id)} // Only disable if another action is loading
+                               >
+                                 Edit
+                               </button>
+                               <button
+                                 onClick={() => handleRemoveUser(user)} // Pass the whole user object
+                                 className="button button-danger button-sm"
+                                 disabled={actionLoading !== null || user.id === currentUser.id || (currentUser.type === 'owner' && user.type === 'owner' && user.id !== currentUser.id)}
+                               >
+                                 Remove
+                               </button>
+                             </>
+                           )}
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
                  </table>
                </div>
              )
@@ -424,14 +419,14 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                              <button
                                onClick={() => handleEditUser(user)} // Pass user object
                                className="button button-primary button-sm"
-                               disabled={actionLoading !== null}
+                               disabled={actionLoading !== null || (currentUser.type === 'owner' && user.type === 'owner' && user.id !== currentUser.id)}
                              >
                                Edit
                              </button>
                              <button
                                onClick={() => handleRemoveUser(user)} // Pass user object
                                className="button button-danger button-sm"
-                               disabled={actionLoading !== null}
+                               disabled={actionLoading !== null || (currentUser.type === 'owner' && user.type === 'owner' && user.id !== currentUser.id)}
                              >
                                Remove
                              </button>

@@ -1058,9 +1058,13 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
         if (!userToCheck) {
             console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
             return res.status(404).json({ message: 'User not found.' });
-        }
+        }ontend
         
-        // Removed check preventing owners from editing other owners
+        // Check if the owner is trying to modify another owner
+        if (userToCheck.type === 'owner' && userToCheck.id !== updatingOwnerId) {
+            console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - Unauthorized: Owner ${updatingOwnerId} cannot modify another owner ${userIdToUpdate}.`);
+            return res.status(403).json({ message: 'Unauthorized: Cannot modify other owners.' });
+        }
         
         // Check for conflicts with other users (excluding the user being updated)
         const conflictingUser = await User.findOne({
@@ -1130,7 +1134,11 @@ app.delete('/api/users/:userId', requireAuth, requireOwner, async (req, res) => 
             return res.status(404).json({ message: 'User not found.' });
         }
         
-        // Removed check preventing owners from deleting other owners
+        // Check if the owner is trying to delete another owner
+        if (userToDelete.type === 'owner' && userToDelete.id !== deletingOwnerId) {
+            console.warn(`[${new Date().toISOString()}] DELETE /api/users/${userIdToDelete} - Unauthorized: Owner ${deletingOwnerId} cannot delete another owner ${userIdToDelete}.`);
+            return res.status(403).json({ message: 'Unauthorized: Cannot delete other owners.' });
+        }
         
         const deleteResult = await User.deleteOne({ id: userIdToDelete });
 
