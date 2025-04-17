@@ -1,6 +1,60 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion and AnimatePresence
 import GroceryItem from './GroceryItem';
 import './GroceryList.css'; // Import CSS for styling
+
+// Animation Variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1, // Stagger item appearance
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 30, opacity: 0, scale: 0.95 }, // Increased y offset, added scale
+  visible: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    transition: { type: 'spring', stiffness: 90, damping: 15 }, // Adjusted spring
+  },
+  exit: { // Define exit animation
+    y: -30, // Increased y offset
+    opacity: 0,
+    scale: 0.95,
+    transition: { duration: 0.25 } // Slightly longer duration
+  }
+};
+
+const controlsVariants = {
+  hidden: { height: 0, opacity: 0, marginTop: 0, marginBottom: 0, overflow: 'hidden' },
+  visible: {
+    height: 'auto',
+    opacity: 1,
+    marginTop: '1.2rem', // Slightly more space
+    marginBottom: '1.2rem',
+    transition: { duration: 0.4, ease: "circOut" } // Slightly longer, different ease
+  },
+  exit: {
+    height: 0,
+    opacity: 0,
+    marginTop: 0,
+    marginBottom: 0,
+    overflow: 'hidden',
+    transition: { duration: 0.3, ease: "circIn" } // Different ease for exit
+  }
+};
+
+// Variant for the main container entry animation
+const pageVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
+
 
 function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateItem }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
@@ -151,7 +205,13 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
   };
 
   return (
-    <div className="grocery-list-container">
+    // Add motion to the main container
+    <motion.div
+      className="grocery-list-container"
+      variants={pageVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <h2>Groceries</h2>
 
       {/* Toggle Button for Controls */}
@@ -161,11 +221,19 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
         </button>
       </div>
 
-      {/* Conditionally render controls */}
-      {showControls && (
-        <>
-          {/* Sorting Controls */}
-          <div className="controls-container sort-controls">
+      {/* Conditionally render controls with animation */}
+      <AnimatePresence>
+        {showControls && (
+          <motion.div
+            key="controls" // Add key for AnimatePresence
+            className="controls-wrapper" // New wrapper for animation
+            variants={controlsVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            {/* Sorting Controls */}
+            <div className="controls-container sort-controls">
         <span>Sort by:</span>
         <button onClick={() => handleSort('name')} className={sortConfig.key === 'name' ? 'active' : ''}>
           Name{getSortIndicator('name')}
@@ -243,30 +311,55 @@ function GroceryList({ items, onAddToCart, currentUser, onDeleteItem, onUpdateIt
             className={`out-of-stock-button ${availabilityFilter === 'outOfStock' ? 'active' : ''}`}
         >
             Out of Stock
-            </button>
-          </div>
-          </div>
-        </>
-      )}
-
-      <div className="grocery-list items-grid">
-        {sortedAndFilteredItems.length > 0 ? (
-          sortedAndFilteredItems.map(item => (
-            <GroceryItem
-              key={item.id}
-              item={item}
-              onAddToCart={onAddToCart}
-              currentUser={currentUser} // Pass currentUser down
-              onDeleteItem={onDeleteItem} // Pass onDeleteItem down
-              onUpdateItem={onUpdateItem} // Pass onUpdateItem down
-            />
-          ))
-        ) : (
-          // Updated message for combined filtering
-          <p>No matching items found for the current search and category.</p>
+              </button>
+            </div>
+            </div>
+          </motion.div>
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+
+      {/* Apply motion to the grid container */}
+      <motion.div
+        className="grocery-list items-grid"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <AnimatePresence> {/* Wrap items with AnimatePresence for exit animations */}
+          {sortedAndFilteredItems.length > 0 ? (
+            sortedAndFilteredItems.map(item => (
+              <motion.div
+                key={item.id} // Key is crucial for AnimatePresence
+                variants={itemVariants}
+                // initial="hidden" // Handled by container stagger
+                // animate="visible" // Handled by container stagger
+                exit="exit" // Apply exit animation
+                layout // Animate layout changes (e.g., when filtering/sorting)
+              >
+                <GroceryItem
+                  item={item}
+                  onAddToCart={onAddToCart}
+                  currentUser={currentUser} // Pass currentUser down
+                  onDeleteItem={onDeleteItem} // Pass onDeleteItem down
+                  onUpdateItem={onUpdateItem} // Pass onUpdateItem down
+                />
+              </motion.div>
+            ))
+          ) : (
+            // Use motion for the "no items" message for consistency
+            <motion.p
+              key="no-items"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="no-items-message" // Add class for styling
+            >
+              No matching items found for the current filters and sort order.
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </motion.div> // Close motion.div for main container
   );
 }
 

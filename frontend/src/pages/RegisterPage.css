@@ -1,0 +1,225 @@
+/* RegisterPage Styles - Adapted from LoginPage.css */
+
+/* Back Button Style - Reuse from LoginPage for consistency */
+.back-button {
+  position: absolute;
+  top: 1rem; /* Position inside the container */
+  left: 1rem; /* Position inside the container */
+  font-size: 1.8rem; /* Larger arrow */
+  color: var(--text-secondary); /* Muted color */
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  z-index: 10; /* Ensure it's clickable */
+}
+
+.back-button:hover {
+  color: var(--text-accent-hover); /* Brighter on hover */
+  transform: translateX(-3px); /* Slight move effect */
+}
+
+
+.register-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  /* Use dark theme background variables */
+  background: linear-gradient(120deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  overflow: hidden;
+}
+
+.register-form-container {
+  background-color: var(--bg-secondary); /* Dark background for the card */
+  padding: 2.5rem 2.5rem;
+  border-radius: 15px;
+  box-shadow: var(--box-shadow-lg); /* Use dark theme shadow */
+  border: 1px solid var(--border-color); /* Add subtle border */
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  position: relative; /* Make this the positioned ancestor for the back button */
+}
+
+.register-form-container h2 {
+  margin-bottom: 1.5rem;
+  color: var(--text-primary); /* Light text for title */
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.register-form .form-group {
+  margin-bottom: 1rem; /* Reduced margin */
+  position: relative; /* Needed for icon positioning */
+}
+
+.register-form label {
+  display: none; /* Hide labels, use placeholders and icons */
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  filter: invert(75%) sepia(10%) saturate(200%) hue-rotate(180deg) brightness(90%) contrast(85%); /* Adjust color to match text-secondary */
+}
+
+/* Use .form-control styles from App.css as base */
+.register-form input[type="text"],
+.register-form input[type="email"],
+.register-form input[type="password"] {
+  /* Inherit base styles from .form-control in App.css */
+  width: 100%;
+  padding: 10px 15px 10px 50px; /* Keep padding for icon */
+  font-size: 0.95rem;
+  /* Overrides from App.css if needed */
+  background-color: var(--bg-tertiary); /* Slightly lighter dark input */
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+
+
+/* Style placeholders */
+.register-form input::placeholder {
+  color: var(--text-secondary); /* Use secondary text color */
+  font-style: italic;
+}
+
+.register-form .error-message,
+.register-form .success-message,
+.register-form .info-message {
+  font-size: 0.9rem;
+  margin-top: 0.8rem;
+  text-align: center;
+  min-height: 1.2em;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
+/* Dark theme message styles */
+.register-form .error-message {
+  color: var(--danger-color);
+  background-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.15);
+  border: 1px solid rgba(var(--danger-color-rgb, 239, 68, 68), 0.3);
+}
+.register-form .success-message {
+  color: var(--success-color);
+  background-color: rgba(var(--success-color-rgb, 16, 185, 129), 0.15);
+  border: 1px solid rgba(var(--success-color-rgb, 16, 185, 129), 0.3);
+}
+.register-form .info-message {
+  color: var(--info-color);
+  background-color: rgba(var(--info-color-rgb, 59, 130, 246), 0.15);
+  border: 1px solid rgba(var(--info-color-rgb, 59, 130, 246), 0.3);
+}
+
+
+.register-button, .otp-button {
+  /* Use base .button styles from App.css */
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: var(--box-shadow); /* Use dark theme shadow */
+}
+
+.register-button {
+  background-color: var(--success-color); /* Use success color */
+  color: #fff; /* White text */
+}
+.register-button:hover:not(:disabled) {
+  background-color: var(--success-color-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-lg);
+}
+
+.otp-button {
+  background-color: var(--warning-color); /* Use warning color */
+  color: var(--bg-primary); /* Dark text on warning */
+  margin-bottom: 1rem;
+}
+.otp-button:hover:not(:disabled) {
+  background-color: var(--warning-color-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-lg);
+}
+
+
+.register-button:disabled, .otp-button:disabled {
+  background: var(--border-color); /* Use dark theme disabled color */
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.register-links {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.register-links a {
+  color: var(--text-accent); /* Use accent color for links */
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.register-links a:hover {
+  color: var(--text-accent-hover); /* Lighter accent on hover */
+  text-decoration: underline;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  filter: invert(75%) sepia(10%) saturate(200%) hue-rotate(180deg) brightness(90%) contrast(85%); /* Match input icon color */
+}
+
+.password-toggle-icon:hover {
+  opacity: 1;
+}
+
+/* User Type Selection */
+.user-type-selection {
+  margin-bottom: 1rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: var(--text-secondary); /* Use secondary text color */
+}
+
+.user-type-selection label {
+  display: inline-block;
+  margin-right: 1.5rem;
+  cursor: pointer;
+  color: var(--text-primary); /* Light text for labels */
+}
+
+.user-type-selection input[type="radio"] {
+  margin-right: 0.5rem;
+  cursor: pointer;
+  accent-color: var(--text-accent); /* Style radio button color */
+}

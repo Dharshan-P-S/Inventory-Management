@@ -1,199 +1,542 @@
-/* Styling for Sorting and Filtering Controls in GroceryList */
+/* === GroceryList.css - Enhanced Styling with Availability Borders === */
 
+/* --- GroceryList.css - Dark Theme Adjustments --- */
+
+/* Main Container - Standard Dark Background */
 .grocery-list-container {
-  padding: 15px;
+  padding: 25px;
+  background-color: var(--bg-primary); /* Use primary dark background */
+  border-radius: var(--border-radius); /* Use standard border radius */
+  box-shadow: var(--box-shadow); /* Use standard shadow */
+  color: var(--text-primary); /* Use primary text color */
 }
 
-/* Container for the main toggle button */
+.grocery-list-container h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--text-accent); /* Use accent color for title */
+  font-weight: 700;
+  font-size: 1.8em;
+  text-shadow: none; /* Remove shadow for dark theme */
+}
+
+/* Toggle Button - Dark Theme */
 .toggle-controls-container {
-  margin-bottom: 15px; /* Space below the toggle button */
-  text-align: left; /* Align button to the left */
+  margin-bottom: 15px;
+  text-align: left;
 }
 
 .toggle-controls-button {
-  padding: 0; /* No padding */
-  border: none; /* No border */
-  background-color: transparent; /* Transparent background */
-  color: inherit; /* Inherit text color */
-  font-size: 1.2em; /* Adjust size of arrow */
+  padding: 10px 18px;
+  border: 1px solid var(--border-color-light);
+  background-color: var(--bg-tertiary); /* Darker button background */
+  color: var(--text-primary); /* Light text */
+  font-size: 1em;
+  font-weight: 600;
   cursor: pointer;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--box-shadow-sm);
 }
 
-/* Removed hover effect */
+.toggle-controls-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+  border-color: var(--text-accent);
+  background-color: var(--bg-tertiary);
+}
 
+/* Controls Wrapper - Dark Theme */
+.controls-wrapper {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--bg-secondary); /* Darker wrapper background */
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color); /* Use dark theme border */
+  box-shadow: var(--box-shadow-sm);
+}
+
+/* General Controls Container Styling - Dark Theme */
 .controls-container {
   display: flex;
-  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px; /* Spacing between elements */
-  margin-bottom: 15px;
-  padding: 10px;
-  background-color: #f8f9fa; /* Light background for controls area */
-  border-radius: 5px;
-  border: 1px solid #dee2e6;
+  gap: 12px;
+  padding: 18px;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.controls-container span {
-  font-weight: bold;
-  margin-right: 5px;
+.controls-container span:first-child {
+  font-weight: 600;
+  color: var(--text-secondary); /* Use secondary text color */
+  margin-right: 8px;
+  font-size: 0.95em;
 }
 
-/* Sorting Controls Specifics */
-.sort-controls button {
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  color: darkslategray;
+/* Button Base Styles (within controls) - Dark Theme */
+.controls-container button {
+  padding: 7px 14px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary); /* Darker button */
+  color: var(--text-primary); /* Light text */
   cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s, border-color 0.2s;
+  border-radius: 6px;
+  font-size: 0.9em;
+  font-weight: 500;
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
 }
 
-.sort-controls button:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
+.controls-container button:hover {
+  background-color: var(--border-color); /* Slightly lighter dark */
+  border-color: var(--border-color-light);
+  transform: translateY(-1px);
 }
 
-.sort-controls button.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #0056b3;
-  outline: none;
+/* Active Sort/Filter Button Styles - Dark Theme */
+.controls-container button.active {
+  background: var(--primary-color); /* Use primary accent color */
+  color: var(--bg-primary); /* Dark text on accent bg */
+  border-color: transparent;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(var(--text-accent-rgb, 96, 165, 250), 0.3); /* Adjusted shadow */
+}
+.controls-container button.active:hover {
+  transform: translateY(0);
+  background: var(--primary-color-dark); /* Darker accent on hover */
 }
 
-/* Filtering Controls Specifics */
+/* Clear Buttons - Dark Theme */
+.clear-button {
+  background-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.15); /* Danger background tint */
+  color: var(--danger-color);
+  border-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.3);
+  margin-left: auto;
+}
+.clear-button:hover {
+  background-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.25);
+  color: var(--danger-color-dark);
+  border-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.5);
+}
+
+/* Apply Button - Dark Theme */
+.apply-button {
+  background-color: rgba(var(--success-color-rgb, 16, 185, 129), 0.15); /* Success background tint */
+  color: var(--success-color);
+  border-color: rgba(var(--success-color-rgb, 16, 185, 129), 0.3);
+}
+.apply-button:hover {
+  background-color: rgba(var(--success-color-rgb, 16, 185, 129), 0.25);
+  color: var(--success-color-dark);
+  border-color: rgba(var(--success-color-rgb, 16, 185, 129), 0.5);
+}
+
+/* Filter Group Styling - Dark Theme */
 .filter-controls {
-  gap: 15px; /* Slightly larger gap for filter groups */
+  gap: 15px 25px;
 }
 
 .filter-group {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .filter-group label {
-  font-weight: normal;
-  margin-right: 3px;
+  font-weight: 500;
+  font-size: 0.9em;
+  color: var(--text-secondary); /* Use secondary text */
+  margin-right: 0;
 }
 
 .filter-group input[type="number"] {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 70px; /* Adjust width as needed */
+  padding: 7px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  width: 75px;
+  font-size: 0.9em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background-color: var(--bg-secondary); /* Dark input */
+  color: var(--text-primary); /* Light text */
 }
 
-/* Hide spinner buttons on number inputs */
+.filter-group input[type="number"]:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 3px rgba(var(--text-accent-rgb, 96, 165, 250), 0.25);
+  background-color: var(--bg-secondary);
+}
+
+/* Hide spinner buttons */
 .filter-group input[type="number"]::-webkit-outer-spin-button,
 .filter-group input[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
-
-.apply-button,
-.clear-button {
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+.filter-group input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
 }
 
-.apply-button {
-  background-color: #28a745; /* Green */
-  color: white;
-  border: 1px solid #218838;
-}
-
-.apply-button:hover {
-  background-color: #218838;
-}
-
-.clear-button {
-  background-color: #dc3545; /* Red */
-  color: white;
-  border: 1px solid #c82333;
-  margin-left: 5px; /* Add some space before clear buttons */
-}
-
-.clear-button:hover {
-  background-color: #c82333;
-}
-
-/* Wrapper for Availability Buttons */
+/* Availability Buttons Wrapper - Dark Theme */
 .availability-buttons-wrapper {
-  flex-basis: 100%; /* Make the wrapper take full width to force line break */
-  margin-top: 10px; /* Add some space above the buttons */
-  display: flex; /* Align buttons within the wrapper */
-  gap: 10px; /* Space between the availability buttons */
+  flex-basis: 100%;
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color); /* Use dark theme border */
 }
 
-/* Availability Quick Filter Buttons */
+/* Availability Quick Filter Buttons - Dark Theme */
 .available-button,
 .out-of-stock-button {
-  padding: 5px 15px; /* Slightly more padding for rounded look */
-  border-radius: 20px; /* Make buttons rounded (pill shape) */
+  padding: 7px 16px;
+  border-radius: 18px;
+  font-size: 0.88em;
+  font-weight: 500;
+  border: 1px solid var(--border-color-light);
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  transition: var(--transition-base);
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
-  border: 1px solid #ccc; /* Default border like sort buttons */
-  background-color: #fff; /* Default background like sort buttons */
-  color: darkslategray; /* Default text color like sort buttons */
 }
-
 .available-button:hover,
 .out-of-stock-button:hover {
-  background-color: #e9ecef; /* Default hover like sort buttons */
-  border-color: #adb5bd;
+    background-color: var(--border-color);
+    border-color: var(--border-color-light);
+    color: var(--text-primary);
 }
 
-/* Active state retains specific colors */
+
 .available-button.active {
-  background-color: #28a745; /* Green */
-  border-color: #218838;
-  color: white; /* Text color for active state */
-  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5); /* Active indicator */
+  background: var(--success-color);
+  border-color: transparent;
+  color: #fff; /* White text on success */
+  box-shadow: 0 2px 4px rgba(var(--success-color-rgb, 16, 185, 129), 0.3);
 }
 
-.available-button.active:hover {
-  background-color: #218838; /* Darker green on hover when active */
-}
 
 .out-of-stock-button.active {
-  background-color: #dc3545; /* Red */
-  border-color: #c82333;
-  color: white; /* Text color for active state */
-  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.5); /* Active indicator */
-}
-
-.out-of-stock-button.active:hover {
-  background-color: #c82333; /* Darker red on hover when active */
+  background: var(--danger-color);
+  border-color: transparent;
+  color: #fff; /* White text on danger */
+  box-shadow: 0 2px 4px rgba(var(--danger-color-rgb, 239, 68, 68), 0.3);
 }
 
 
-/* Ensure items grid still works */
+/* Items Grid - More spacing */
 .items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* Responsive grid */
-    gap: 20px; /* Space between items */
-    padding: 10px 0; /* Padding above/below grid */
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 30px; /* Keep larger gap */
+    padding: 25px 0;
 }
 
-/* Responsive adjustments if needed */
+/* No Items Message - Dark Theme */
+.no-items-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-secondary); /* Use secondary text */
+  font-size: 1.1em;
+  background-color: var(--bg-secondary); /* Use secondary dark bg */
+  border-radius: var(--border-radius);
+  border: 2px dashed var(--border-color); /* Use dark theme border */
+}
+
+
+/* Responsive Adjustments */
 @media (max-width: 768px) {
+  .controls-wrapper {
+    background-color: var(--bg-secondary); /* Keep dark */
+  }
   .controls-container {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 15px;
+  }
+  .sort-controls, .filter-controls {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
   }
   .filter-group {
-     width: 100%; /* Make filter groups take full width */
-     justify-content: space-between; /* Space out elements */
+     width: auto;
+     justify-content: center;
   }
    .filter-group input[type="number"] {
-     width: 35%; /* Adjust input width */
+     width: 65px;
    }
   .apply-button, .clear-button {
-      width: auto; /* Allow buttons to size naturally */
-      margin-top: 5px;
+      width: auto;
+      margin-top: 10px;
+      margin-left: 5px;
+  }
+  .clear-button {
+    margin-left: 10px;
+  }
+  .availability-buttons-wrapper {
+    justify-content: center;
+    gap: 15px;
+  }
+  .items-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* --- GroceryItem Styling (Dark Theme) --- */
+
+.grocery-item {
+  /* Dark item background */
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  padding: 0; /* Remove padding, handled by link */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
+  min-height: auto; /* Remove fixed min-height */
+  position: relative;
+  overflow: hidden;
+  color: var(--text-primary); /* Ensure text is light */
+
+  /* === BORDER LOGIC START === */
+  /* DEFAULT: Available items get a green border */
+  border: 2px solid var(--success-color);
+  /* === BORDER LOGIC END === */
+}
+
+/* Remove accent border (no longer needed as we use full border now) */
+.grocery-item::before {
+  content: none;
+}
+
+
+.grocery-item:hover {
+  transform: translateY(-5px); /* Use standard hover effect */
+  box-shadow: var(--box-shadow);
+  /* background-color: var(--bg-tertiary); */ /* Optional: slightly lighter bg on hover */
+}
+
+/* Link Styling */
+.grocery-item-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  flex-grow: 1;
+  padding: 1rem 1.25rem; /* Add padding here */
+  margin-bottom: 0; /* Remove margin */
+}
+.grocery-item-link:hover h3 {
+  color: var(--text-accent); /* Accent color on hover */
+}
+
+.grocery-item h3 {
+  margin-top: 0; /* Remove top margin */
+  margin-bottom: 0.5rem; /* Standard margin */
+  font-size: 1.15em; /* Standard size */
+  color: var(--text-primary); /* Primary text color */
+  font-weight: 500; /* Standard weight */
+}
+
+.grocery-item p {
+  margin: 0.2rem 0;
+  font-size: 0.9em; /* Standard size */
+  color: var(--text-secondary); /* Secondary text color */
+  line-height: 1.5;
+}
+
+.grocery-item .item-category {
+  font-size: 0.8em; /* Standard size */
+  color: var(--text-secondary); /* Secondary text color */
+  font-style: italic;
+  margin-top: 0.5rem; /* Standard margin */
+  margin-bottom: 0.5rem;
+  background-color: transparent; /* Remove background */
+  padding: 0; /* Remove padding */
+  border-radius: 0;
+  display: inline-block;
+  font-weight: 400; /* Standard weight */
+}
+
+/* Controls Wrapper */
+.item-controls-wrapper {
+  margin-top: auto;
+  padding: 0.75rem 1.25rem; /* Standard padding */
+  border-top: 1px solid var(--border-color); /* Use dark theme border */
+  background-color: var(--bg-tertiary); /* Darker controls background */
+}
+
+/* Item Controls (Quantity + Add Button) */
+.item-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px; /* Standard gap */
+}
+
+/* Quantity Adjuster */
+.quantity-adjuster {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Standard gap */
+}
+
+.quantity-adjuster button {
+  background-color: var(--bg-secondary); /* Darker button */
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: auto; /* Let padding define size */
+  height: auto;
+  min-width: 24px; /* Ensure minimum size */
+  padding: 3px 8px; /* Standard padding */
+  border-radius: 4px; /* Standard radius */
+  font-size: 0.9rem; /* Standard size */
+  font-weight: normal;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-base);
+  box-shadow: none; /* Remove shadow */
+}
+
+.quantity-adjuster button:hover:not(:disabled) {
+  background-color: var(--border-color); /* Slightly lighter dark */
+  border-color: var(--border-color-light);
+  color: var(--text-primary);
+  box-shadow: none;
+}
+
+.quantity-adjuster button:disabled {
+  opacity: 0.5; /* Standard disabled opacity */
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.quantity-display {
+  font-weight: 500; /* Standard weight */
+  min-width: 25px; /* Standard width */
+  text-align: center;
+  color: var(--text-primary); /* Primary text color */
+  font-size: 1rem; /* Standard size */
+  padding: 0 5px;
+}
+
+/* Add to Cart Button - Dark Theme */
+.add-to-cart-button {
+  /* Inherit base .button styles from App.css */
+  padding: 0.35rem 0.8rem; /* Adjust padding */
+  font-size: 0.9rem; /* Adjust font size */
+  /* Apply primary button variant */
+  color: var(--bg-primary);
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  font-weight: 500;
+  border-radius: var(--border-radius);
+  transition: var(--transition-base);
+  box-shadow: var(--box-shadow-sm);
+}
+
+.add-to-cart-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow);
+  background-color: var(--primary-color-dark);
+  border-color: var(--primary-color-dark);
+}
+
+.add-to-cart-button:disabled {
+  /* Inherit disabled styles from App.css */
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+  background-color: var(--bg-tertiary); /* Use a disabled background */
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* === BORDER LOGIC START === */
+/* Out of Stock Styling - Dark Theme Differentiation */
+.grocery-item.out-of-stock {
+  background-color: var(--bg-secondary); /* Keep base dark */
+  opacity: 0.7; /* Standard opacity from App.css */
+
+  /* OVERRIDE: Out-of-stock items get a red border */
+  border: 2px solid var(--danger-color);
+}
+/* === BORDER LOGIC END === */
+
+
+/* Remove specific background/border changes for out-of-stock (no longer needed) */
+.grocery-item.out-of-stock::before {
+  content: none;
+}
+
+.grocery-item.out-of-stock:hover {
+  transform: none; /* Disable hover transform */
+  box-shadow: var(--box-shadow-sm); /* Keep base shadow */
+  background-color: var(--bg-secondary); /* Keep base background */
+}
+
+.grocery-item.out-of-stock .grocery-item-link {
+  cursor: default;
+}
+.grocery-item.out-of-stock .grocery-item-link:hover h3 {
+  color: var(--text-primary); /* Prevent heading color change on hover */
+}
+
+.stock-message {
+  text-align: center;
+  font-weight: 500; /* Standard weight */
+  color: var(--danger-color); /* Use danger color */
+  font-size: 0.9em; /* Standard size */
+  padding: 0.5rem 0; /* Adjust padding */
+  background-color: transparent; /* Remove background */
+  border: none; /* Remove border */
+  border-radius: 0;
+  margin-top: 0.5rem; /* Standard margin */
+  /* Ensure it's placed correctly within the controls wrapper */
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .grocery-list-container {
+    padding: 15px;
+    border-radius: var(--border-radius); /* Use standard radius */
+  }
+  .items-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .grocery-item {
+    /* Padding is now on link */
+    border-radius: var(--border-radius);
+  }
+  .filter-group input[type="number"] {
+     width: 60px;
+   }
+  .toggle-controls-button {
+    font-size: 0.95em;
+    padding: 8px 12px;
+  }
+  .controls-container button {
+    font-size: 0.88em;
+    padding: 6px 10px;
+  }
+  .add-to-cart-button {
+    padding: 0.3rem 0.7rem; /* Adjust padding */
+    font-size: 0.85rem; /* Adjust font size */
   }
 }

@@ -2,29 +2,43 @@
 
 /* --- Base & Variables --- */
 :root {
-  --primary-color: #0d6efd; /* Bootstrap Blue */
-  --primary-color-dark: #0b5ed7;
-  --secondary-color: #6c757d; /* Bootstrap Secondary */
-  --secondary-color-light: #f8f9fa;
-  --success-color: #198754; /* Bootstrap Success */
-  --success-color-dark: #157347;
-  --danger-color: #dc3545; /* Bootstrap Danger */
-  --danger-color-dark: #bb2d3b;
-  --warning-color: #ffc107; /* Bootstrap Warning */
-  --warning-color-dark: #ffae00;
-  --info-color: #0dcaf0; /* Bootstrap Info */
-  --light-gray: #f8f9fa;
-  --medium-gray: #e9ecef;
-  --dark-gray: #6c757d;
-  --text-color: #212529; /* Bootstrap Default Text */
-  --text-muted: #6c757d;
-  --border-color: #dee2e6;
-  --border-radius: 0.375rem; /* Bootstrap Default Radius */
-  --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
-  --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-  --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
+  /* Dark Theme Palette */
+  --bg-primary: #111827; /* Deep Space Black / Near Black */
+  --bg-secondary: #1F2937; /* Charcoal / Dark Grey */
+  --bg-tertiary: #374151; /* Medium Dark Grey */
+  --text-primary: #F3F4F6; /* Light Grey / Off-white */
+  --text-secondary: #9CA3AF; /* Medium Grey */
+  --text-accent: #60A5FA; /* Bright Aqua/Cyber Blue */
+  --text-accent-hover: #93C5FD; /* Lighter Accent Blue */
+  --border-color: #4B5563; /* Grey for borders */
+  --border-color-light: #6B7280; /* Lighter Grey for borders */
+
+  /* Functional Colors (Adjusted for Dark Theme) */
+  --primary-color: var(--text-accent); /* Use accent blue as primary */
+  --primary-color-dark: var(--text-accent-hover);
+  --secondary-color: var(--text-secondary);
+  --secondary-color-light: var(--bg-tertiary); /* Use tertiary bg for light secondary */
+  --success-color: #10B981; /* Emerald Green */
+  --success-color-dark: #059669;
+  --danger-color: #EF4444; /* Red */
+  --danger-color-dark: #DC2626;
+  --warning-color: #F59E0B; /* Amber */
+  --warning-color-dark: #D97706;
+  --info-color: #3B82F6; /* Blue */
+  --info-color-dark: #2563EB;
+
+  /* UI Elements */
+  --light-gray: var(--bg-secondary); /* Remap light gray */
+  --medium-gray: var(--bg-tertiary); /* Remap medium gray */
+  --dark-gray: var(--text-secondary); /* Remap dark gray */
+  --text-color: var(--text-primary); /* Default text */
+  --text-muted: var(--text-secondary); /* Muted text */
+  --border-radius: 0.375rem;
+  --box-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Subtle shadow for dark */
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Adjusted shadow */
+  --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Adjusted shadow */
   --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --transition-base: all 0.25s ease-in-out; /* Smoother transition */
+  --transition-base: all 0.25s ease-in-out;
 }
 
 /* --- Global Styles --- */
@@ -37,8 +51,8 @@
 body {
   font-family: var(--font-family-sans-serif);
   margin: 0;
-  background-color: #f8f9fc; /* Slightly lighter/bluer background */
-  color: var(--text-color);
+  background-color: var(--bg-primary); /* Dark background */
+  color: var(--text-primary); /* Light text */
   line-height: 1.6;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
@@ -75,18 +89,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 { font-size: 2.25rem; }
-h2 { font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; color: var(--primary-color); }
+h2 { font-size: 1.75rem; text-align: center; margin-bottom: 1.5rem; color: var(--text-accent); } /* Use accent color for headings */
 h3 { font-size: 1.5rem; }
 h4 { font-size: 1.25rem; }
 
 a {
-  color: var(--primary-color);
+  color: var(--text-accent); /* Use accent color for links */
   text-decoration: none;
   transition: var(--transition-base);
 }
 a:hover {
-  color: var(--primary-color-dark);
-  /* text-decoration: underline; /* Keep underline optional */
+  color: var(--text-accent-hover); /* Lighter accent on hover */
 }
 
 /* --- Utility Classes --- */
@@ -103,15 +116,15 @@ a:hover {
 /* --- Base Button Style --- */
 .button {
   display: inline-block;
-  font-weight: 400;
+  font-weight: 500; /* Slightly bolder */
   line-height: 1.5;
-  color: var(--text-color);
+  color: var(--text-primary); /* Light text on buttons */
   text-align: center;
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
-  background-color: transparent;
-  border: 1px solid transparent;
+  background-color: var(--bg-tertiary); /* Darker button background */
+  border: 1px solid var(--border-color-light); /* Lighter border */
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
   border-radius: var(--border-radius);
@@ -120,45 +133,47 @@ a:hover {
 }
 .button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: var(--box-shadow); /* Enhance shadow on hover */
+  box-shadow: var(--box-shadow);
+  border-color: var(--text-accent); /* Accent border on hover */
+  background-color: var(--bg-tertiary); /* Keep background consistent */
 }
 .button:active:not(:disabled) {
   transform: translateY(0);
   box-shadow: var(--box-shadow-sm);
 }
 .button:disabled {
-  opacity: 0.65;
+  opacity: 0.5; /* Slightly more faded */
   cursor: not-allowed;
 }
 
-/* Button Color Variants */
-.button-primary { color: #fff; background-color: var(--primary-color); border-color: var(--primary-color); }
+/* Button Color Variants (Dark Theme) */
+.button-primary { color: var(--bg-primary); background-color: var(--primary-color); border-color: var(--primary-color); } /* Dark text on bright bg */
 .button-primary:hover:not(:disabled) { background-color: var(--primary-color-dark); border-color: var(--primary-color-dark); }
-.button-primary:focus { box-shadow: 0 0 0 0.25rem rgba(49, 132, 253, 0.5); } /* Adjusted focus */
+.button-primary:focus { box-shadow: 0 0 0 0.25rem rgba(var(--text-accent-rgb, 96, 165, 250), 0.5); } /* Use RGB if possible, fallback */
 
-.button-secondary { color: #fff; background-color: var(--secondary-color); border-color: var(--secondary-color); }
-.button-secondary:hover:not(:disabled) { background-color: #5a6268; border-color: #545b62; }
-.button-secondary:focus { box-shadow: 0 0 0 0.25rem rgba(130, 138, 145, 0.5); }
+.button-secondary { color: var(--text-primary); background-color: var(--secondary-color); border-color: var(--secondary-color); }
+.button-secondary:hover:not(:disabled) { background-color: var(--border-color-light); border-color: var(--border-color-light); }
+.button-secondary:focus { box-shadow: 0 0 0 0.25rem rgba(var(--text-secondary-rgb, 156, 163, 175), 0.5); }
 
 .button-success { color: #fff; background-color: var(--success-color); border-color: var(--success-color); }
 .button-success:hover:not(:disabled) { background-color: var(--success-color-dark); border-color: var(--success-color-dark); }
-.button-success:focus { box-shadow: 0 0 0 0.25rem rgba(60, 153, 110, 0.5); }
+.button-success:focus { box-shadow: 0 0 0 0.25rem rgba(var(--success-color-rgb, 16, 185, 129), 0.5); }
 
 .button-danger { color: #fff; background-color: var(--danger-color); border-color: var(--danger-color); }
 .button-danger:hover:not(:disabled) { background-color: var(--danger-color-dark); border-color: var(--danger-color-dark); }
-.button-danger:focus { box-shadow: 0 0 0 0.25rem rgba(225, 83, 97, 0.5); }
+.button-danger:focus { box-shadow: 0 0 0 0.25rem rgba(var(--danger-color-rgb, 239, 68, 68), 0.5); }
 
-.button-warning { color: #000; background-color: var(--warning-color); border-color: var(--warning-color); }
-.button-warning:hover:not(:disabled) { background-color: var(--warning-color-dark); border-color: #ffba00; }
-.button-warning:focus { box-shadow: 0 0 0 0.25rem rgba(217, 164, 6, 0.5); }
+.button-warning { color: var(--bg-primary); background-color: var(--warning-color); border-color: var(--warning-color); } /* Dark text on warning */
+.button-warning:hover:not(:disabled) { background-color: var(--warning-color-dark); border-color: var(--warning-color-dark); }
+.button-warning:focus { box-shadow: 0 0 0 0.25rem rgba(var(--warning-color-rgb, 245, 158, 11), 0.5); }
 
-.button-light { color: #000; background-color: var(--light-gray); border-color: #ced4da; }
-.button-light:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
-.button-light:focus { box-shadow: 0 0 0 0.25rem rgba(211, 212, 213, 0.5); }
+.button-light { color: var(--text-primary); background-color: var(--bg-tertiary); border-color: var(--border-color); } /* Use tertiary bg */
+.button-light:hover:not(:disabled) { background-color: var(--border-color); border-color: var(--border-color-light); }
+.button-light:focus { box-shadow: 0 0 0 0.25rem rgba(var(--border-color-rgb, 75, 85, 99), 0.5); }
 
-/* Button Outline Variants */
-.button-outline-primary { color: var(--primary-color); border-color: var(--primary-color); }
-.button-outline-primary:hover:not(:disabled) { color: #fff; background-color: var(--primary-color); border-color: var(--primary-color); }
+/* Button Outline Variants (Dark Theme) */
+.button-outline-primary { color: var(--primary-color); border-color: var(--primary-color); background-color: transparent; }
+.button-outline-primary:hover:not(:disabled) { color: var(--bg-primary); background-color: var(--primary-color); border-color: var(--primary-color); }
 
 /* Button Sizes */
 .button-sm { padding: 0.25rem 0.5rem; font-size: 0.875rem; border-radius: 0.25rem; }
@@ -182,27 +197,28 @@ a:hover {
   font-size: 0.95rem;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--text-color);
-  background-color: #fff;
+  color: var(--text-primary); /* Light text in forms */
+  background-color: var(--bg-secondary); /* Darker input background */
   background-clip: padding-box;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--border-color); /* Use dark theme border */
   appearance: none;
   border-radius: var(--border-radius);
   transition: var(--transition-base);
 }
 .form-control:focus {
-  color: var(--text-color);
-  background-color: #fff;
-  border-color: #86b7fe; /* Lighter blue focus */
+  color: var(--text-primary);
+  background-color: var(--bg-secondary); /* Keep bg dark on focus */
+  border-color: var(--text-accent); /* Accent border on focus */
   outline: 0;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); /* Standard Bootstrap focus */
+  /* Slightly more subtle focus shadow */
+  box-shadow: 0 0 0 0.2rem rgba(var(--text-accent-rgb, 96, 165, 250), 0.25);
 }
 .form-control[aria-invalid="true"] {
   border-color: var(--danger-color);
 }
 .form-control[aria-invalid="true"]:focus {
   border-color: var(--danger-color);
-  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+  box-shadow: 0 0 0 0.25rem rgba(var(--danger-color-rgb, 239, 68, 68), 0.35);
 }
 
 textarea.form-control {
@@ -210,15 +226,17 @@ textarea.form-control {
   resize: vertical;
 }
 
-/* --- Navigation --- */
+/* --- Navigation - Stylish Dark --- */
 .main-nav {
-  background-color: #fff;
-  padding: 0.75rem 1rem;
-  box-shadow: var(--box-shadow); /* Use standard shadow */
+  /* Dark background with subtle gradient */
+  background: var(--bg-secondary); /* Use dark theme variable */
+  padding: 0.8rem 1.5rem;
+  box-shadow: var(--box-shadow); /* Use adjusted shadow */
   margin-bottom: 1.5rem;
   position: sticky;
   top: 0;
   z-index: 1020;
+  border-bottom: 1px solid var(--border-color); /* Use dark theme border */
 }
 
 .main-nav ul {
@@ -227,22 +245,88 @@ textarea.form-control {
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: space-between; /* Space out items */
+  gap: 1rem; /* Adjust gap */
 }
 
-.main-nav a {
-  text-decoration: none;
-  color: var(--text-muted); /* Use muted color */
-  font-weight: 500;
-  padding-bottom: 4px;
-  border-bottom: 2px solid transparent;
-  transition: var(--transition-base);
+/* Group main links to the left */
+.main-nav ul > li:not(.nav-welcome):not(:has(.logout-button)):not(:has(a[href="/login"])):not(:has(a[href="/register"])) {
+  margin-right: 0.5rem; /* Adjust spacing between main links */
 }
+
+/* Push auth/user links to the right */
+.main-nav ul > li.nav-welcome,
+.main-nav ul > li:has(.logout-button),
+.main-nav ul > li:has(a[href="/login"]),
+.main-nav ul > li:has(a[href="/register"]) {
+  margin-left: auto; /* Push these items to the right */
+}
+/* Add spacing between right-aligned items */
+.main-nav ul > li.nav-welcome + li,
+.main-nav ul > li:has(a[href="/login"]) + li,
+.main-nav ul > li:has(a[href="/change-password"]) + li:has(.logout-button) {
+    margin-left: 1.5rem;
+}
+
+
+.main-nav a,
+.main-nav .logout-button { /* Style logout button like a link */
+  text-decoration: none;
+  color: var(--text-secondary); /* Use secondary text color */
+  font-weight: 500;
+  padding: 0.5rem 0.2rem;
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95em;
+  font-family: inherit;
+}
+
+/* Hover/Active effect with underline grow */
+.main-nav a::after,
+.main-nav .logout-button::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--text-accent); /* Use accent color */
+  transition: width 0.3s ease;
+}
+
 .main-nav a:hover,
+.main-nav a.active,
+.main-nav .logout-button:hover {
+  color: var(--text-primary); /* Use primary text color on hover/active */
+}
+
+.main-nav a:hover::after,
+.main-nav a.active::after,
+.main-nav .logout-button:hover::after {
+  width: 100%; /* Grow underline */
+}
+
+/* Specific style for active link text */
 .main-nav a.active {
-  color: var(--primary-color);
-  border-bottom-color: var(--primary-color);
-  transform: translateY(-1px);
+  color: var(--text-accent-hover); /* Use lighter accent for active */
+  font-weight: 600;
+}
+
+/* Welcome message styling */
+.nav-welcome span {
+  color: var(--text-secondary); /* Use secondary text color */
+  font-size: 0.9em;
+  margin-right: 0.5rem;
+}
+
+/* Logout button specific adjustments if needed */
+.logout-button {
+  padding-bottom: calc(0.5rem + 2px); /* Align baseline with links */
 }
 
 .cart-count {
@@ -252,7 +336,7 @@ textarea.form-control {
   width: 22px;
   height: 22px;
   background-color: var(--danger-color);
-  color: white;
+  color: #fff; /* Ensure white text */
   border-radius: 50%;
   font-size: 0.7em;
   font-weight: bold;
@@ -263,11 +347,12 @@ textarea.form-control {
 
 /* --- Page Container --- */
 .page-container {
-  background-color: #fff;
+  background-color: var(--bg-secondary); /* Dark background for containers */
   padding: 1.5rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color); /* Add subtle border */
 }
 
 /* --- Search & Filter --- */
@@ -283,12 +368,15 @@ textarea.form-control {
   font-size: 1rem;
   border: 1px solid var(--border-color);
   border-radius: 50px;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+  background-color: var(--bg-tertiary); /* Darker input */
+  color: var(--text-primary); /* Light text */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Adjusted shadow */
   transition: var(--transition-base);
 }
 .search-bar-container input[type="text"]:focus {
-  border-color: #86b7fe;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075), 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: var(--text-accent); /* Accent border */
+  background-color: var(--bg-tertiary); /* Keep dark */
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1), 0 0 0 0.25rem rgba(var(--text-accent-rgb, 96, 165, 250), 0.35); /* Accent focus */
 }
 
 .category-filter-container {
@@ -301,23 +389,23 @@ textarea.form-control {
 .category-button {
   padding: 0.4rem 0.9rem;
   border: 1px solid var(--border-color);
-  background-color: #fff;
-  color: var(--secondary-color);
+  background-color: var(--bg-tertiary); /* Darker background */
+  color: var(--text-secondary); /* Muted text */
   border-radius: 20px;
   font-size: 0.9em;
   transition: var(--transition-base);
   box-shadow: var(--box-shadow-sm);
 }
 .category-button:hover {
-  background-color: var(--medium-gray);
-  border-color: #adb5bd;
-  color: var(--text-color);
+  background-color: var(--border-color); /* Slightly lighter dark */
+  border-color: var(--border-color-light);
+  color: var(--text-primary); /* Brighter text */
   transform: translateY(-2px);
   box-shadow: var(--box-shadow);
 }
 .category-button.active {
   background-color: var(--primary-color);
-  color: white;
+  color: var(--bg-primary); /* Dark text on accent bg */
   border-color: var(--primary-color);
   box-shadow: none;
   transform: translateY(0);
@@ -333,25 +421,28 @@ textarea.form-control {
 .grocery-item {
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  background-color: #fff;
+  background-color: var(--bg-secondary); /* Dark item background */
   box-shadow: var(--box-shadow-sm);
   display: flex;
   flex-direction: column;
   transition: var(--transition-base);
   text-decoration: none;
-  color: inherit;
+  color: var(--text-primary); /* Ensure text is light */
   overflow: hidden;
-  border-left: 4px solid transparent; /* Prepare for accent */
+  border-left: 4px solid transparent;
 }
 .grocery-item:hover {
   box-shadow: var(--box-shadow);
   transform: translateY(-5px);
-  border-left-color: var(--primary-color); /* Accent on hover */
+  border-left-color: var(--text-accent); /* Use accent color */
+  /* background-color: var(--bg-tertiary); */ /* Removed background change on hover */
 }
 .grocery-item.out-of-stock {
-  background-color: var(--light-gray);
-  opacity: 0.8;
-  border-left-color: var(--secondary-color);
+  background-color: var(--bg-secondary); /* Keep dark */
+  opacity: 0.7; /* Slightly less faded */
+  border-left-color: var(--border-color); /* Use standard border color */
+  /* Add a subtle visual cue, maybe a slightly darker border overall */
+  border: 1px solid var(--border-color-light); /* Slightly more prominent border */
 }
 
 .grocery-item-link {
@@ -361,36 +452,37 @@ textarea.form-control {
   flex-direction: column;
 }
 .grocery-item-link:hover h3 {
-  color: var(--primary-color);
+  color: var(--text-accent); /* Use accent color */
 }
 
 .grocery-item h3 {
   margin-bottom: 0.5rem;
   font-size: 1.15em;
   font-weight: 500;
+  color: var(--text-primary); /* Ensure heading is light */
 }
 .grocery-item p {
   margin: 0.2rem 0;
   font-size: 0.9em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text color */
 }
 .item-category {
   font-size: 0.8em;
-  color: var(--secondary-color);
+  color: var(--text-secondary);
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   font-style: italic;
 }
 .item-price {
   font-weight: bold;
-  color: var(--success-color);
+  color: var(--success-color); /* Keep success color for price */
   margin-top: auto;
   padding-top: 0.5rem;
 }
 
 .item-controls-wrapper {
   padding: 0.75rem 1.25rem;
-  background-color: var(--light-gray);
+  background-color: var(--bg-tertiary); /* Darker controls background */
   border-top: 1px solid var(--border-color);
   margin-top: auto;
 }
@@ -412,15 +504,16 @@ textarea.form-control {
   font-size: 0.9rem;
   line-height: 1;
   min-width: 24px;
-  color: var(--secondary-color);
-  background-color: #fff;
+  color: var(--text-secondary);
+  background-color: var(--bg-secondary); /* Darker button */
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  transition: var(--transition-base); /* Add transition */
+  transition: var(--transition-base);
 }
 .grocery-item .quantity-adjuster button:hover:not(:disabled) {
-  background-color: var(--medium-gray);
-  border-color: #adb5bd;
+  background-color: var(--border-color); /* Slightly lighter dark */
+  border-color: var(--border-color-light);
+  color: var(--text-primary);
 }
 .grocery-item .quantity-adjuster button:disabled {
   cursor: not-allowed;
@@ -432,6 +525,7 @@ textarea.form-control {
   font-weight: 500;
   padding: 0 5px;
   font-size: 1rem;
+  color: var(--text-primary); /* Ensure light text */
 }
 
 .grocery-item .add-to-cart-button {
@@ -473,27 +567,28 @@ textarea.form-control {
 }
 .product-category {
   font-size: 0.9em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text */
   margin-bottom: 1rem;
   display: block;
 }
 .product-price {
   font-size: 1.6em;
   font-weight: bold;
-  color: var(--success-color);
+  color: var(--success-color); /* Keep success color */
   margin-bottom: 0.5rem;
 }
 .product-stock {
   font-size: 1em;
   margin-bottom: 1.5rem;
   font-weight: 500;
+  color: var(--text-primary); /* Base light text */
 }
 .product-stock.in-stock { color: var(--success-color); }
 .product-stock.out-of-stock { color: var(--danger-color); }
 
 .product-description-section { margin-top: 1.5rem; }
-.product-description-section h3 { margin-bottom: 0.5rem; font-size: 1.2em; color: var(--secondary-color); }
-.product-description { line-height: 1.7; color: var(--text-color); }
+.product-description-section h3 { margin-bottom: 0.5rem; font-size: 1.2em; color: var(--text-secondary); }
+.product-description { line-height: 1.7; color: var(--text-primary); }
 
 .product-actions {
   display: flex;
@@ -509,12 +604,12 @@ textarea.form-control {
 }
 .product-actions .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
-  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
   transition: var(--transition-base);
 }
-.product-actions .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); }
+.product-actions .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); color: var(--text-primary); }
 .product-actions .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
-.product-actions .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
+.product-actions .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; color: var(--text-primary); }
 
 .add-to-cart-button-detail {
   padding: 0.6rem 1.2rem;
@@ -530,26 +625,27 @@ textarea.form-control {
 .product-detail-page .owner-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color); /* Add separator */
 }
 .product-detail-page .owner-section h4 {
-  margin-bottom: 1rem; font-size: 1.3em; color: var(--secondary-color);
+  margin-bottom: 1rem; font-size: 1.3em; color: var(--text-secondary);
 }
 .product-detail-page .owner-stock-update {
   margin-bottom: 1.5rem; display: flex; flex-direction: column; align-items: flex-start; gap: 0.75rem;
 }
-.product-detail-page .owner-stock-update label { font-weight: 500; }
+.product-detail-page .owner-stock-update label { font-weight: 500; color: var(--text-primary); }
 .product-detail-page .owner-stock-update .quantity-adjuster {
   display: flex; align-items: center; gap: 5px;
 }
 .product-detail-page .owner-stock-update .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
-  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
   transition: var(--transition-base);
 }
-.product-detail-page .owner-stock-update .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); }
+.product-detail-page .owner-stock-update .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); color: var(--text-primary); }
 .product-detail-page .owner-stock-update .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
-.product-detail-page .owner-stock-update .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
-.product-detail-page .owner-stock-update .projected-stock { font-size: 0.9em; color: var(--text-muted); margin-top: 0.25rem; font-weight: 500; }
+.product-detail-page .owner-stock-update .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; color: var(--text-primary); }
+.product-detail-page .owner-stock-update .projected-stock { font-size: 0.9em; color: var(--text-secondary); margin-top: 0.25rem; font-weight: 500; }
 .product-detail-page .owner-stock-update .update-stock-button.save {
   padding: 0.6rem 1.2rem; font-size: 0.95rem; align-self: flex-start;
 }
@@ -566,28 +662,28 @@ textarea.form-control {
   padding: 1rem 0;
   border-bottom: 1px solid var(--border-color);
   gap: 1rem;
-  transition: background-color 0.2s ease; /* Add subtle hover */
+  transition: background-color 0.2s ease;
 }
 .cart-item:hover {
-  background-color: rgba(0, 123, 255, 0.03); /* Very light blue hover */
+  background-color: rgba(var(--text-accent-rgb, 96, 165, 250), 0.05); /* Subtle accent hover */
 }
 .cart-item:last-child { border-bottom: none; }
-.cart-item span:first-child { flex-grow: 1; font-weight: 500; }
+.cart-item span:first-child { flex-grow: 1; font-weight: 500; color: var(--text-primary); }
 .cart-item-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .cart-item-controls button {
   padding: 4px 8px; font-size: 0.9rem; line-height: 1; min-width: 26px;
-  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
-  transition: var(--transition-base); /* Add transition */
+  color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
+  transition: var(--transition-base);
 }
-.cart-item-controls button:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
+.cart-item-controls button:hover:not(:disabled) { background-color: var(--border-color); border-color: var(--border-color-light); color: var(--text-primary); }
 .cart-item-controls button:disabled { cursor: not-allowed; opacity: 0.5; }
 .cart-item-controls .remove-button {
   margin-left: 10px; font-size: 0.85em; padding: 5px 9px;
 }
-.cart-item-controls span { min-width: 25px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1rem; }
-.cart-empty-message { text-align: center; font-style: italic; color: var(--text-muted); padding: 2rem 0; }
-.cart-summary { display: flex; flex-direction: column; align-items: flex-end; padding-top: 1.5rem; margin-top: 1rem; }
-.cart-total { font-size: 1.3em; font-weight: bold; margin-bottom: 1rem; }
+.cart-item-controls span { min-width: 25px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1rem; color: var(--text-primary); }
+.cart-empty-message { text-align: center; font-style: italic; color: var(--text-secondary); padding: 2rem 0; }
+.cart-summary { display: flex; flex-direction: column; align-items: flex-end; padding-top: 1.5rem; margin-top: 1rem; border-top: 1px solid var(--border-color); } /* Add border */
+.cart-total { font-size: 1.3em; font-weight: bold; margin-bottom: 1rem; color: var(--text-primary); }
 .buy-button { padding: 0.7rem 1.4rem; font-size: 1.05rem; font-weight: 500; }
 
 /* --- Add/Edit Forms --- */
@@ -595,10 +691,11 @@ textarea.form-control {
 .edit-item-form-container {
   max-width: 600px;
   margin: 2rem auto;
-  background-color: #fff;
+  background-color: var(--bg-secondary); /* Dark background */
   padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
+  border: 1px solid var(--border-color); /* Add border */
 }
 .add-item-form,
 .edit-item-form {
@@ -611,39 +708,23 @@ textarea.form-control {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-}
-.add-item-form input,
-.add-item-form textarea,
-.add-item-form select,
-.edit-item-form input,
-.edit-item-form textarea,
-.edit-item-form select {
-  display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem;
-  border: 1px solid var(--border-color); border-radius: var(--border-radius);
-  transition: var(--transition-base);
+  color: var(--text-primary); /* Light label text */
 }
 .add-item-form textarea,
 .edit-item-form textarea { min-height: 90px; resize: vertical; }
-.add-item-form input:focus,
-.add-item-form textarea:focus,
-.add-item-form select:focus,
-.edit-item-form input:focus,
-.edit-item-form textarea:focus,
-.edit-item-form select:focus {
-  border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
+/* Focus styles inherited from .form-control:focus */
+
 .add-item-form button[type="submit"] {
   padding: 0.75rem 1.5rem; font-size: 1rem; width: auto;
   margin-top: 1rem; align-self: center;
 }
 
-/* --- Auth Forms --- */
+/* --- Auth Forms (Adjusted for Dark Theme) --- */
+/* These might be overridden by specific page CSS, but provide a base */
 .auth-page { max-width: 450px; margin: 3rem auto; }
 .auth-form { display: flex; flex-direction: column; gap: 1rem; }
 .auth-form .form-group { margin-bottom: 0; }
-.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-.auth-form input { display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem; border: 1px solid var(--border-color); border-radius: var(--border-radius); transition: var(--transition-base); }
-.auth-form input:focus { border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); }
+.auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary); }
 .auth-button { padding: 0.75rem 1.5rem; font-size: 1rem; width: 100%; margin-top: 0.5rem; }
 
 /* --- Error Messages --- */
@@ -654,83 +735,111 @@ textarea.form-control {
   display: block;
 }
 .api-error {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: rgba(var(--danger-color-rgb, 239, 68, 68), 0.15); /* Lighter danger bg */
+  color: var(--danger-color); /* Danger text */
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
-  border: 1px solid #f5c6cb;
+  border: 1px solid rgba(var(--danger-color-rgb, 239, 68, 68), 0.3); /* Lighter danger border */
   border-radius: var(--border-radius);
   text-align: center;
 }
 
 /* --- Stock Updater Page --- */
-.stock-updater-container { max-width: 550px; margin: 2rem auto; }
+.stock-updater-container { max-width: 550px; margin: 2rem auto; background-color: var(--bg-secondary); padding: 1.5rem; border-radius: var(--border-radius); border: 1px solid var(--border-color); } /* Dark container */
 .stock-update-form { display: flex; flex-direction: column; gap: 1.25rem; }
 .stock-update-form .form-group { position: relative; }
-.stock-update-form input[type="text"] {
-  display: block; width: 100%; padding: 0.6rem 0.9rem; font-size: 0.95rem;
-  border: 1px solid var(--border-color); border-radius: var(--border-radius);
-  transition: var(--transition-base);
-}
-.stock-update-form input[type="text"]:focus {
-  border-color: #86b7fe; outline: 0; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-}
+/* Focus inherited */
 .suggestions-container {
   position: absolute; top: 100%; left: 0; right: 0;
-  border: 1px solid var(--border-color); border-top: none; background-color: #fff;
-  z-index: 1000; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color); border-top: none; background-color: var(--bg-tertiary); /* Dark suggestions */
+  z-index: 1000; box-shadow: var(--box-shadow); /* Use dark shadow */
   list-style: none; padding: 0; margin: 0; border-radius: 0 0 var(--border-radius) var(--border-radius);
   max-height: 200px; overflow-y: auto;
 }
-.suggestion-item { padding: 0.75rem 1rem; cursor: pointer; transition: background-color 0.2s ease; }
-.suggestion-item:hover { background-color: var(--light-gray); }
+.suggestion-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-left-color 0.2s ease;
+  color: var(--text-primary); /* Light text */
+  border-left: 4px solid transparent; /* Default transparent border */
+  margin-left: -4px; /* Offset padding to align text */
+  padding-left: calc(1rem + 4px); /* Adjust padding for border */
+}
+/* Base hover style - ensure it doesn't set border-left-color */
+.suggestions-container .suggestion-item:hover {
+  background-color: var(--border-color); /* Lighter dark hover */
+}
+
+/* Availability borders for suggestions (Increased Specificity) */
+.suggestions-container .suggestion-item.available {
+  border-left-color: var(--success-color) !important; /* Green border - use !important initially to ensure override */
+}
+.suggestions-container .suggestion-item.unavailable {
+  border-left-color: var(--danger-color) !important; /* Red border - use !important initially */
+  /* opacity: 0.8; */ /* Removing opacity for now to simplify */
+}
+
+/* Ensure hover state keeps the correct border color */
+.suggestions-container .suggestion-item.available:hover {
+  border-left-color: var(--success-color) !important; /* Keep green border on hover */
+  background-color: var(--border-color); /* Apply standard hover background */
+}
+.suggestions-container .suggestion-item.unavailable:hover {
+  border-left-color: var(--danger-color) !important; /* Keep red border on hover */
+  background-color: var(--border-color); /* Apply standard hover background */
+  /* opacity: 1; */
+}
+
+
 .stock-update-form .clear-selection-button {
   padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-left: 0.5rem; vertical-align: middle;
 }
-.stock-update-form .stock-info { background-color: var(--light-gray); padding: 0.75rem 1rem; border-radius: var(--border-radius); margin-bottom: 0; }
-.stock-update-form .stock-info p { margin: 0.25rem 0; font-size: 0.95em; }
+.stock-update-form .stock-info { background-color: var(--bg-tertiary); padding: 0.75rem 1rem; border-radius: var(--border-radius); margin-bottom: 0; border: 1px solid var(--border-color); } /* Dark info box */
+.stock-update-form .stock-info p { margin: 0.25rem 0; font-size: 0.95em; color: var(--text-primary); } /* Light text */
 .stock-update-form .quantity-adjuster {
   display: flex; align-items: center; gap: 5px; margin: 0.5rem 0;
 }
 .stock-update-form .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
-  color: var(--secondary-color); background-color: #fff; border: 1px solid var(--border-color); border-radius: 4px;
+  color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
   transition: var(--transition-base);
 }
-.stock-update-form .quantity-adjuster button:hover:not(:disabled) { background-color: var(--medium-gray); border-color: #adb5bd; }
+.stock-update-form .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); border-color: var(--border-color-light); color: var(--text-primary); }
 .stock-update-form .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
-.stock-update-form .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; }
-.stock-update-form .projected-stock { font-size: 0.9em; color: var(--text-muted); margin-top: 0.5rem; font-weight: 500; }
+.stock-update-form .quantity-display { min-width: 30px; text-align: center; font-weight: 500; padding: 0 5px; font-size: 1.1rem; color: var(--text-primary); }
+.stock-update-form .projected-stock { font-size: 0.9em; color: var(--text-secondary); margin-top: 0.5rem; font-weight: 500; }
 .stock-button-group { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
 .stock-updater-container .update-stock-button.save {
   padding: 0.75rem 1.5rem; font-size: 1rem;
 }
 
 /* --- History Pages (Order/Edit) --- */
-.order-history-page h2,
-.edit-history-page h2 { /* Shared styles */
-  text-align: center; margin-bottom: 1.5rem; color: var(--primary-color);
-}
+.order-history-page h2 { text-align: center; margin-bottom: 1.5rem; color: var(--text-accent); } /* Use accent */
+.edit-history-page h2 { text-align: center; margin-bottom: 1.5rem; color: var(--info-color); } /* Keep info color */
+
 .order-list,
 .edit-history-list { /* Shared list styles */
   display: flex; flex-direction: column; gap: 1rem;
 }
 .order-history-item,
 .edit-history-item { /* Shared item styles */
-  background-color: #fff; border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary); border: 1px solid var(--border-color); /* Dark bg, dark border */
   border-radius: var(--border-radius); padding: 1rem 1.5rem; box-shadow: var(--box-shadow-sm);
   transition: var(--transition-base);
+  color: var(--text-primary); /* Ensure light text */
 }
 .order-history-item:hover,
 .edit-history-item:hover {
-  border-left: 4px solid var(--info-color); /* Add accent on hover */
+  border-left: 4px solid var(--info-color);
   box-shadow: var(--box-shadow);
   transform: translateX(2px);
+  background-color: var(--bg-tertiary); /* Slightly lighter dark on hover */
 }
 
 /* --- Sales History Page --- */
+/* --- Sales History Page --- */
 .sales-history-page h2 {
-  color: var(--success-color); /* Use success color for sales */
+  color: var(--success-color);
 }
 
 .monthly-sales-list {
@@ -740,7 +849,7 @@ textarea.form-control {
 }
 
 .monthly-sales-section {
-  background-color: #fff;
+  background-color: var(--bg-secondary); /* Dark background */
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   padding: 1.5rem;
@@ -752,7 +861,7 @@ textarea.form-control {
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border-color);
   font-size: 1.4em;
-  color: var(--secondary-color);
+  color: var(--text-secondary); /* Use secondary text */
 }
 
 .sales-order-list {
@@ -765,26 +874,26 @@ textarea.form-control {
 }
 
 .sales-order-item {
-  border: 1px solid var(--medium-gray);
+  border: 1px solid var(--border-color); /* Darker border */
   border-radius: var(--border-radius);
   padding: 1rem;
-  background-color: var(--light-gray);
+  background-color: var(--bg-tertiary); /* Darker item background */
 }
 
 .sales-order-header {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem 1.5rem; /* Increase column gap */
+  gap: 0.5rem 1.5rem;
   font-size: 0.9em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text */
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px dashed var(--border-color);
 }
 .sales-order-header span:last-child {
   font-weight: 500;
-  color: var(--text-color);
+  color: var(--text-primary); /* Use primary text */
 }
 
 .sales-item-list {
@@ -795,6 +904,7 @@ textarea.form-control {
   flex-direction: column;
   gap: 0.3rem;
   font-size: 0.9em;
+  color: var(--text-primary); /* Ensure light text */
 }
 
 .sales-item-detail {
@@ -809,7 +919,7 @@ textarea.form-control {
   flex-shrink: 0;
   min-width: 70px;
   text-align: right;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text */
 }
 
 
@@ -827,6 +937,7 @@ textarea.form-control {
   padding: 0;
   margin: 0;
   font-size: 0.9em;
+  color: var(--text-primary); /* Ensure light text */
 }
 .history-table td .edit-details-list li {
   margin-bottom: 0.25rem;
@@ -835,56 +946,56 @@ textarea.form-control {
   margin-bottom: 0;
 }
 .history-table td .edit-details-list strong {
-  color: var(--secondary-color); /* Dim the field name slightly */
+  color: var(--text-secondary); /* Use secondary text */
 }
 .history-table td .edit-details-list .old-value {
-  color: var(--text-muted);
-  /* text-decoration: line-through; /* Optional: strike through old value */
+  color: var(--text-secondary); /* Use secondary text */
+  /* text-decoration: line-through; */
 }
 .history-table td .edit-details-list .new-value {
-  color: var(--text-color);
-  font-weight: 500; /* Make new value slightly bolder */
+  color: var(--text-primary); /* Use primary text */
+  font-weight: 500;
 }
 
 
 .order-header {
   display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-  gap: 0.5rem 1rem; padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #eee;
+  gap: 0.5rem 1rem; padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border-color); /* Dark border */
 }
-.order-header h3 { margin: 0; font-size: 1.2em; flex-basis: 100%; }
-.order-date, .order-total { font-size: 0.9em; color: var(--text-muted); }
-.order-total { font-weight: bold; color: var(--text-color); }
+.order-header h3 { margin: 0; font-size: 1.2em; flex-basis: 100%; color: var(--text-primary); } /* Light text */
+.order-date, .order-total { font-size: 0.9em; color: var(--text-secondary); } /* Secondary text */
+.order-total { font-weight: bold; color: var(--text-primary); } /* Primary text */
 .order-item-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.order-item-detail { display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; padding: 0.25rem 0; gap: 1rem; }
+.order-item-detail { display: flex; justify-content: space-between; align-items: center; font-size: 0.9em; padding: 0.25rem 0; gap: 1rem; color: var(--text-primary); } /* Light text */
 .order-item-detail span:first-child { flex-grow: 1; text-align: left; }
-.order-item-detail span:not(:first-child) { flex-shrink: 0; min-width: 80px; text-align: right; }
+.order-item-detail span:not(:first-child) { flex-shrink: 0; min-width: 80px; text-align: right; color: var(--text-secondary); } /* Secondary text */
 
-.edit-history-item p { margin: 0.3rem 0; font-size: 0.95em; } /* Assuming this class might be used inside */
-.edit-history-item .history-timestamp { font-size: 0.85em; color: var(--text-muted); }
-.edit-history-item .history-details { margin-top: 0.5rem; padding-left: 1rem; border-left: 3px solid var(--medium-gray); font-size: 0.9em; }
-.edit-history-item .history-details strong { color: var(--text-color); }
+.edit-history-item p { margin: 0.3rem 0; font-size: 0.95em; color: var(--text-primary); }
+.edit-history-item .history-timestamp { font-size: 0.85em; color: var(--text-secondary); }
+.edit-history-item .history-details { margin-top: 0.5rem; padding-left: 1rem; border-left: 3px solid var(--border-color); font-size: 0.9em; color: var(--text-primary); } /* Dark border, light text */
+.edit-history-item .history-details strong { color: var(--text-primary); font-weight: 500; } /* Bolder strong */
 
 .empty-history-message, .loading-message {
-  text-align: center; font-style: italic; color: var(--text-muted); padding: 2rem 0;
+  text-align: center; font-style: italic; color: var(--text-secondary); padding: 2rem 0;
 }
 
 /* --- Deleted Items Page --- */
 .deleted-items-page h2 { text-align: center; margin-bottom: 1.5rem; color: var(--danger-color); }
 .deleted-items-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
 .deleted-item {
-  border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: #fff;
+  border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: var(--bg-secondary); /* Dark bg */
   box-shadow: var(--box-shadow-sm); display: flex; flex-direction: column;
-  transition: var(--transition-base); color: inherit; overflow: hidden;
+  transition: var(--transition-base); color: var(--text-primary); overflow: hidden; /* Light text */
   border-left: 5px solid var(--danger-color);
-  opacity: 0.9;
+  opacity: 0.8; /* More faded */
 }
-.deleted-item:hover { box-shadow: var(--box-shadow); transform: translateY(-4px); opacity: 1; }
+.deleted-item:hover { box-shadow: var(--box-shadow); transform: translateY(-4px); opacity: 1; background-color: var(--bg-tertiary); } /* Lighter dark hover */
 .deleted-item .grocery-item-link { padding: 1rem 1.25rem; flex-grow: 1; }
-.deleted-item h3 { margin-bottom: 0.5rem; font-size: 1.1em; }
-.deleted-item p { margin: 0.2rem 0; font-size: 0.9em; color: var(--text-muted); }
+.deleted-item h3 { margin-bottom: 0.5rem; font-size: 1.1em; color: var(--text-primary); } /* Light text */
+.deleted-item p { margin: 0.2rem 0; font-size: 0.9em; color: var(--text-secondary); } /* Secondary text */
 .deleted-item .deleted-info { font-size: 0.8em; color: var(--danger-color); margin-top: 0.5rem; }
 .deleted-item .owner-controls {
-  padding: 0.75rem 1.25rem; background-color: var(--light-gray); border-top: 1px solid var(--border-color);
+  padding: 0.75rem 1.25rem; background-color: var(--bg-tertiary); border-top: 1px solid var(--border-color); /* Dark controls */
   margin-top: auto; display: flex; justify-content: flex-end;
 }
 .deleted-item .restore-button { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
@@ -898,16 +1009,18 @@ textarea.form-control {
   padding: 1rem;
 }
 .modal-content {
-  background-color: #fff; padding: 2rem; border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow-lg); /* Larger shadow for modal */
+  background-color: var(--bg-secondary); padding: 2rem; border-radius: var(--border-radius); /* Dark modal */
+  box-shadow: var(--box-shadow-lg);
   max-width: 550px; width: 100%;
   max-height: 90vh; overflow-y: auto;
   position: relative;
+  border: 1px solid var(--border-color); /* Add border */
+  color: var(--text-primary); /* Ensure light text */
 }
-.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.5em; color: var(--primary-color); }
+.modal-content h2 { margin-top: 0; margin-bottom: 1.5rem; text-align: center; font-size: 1.5em; color: var(--text-accent); } /* Accent heading */
 .modal-actions {
   display: flex; justify-content: flex-end; gap: 0.75rem;
-  margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #eee;
+  margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); /* Dark border */
 }
 .modal-actions .button { padding: 0.6rem 1.2rem; font-size: 0.95rem; font-weight: 500; }
 
@@ -922,18 +1035,18 @@ textarea.form-control {
 
 /* --- User Management Page --- */
 .user-management-page h2 {
-  color: var(--secondary-color); /* Use secondary color */
+  color: var(--text-secondary); /* Use secondary text */
 }
 .user-management-page h3 { /* Style for section headings */
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-size: 1.4em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text */
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 .user-management-page .pending-users-section h3 {
-  color: var(--warning-color-dark); /* Make pending header stand out */
+  color: var(--warning-color); /* Use warning color */
 }
 
 .user-table {
@@ -941,40 +1054,46 @@ textarea.form-control {
   border-collapse: collapse;
   margin-top: 1rem; /* Reduced top margin */
   box-shadow: var(--box-shadow-sm);
-  font-size: 0.95em; /* Slightly smaller table font */
+  font-size: 0.95em;
 }
 
 .user-table th,
 .user-table td {
   border: 1px solid var(--border-color);
-  padding: 0.6rem 0.9rem; /* Adjust padding */
+  padding: 0.6rem 0.9rem;
   text-align: left;
   vertical-align: middle;
+  color: var(--text-primary); /* Light text in cells */
 }
 
 .user-table thead th {
-  background-color: var(--light-gray);
+  background-color: var(--bg-tertiary); /* Darker header */
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Muted header text */
 }
 
+.user-table tbody tr {
+  background-color: var(--bg-secondary); /* Dark row background */
+  border-bottom: 1px solid var(--border-color); /* Separator */
+}
+
+/* Remove alternating row colors for dark theme, rely on hover */
 .user-table tbody tr:nth-child(odd) {
-  background-color: #fff;
+  background-color: var(--bg-secondary);
 }
-
 .user-table tbody tr:nth-child(even) {
-  background-color: var(--light-gray);
+  background-color: var(--bg-secondary);
 }
 
 .user-table tbody tr:hover {
-  background-color: var(--medium-gray);
+  background-color: var(--bg-tertiary); /* Slightly lighter dark on hover */
 }
 
 .user-table td:first-child { /* Style User ID */
   font-family: monospace;
   font-size: 0.85em;
-  color: var(--text-muted);
-  max-width: 150px; /* Prevent long IDs from stretching */
+  color: var(--text-secondary); /* Muted ID */
+  max-width: 150px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -990,58 +1109,18 @@ textarea.form-control {
 }
 
 /* --- User Management Page --- */
-.user-management-page h2 {
-  color: var(--secondary-color); /* Use secondary color */
-}
-
-.user-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5rem;
-  box-shadow: var(--box-shadow-sm);
-}
-
-.user-table th,
-.user-table td {
-  border: 1px solid var(--border-color);
-  padding: 0.75rem 1rem;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.user-table thead th {
-  background-color: var(--light-gray);
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
-.user-table tbody tr:nth-child(odd) {
-  background-color: #fff;
-}
-
-.user-table tbody tr:nth-child(even) {
-  background-color: var(--light-gray);
-}
-
-.user-table tbody tr:hover {
-  background-color: var(--medium-gray);
-}
-
-.user-table td:first-child { /* Style User ID / Timestamp */
-  font-family: monospace;
-  font-size: 0.85em;
-  color: var(--text-muted);
-  white-space: nowrap; /* Prevent timestamp wrapping */
-}
+/* --- User Management Page --- */
+/* Styles already adjusted above, this section seems redundant */
+/* Removing redundant section */
 
 /* --- Edit History Page Specific Styles --- */
 .edit-history-page h2 {
-  color: var(--info-color); /* Use info color for edit history */
+  color: var(--info-color);
 }
 
 /* Container for all filter controls */
 .filter-controls-area {
-  background-color: var(--secondary-color-light);
+  background-color: var(--bg-secondary); /* Dark background */
   padding: 1rem;
   border-radius: var(--border-radius);
   margin-bottom: 1.5rem;
@@ -1062,9 +1141,9 @@ textarea.form-control {
 
 .filter-label {
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Use secondary text */
   margin-right: 0.5rem;
-  flex-shrink: 0; /* Prevent label from shrinking */
+  flex-shrink: 0;
 }
 
 /* Remove specific centering rules now handled by .filter-row */
@@ -1079,38 +1158,36 @@ textarea.form-control {
 .action-filter-button {
   padding: 0.4rem 0.9rem;
   border: 1px solid var(--border-color);
-  background-color: #fff;
-  color: var(--secondary-color);
-  border-radius: var(--border-radius); /* Square-rounded */
+  background-color: var(--bg-tertiary); /* Darker button */
+  color: var(--text-secondary); /* Muted text */
+  border-radius: var(--border-radius);
   font-size: 0.9em;
   transition: var(--transition-base);
   box-shadow: var(--box-shadow-sm);
   cursor: pointer;
-  text-transform: capitalize; /* Nicer display */
+  text-transform: capitalize;
 }
 .action-filter-button:hover {
-  background-color: var(--medium-gray);
-  border-color: #adb5bd;
-  color: var(--text-color);
+  background-color: var(--border-color); /* Lighter dark */
+  border-color: var(--border-color-light);
+  color: var(--text-primary); /* Brighter text */
   transform: translateY(-2px);
   box-shadow: var(--box-shadow);
 }
 .action-filter-button.active {
-  color: white;
+  color: #fff; /* White text on active colored buttons */
   box-shadow: none;
   transform: translateY(0);
-  /* Keep border color consistent with background */
 }
 
-/* Specific colors for active action buttons */
-.action-filter-button.action-btn-all.active { background-color: var(--primary-color); border-color: var(--primary-color); }
-.action-filter-button.action-btn-item_edit.active { background-color: var(--info-color); border-color: var(--info-color); color: #000; } /* Darker text on info */
+/* Specific colors for active action buttons (Ensure contrast) */
+.action-filter-button.action-btn-all.active { background-color: var(--primary-color); border-color: var(--primary-color); color: var(--bg-primary); } /* Dark text on accent */
+.action-filter-button.action-btn-item_edit.active { background-color: var(--info-color); border-color: var(--info-color); color: #fff; } /* White text on info */
 .action-filter-button.action-btn-stock_increase.active,
 .action-filter-button.action-btn-restored.active,
-.action-filter-button.action-btn-item_add.active { background-color: var(--success-color); border-color: var(--success-color); } /* Added item_add */
+.action-filter-button.action-btn-item_add.active { background-color: var(--success-color); border-color: var(--success-color); color: #fff; }
 .action-filter-button.action-btn-stock_decrease.active,
-.action-filter-button.action-btn-deleted.active { background-color: var(--danger-color); border-color: var(--danger-color); }
-/* Add more specific styles if other actions appear */
+.action-filter-button.action-btn-deleted.active { background-color: var(--danger-color); border-color: var(--danger-color); color: #fff; }
 
 /* Use user-table styles as a base for history-table */
 .history-table {
@@ -1118,50 +1195,52 @@ textarea.form-control {
   border-collapse: collapse;
   margin-top: 1.5rem;
   box-shadow: var(--box-shadow-sm);
-  font-size: 0.9em; /* Slightly smaller font for history */
+  font-size: 0.9em;
 }
 
 .history-table th,
 .history-table td {
   border: 1px solid var(--border-color);
-  padding: 0.6rem 0.8rem; /* Adjust padding */
+  padding: 0.6rem 0.8rem;
   text-align: left;
   vertical-align: middle;
+  color: var(--text-primary); /* Light text */
 }
 
 .history-table thead th {
-  background-color: var(--light-gray);
+  background-color: var(--bg-tertiary); /* Dark header */
   font-weight: 500;
-  color: var(--text-muted);
-  position: sticky; /* Make header sticky */
+  color: var(--text-secondary); /* Muted header text */
+  position: sticky;
   top: 60px; /* Adjust based on nav height */
   z-index: 10;
 }
 
-.history-table tbody tr:nth-child(odd) {
-  background-color: #fff;
+/* Remove alternating row colors */
+.history-table tbody tr {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
+.history-table tbody tr:nth-child(odd) { background-color: var(--bg-secondary); }
+.history-table tbody tr:nth-child(even) { background-color: var(--bg-secondary); }
 
-.history-table tbody tr:nth-child(even) {
-  background-color: var(--light-gray);
-}
 
 .history-table tbody tr:hover {
-  background-color: #e6f7ff; /* Light blue hover for info */
+  background-color: rgba(var(--info-color-rgb, 59, 130, 246), 0.1); /* Subtle info hover */
 }
 
 /* Style specific columns */
 .history-table td:nth-child(1) { /* Timestamp */
   font-family: monospace;
   font-size: 0.9em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Muted text */
   white-space: nowrap;
 }
 .history-table td:nth-child(3), /* Item ID */
 .history-table td:nth-child(7) { /* User ID */
   font-family: monospace;
   font-size: 0.9em;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Muted text */
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1169,7 +1248,7 @@ textarea.form-control {
 }
 .history-table td:nth-child(5) { /* Category */
   font-style: italic;
-  color: var(--secondary-color);
+  color: var(--text-secondary); /* Muted text */
 }
 
 
@@ -1185,7 +1264,8 @@ textarea.form-control {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 0.95em; /* Slightly larger than base table font */
+  font-size: 0.95em;
+  color: var(--text-primary); /* Light text */
 }
 .history-table td .edit-details-list li {
   margin-bottom: 0.3rem;
@@ -1195,23 +1275,22 @@ textarea.form-control {
   margin-bottom: 0;
 }
 .history-table td .edit-details-list strong {
-  color: var(--secondary-color); /* Dim the field name slightly */
+  color: var(--text-secondary); /* Muted field name */
   margin-right: 0.3em;
 }
 .history-table td .edit-details-list .old-value {
-  color: var(--text-muted);
-  /* text-decoration: line-through; /* Optional: strike through old value */
+  color: var(--text-secondary); /* Muted old value */
   margin-right: 0.2em;
 }
 .history-table td .edit-details-list .new-value {
-  color: var(--text-color);
-  font-weight: 500; /* Make new value slightly bolder */
-  background-color: #e6f7ff; /* Highlight new value slightly */
+  color: var(--text-primary); /* Primary text for new value */
+  font-weight: 500;
+  background-color: rgba(var(--info-color-rgb, 59, 130, 246), 0.15); /* Subtle highlight */
   padding: 0 2px;
   border-radius: 2px;
 }
 .history-table td .no-details {
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Muted text */
   font-style: italic;
 }
 
@@ -1225,22 +1304,22 @@ textarea.form-control {
   font-weight: 500;
 }
 
-.empty-history-message { /* Ensure this is styled */
+.empty-history-message {
   text-align: center;
   font-style: italic;
-  color: var(--text-muted);
+  color: var(--text-secondary); /* Muted text */
   padding: 2rem 0;
-  background-color: #fff;
-  border: 1px dashed var(--border-color);
+  background-color: var(--bg-secondary); /* Dark background */
+  border: 1px dashed var(--border-color); /* Dark border */
   border-radius: var(--border-radius);
   margin-top: 1.5rem;
 }
 
 /* --- User Management Page Grouping --- */
 .user-group {
-  margin-top: 2rem; /* Add space above each user type group */
+  margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid var(--primary-color); /* Separator line */
+  border-top: 2px solid var(--text-accent); /* Use accent color for separator */
 }
 
 .user-group:first-of-type {
@@ -1251,12 +1330,7 @@ textarea.form-control {
 
 .user-type-heading {
   font-size: 1.2em;
-  color: var(--primary-color);
+  color: var(--text-accent); /* Use accent color */
   margin-bottom: 0.75rem;
   padding-bottom: 0.25rem;
-  /* Optional: Add a subtle background or border */
-  /* background-color: var(--light-gray); */
-  /* padding: 0.3rem 0.6rem; */
-  /* border-radius: 4px; */
-  /* display: inline-block; */
 }

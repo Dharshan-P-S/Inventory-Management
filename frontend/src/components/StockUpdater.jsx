@@ -102,7 +102,7 @@ function StockUpdater({ groceries = [], onUpdateStock }) {
               {suggestions.map(item => (
                 <li
                   key={item.id}
-                  className="suggestion-item"
+                  className={`suggestion-item ${item.quantityAvailable > 0 ? 'available' : 'unavailable'}`} // Add availability class
                   onClick={() => handleSuggestionClick(item)} // Use updated handler
                 >
                   {item.name} (Current Stock: {item.quantityAvailable})

@@ -1,0 +1,166 @@
+/* LoginPage Styles */
+
+/* Back Button Style */
+.back-button {
+  position: absolute;
+  top: 1rem; /* Position inside the container */
+  left: 1rem; /* Position inside the container */
+  font-size: 1.8rem; /* Larger arrow */
+  color: var(--text-secondary); /* Muted color */
+  text-decoration: none;
+  transition: color 0.3s ease, transform 0.2s ease;
+  z-index: 10; /* Ensure it's clickable */
+}
+
+.back-button:hover {
+  color: var(--text-accent-hover); /* Brighter on hover */
+  transform: translateX(-3px); /* Slight move effect */
+}
+
+.login-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  /* Use dark theme background variables from App.css */
+  background: linear-gradient(120deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  overflow: hidden;
+}
+
+.login-form-container {
+  background-color: var(--bg-secondary); /* Dark background for the card */
+  padding: 3rem 2.5rem;
+  border-radius: 15px;
+  box-shadow: var(--box-shadow-lg); /* Use dark theme shadow */
+  border: 1px solid var(--border-color); /* Add subtle border */
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  position: relative; /* Make this the positioned ancestor for the back button */
+}
+
+.login-form-container h2 {
+  margin-bottom: 2rem;
+  color: var(--text-primary); /* Light text for title */
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.login-form .form-group {
+  margin-bottom: 1.5rem;
+  position: relative; /* Needed for icon positioning */
+}
+
+.login-form label {
+  display: none; /* Hide labels, use placeholders and icons */
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  opacity: 0.7; /* Slightly more visible */
+  filter: invert(75%) sepia(10%) saturate(200%) hue-rotate(180deg) brightness(90%) contrast(85%); /* Adjust color to match text-secondary */
+}
+
+/* Use .form-control styles from App.css as base */
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  /* Inherit base styles from .form-control in App.css */
+  width: 100%;
+  padding: 12px 15px 12px 50px; /* Keep padding for icon */
+  font-size: 1rem;
+  /* Overrides from App.css if needed */
+  background-color: var(--bg-tertiary); /* Slightly lighter dark input */
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+
+/* Style placeholders */
+.login-form input::placeholder {
+  color: var(--text-secondary); /* Use secondary text color */
+  font-style: italic;
+}
+
+.login-form .error-message {
+  color: var(--danger-color); /* Use danger color variable */
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  text-align: center;
+  min-height: 1.2em;
+}
+
+.login-button {
+  /* Use .button and .button-primary styles from App.css */
+  width: 100%;
+  padding: 12px;
+  color: var(--bg-primary); /* Dark text on accent button */
+  background: var(--primary-color); /* Use accent color */
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: var(--box-shadow); /* Use dark theme shadow */
+}
+
+.login-button:hover:not(:disabled) {
+  background: var(--primary-color-dark); /* Darker accent on hover */
+  transform: translateY(-2px);
+  box-shadow: var(--box-shadow-lg); /* Enhance shadow */
+}
+
+.login-button:disabled {
+  background: var(--border-color); /* Use dark theme disabled color */
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.login-links {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.login-links a {
+  color: var(--text-accent); /* Use accent color for links */
+  text-decoration: none;
+  margin: 0 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.login-links a:hover {
+  color: var(--text-accent-hover); /* Lighter accent on hover */
+  text-decoration: underline;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  filter: invert(75%) sepia(10%) saturate(200%) hue-rotate(180deg) brightness(90%) contrast(85%); /* Match input icon color */
+}
+
+.password-toggle-icon:hover {
+  opacity: 1;
+}

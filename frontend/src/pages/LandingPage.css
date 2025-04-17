@@ -1,0 +1,343 @@
+/* General Landing Page Styles */
+.landing-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  min-height: 100vh; /* Ensure it takes full viewport height */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  box-sizing: border-box;
+  /* Animated Gradient Background */
+  background: linear-gradient(135deg, #667eea, #764ba2, #66a6ff, #89f7fe);
+  background-size: 400% 400%; /* Make gradient larger for smooth transition */
+  animation: gradientAnimation 20s ease infinite; /* Apply animation, slower for smoother effect */
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  color: #fff; /* Default text color to white for better contrast on dark bg */
+}
+
+/* Keyframes for the background gradient animation */
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Header Section */
+.landing-header {
+  text-align: center;
+  padding: 4rem 1rem 2rem 1rem;
+  /* Removed background-color to let the main gradient show */
+  width: 100%;
+  /* Removed box-shadow as it might look odd on gradient */
+}
+
+/* Removed @keyframes slideDown */
+
+.landing-header h1 {
+  font-size: 2.8rem;
+  color: #ffffff; /* White text */
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Subtle shadow for readability */
+}
+
+.landing-header .tagline {
+  font-size: 1.2rem;
+  color: #e0e0e0; /* Lighter grey/white text */
+  font-weight: 300;
+}
+
+/* Section Styling */
+.landing-about,
+.landing-why,
+.landing-user-flow,
+.landing-footer {
+  width: 75%; /* Set width to 65% */
+  /* max-width: 900px; */ /* Keep max-width commented or adjust if needed */
+  padding: 3rem 2rem;
+  margin: 1.5rem auto; /* Center horizontally and add vertical margin */
+  /* Use a slightly darker, less transparent background for sections */
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 10px; /* Slightly more rounded */
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15); /* Add subtle uniform border */
+}
+
+/* Removed @keyframes fadeInUp */
+/* Removed animation-delay properties */
+
+section h2 {
+  font-size: 2rem;
+  color: #ffffff; /* White text for section titles */
+  margin-bottom: 1.5rem;
+  text-align: center;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+/* Underline effect for section titles */
+section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70px; /* Slightly wider underline */
+  height: 3px;
+  background-color: #89f7fe; /* Use a light color from the gradient */
+  border-radius: 2px;
+}
+
+.landing-about p,
+.landing-why li {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: #f0f0f0; /* Light grey/white text for readability */
+}
+
+.landing-why ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.landing-why li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+/* Custom bullet points */
+.landing-why li::before {
+  content: '✓'; /* Checkmark */
+  position: absolute;
+  left: 0;
+  color: #89f7fe; /* Use a light color from the gradient */
+  font-weight: bold;
+}
+
+.landing-why strong {
+  color: #ffffff; /* White for strong text */
+}
+
+/* User Flow Section */
+.landing-user-flow {
+  text-align: center;
+}
+
+.landing-user-flow h2 {
+  margin-bottom: 2rem;
+}
+
+.user-flow-steps {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.flow-step {
+  width: 200px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.flow-step:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.flow-step img {
+  width: 70%;
+  max-height: 100px;
+  object-fit: contain;
+  margin-bottom: 1rem;
+  border-radius: 5px;
+}
+
+.flow-step h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+}
+
+.flow-step p {
+  font-size: 1rem;
+  color: #eee;
+}
+
+/* Footer Section */
+.landing-footer {
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.1); /* Slightly darker footer bg */
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  /* Removed animation properties */
+}
+
+.landing-footer p {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff; /* White text */
+}
+
+.landing-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+/* Button Styles (reuse or adapt from App.css if possible) */
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.8rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Adjusted button styles for better contrast */
+.btn-primary {
+  background-color: #89f7fe; /* Light blue from gradient */
+  color: #333; /* Dark text on light button */
+}
+
+.btn-primary:hover {
+  background-color: #70e6f1; /* Slightly darker hover */
+}
+
+.btn-secondary {
+  background-color: transparent; /* Transparent background */
+  color: #ffffff; /* White text */
+  border: 1px solid #ffffff; /* White border */
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Subtle white hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .landing-header h1 {
+    font-size: 2.2rem;
+  }
+  .landing-header .tagline {
+    font-size: 1rem;
+  }
+  section h2 {
+    font-size: 1.8rem;
+  }
+  .landing-about p,
+  .landing-why li {
+    font-size: 1rem;
+  }
+  .user-flow-steps {
+    gap: 1.5rem;
+  }
+  .flow-step {
+    width: 220px;
+    padding: 1rem;
+  }
+  .flow-step img {
+    max-height: 120px;
+  }
+  .landing-footer p {
+    font-size: 1.1rem;
+  }
+  .btn {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Fixed Action Buttons (Top Right) */
+.fixed-actions { /* Correct class name */
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000; /* Ensure it's above other content */
+  display: flex;
+  gap: 0.8rem;
+  background-color: rgba(255, 255, 255, 0.15); /* Subtle background */
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  backdrop-filter: blur(5px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(5px); /* Safari support */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+}
+
+/* Style for fixed buttons (can be slightly smaller) */
+.btn-fixed {
+  padding: 0.6rem 1.2rem; /* Slightly larger padding */
+  font-size: 0.95rem; /* Slightly larger font */
+  /* Inherits base .btn styles */
+  margin: 0; /* Ensure no extra margin */
+}
+
+/* Specific styles for fixed buttons, inheriting from .btn */
+.btn-primary-fixed {
+  background-color: #89f7fe;
+  color: #333;
+  border: none; /* Override potential border from .btn-secondary */
+}
+.btn-primary-fixed:hover {
+  background-color: #70e6f1;
+  transform: translateY(-1px); /* Subtle lift on hover */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary-fixed {
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.8); /* Slightly less transparent border */
+}
+.btn-secondary-fixed:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* Slightly more visible hover */
+  transform: translateY(-1px); /* Subtle lift on hover */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+  .landing-header {
+    padding: 3rem 1rem 1.5rem 1rem;
+  }
+  .landing-header h1 {
+    font-size: 1.8rem;
+  }
+  section h2 {
+    font-size: 1.6rem;
+  }
+  .landing-about,
+  .landing-why,
+  .landing-user-flow,
+  .landing-footer {
+    padding: 2rem 1rem;
+  }
+  .user-flow-steps {
+     flex-direction: column; /* Stack logos vertically on very small screens */
+     gap: 2rem;
+  }
+  .flow-step {
+    width: 100%; /* Full width on small screens */
+  }
+  .flow-step img {
+    max-height: 120px;
+  }
+  .landing-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
