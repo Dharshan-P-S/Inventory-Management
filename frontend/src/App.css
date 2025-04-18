@@ -725,7 +725,19 @@ textarea.form-control {
 .auth-form { display: flex; flex-direction: column; gap: 1rem; }
 .auth-form .form-group { margin-bottom: 0; }
 .auth-form label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-primary); }
-.auth-button { padding: 0.75rem 1.5rem; font-size: 1rem; width: 100%; margin-top: 0.5rem; background-color: #66FCF1; color: #1F2833;}
+.auth-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 0.5rem;
+  background-color: #66FCF1;
+  color: #1F2833;
+  transition: transform 0.3s ease; /* Add transition for smooth effect */
+}
+
+.auth-button:hover {
+  transform: scale(1.05); /* Zoom effect on hover */
+}
 
 /* --- Error Messages --- */
 .error-message {
