@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import { useParams, Link, useNavigate } from 'react-router-dom'; // Added useNavigate
+import { motion } from 'framer-motion'; // Import motion
 import EditItemModal from '../components/EditItemModal';
 import '../App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 // Accept onAddToCart, currentUser, onUpdateItem, onDeleteItem, onUpdateStock props
 function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteItem, onUpdateStock }) {
@@ -199,7 +209,14 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
   const projectedQuantity = item ? item.quantityAvailable + stockChangeAmount : null;
 
   return (
-    <div className="page-container product-detail-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container product-detail-page" // Apply existing classes here
+    >
       <Link to="/" className="back-link">&larr; Back to Groceries</Link>
       <div className="product-detail-content">
         {/* TODO: Add image if available */}
@@ -317,7 +334,7 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
           onSave={handleSaveEdit}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

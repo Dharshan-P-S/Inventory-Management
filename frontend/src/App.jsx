@@ -1,6 +1,7 @@
 // --- App.jsx ---
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate, useLocation } from 'react-router-dom'; // Added useLocation
+import { motion, AnimatePresence } from 'framer-motion'; // Added framer-motion imports
 import Navigation from './components/Navigation.jsx';
 import HomePage from './pages/HomePage.jsx';
 import CartPage from './pages/CartPage.jsx';
@@ -30,7 +31,32 @@ function NavigateSetter() {
   return null;
 }
 
-function App() {
+// Define page transition variants outside App component
+const pageVariants = {
+  initial: {
+    opacity: 0,
+    x: "-100vw" // Slide in from left
+  },
+  in: {
+    opacity: 1,
+    x: 0
+  },
+  out: {
+    opacity: 0,
+    x: "100vw" // Slide out to right
+  }
+};
+
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.3 // Reduced duration for faster animation
+};
+
+
+// Main App component needs to be wrapped by Router to use useLocation
+function AppContent() {
+  const location = useLocation(); // Get location here
   const [groceryItems, setGroceryItems] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -281,15 +307,14 @@ function App() {
 
   // --- Render Logic ---
   if (authLoading) {
-    return <div className="loading-message">Checking login status...</div>;
+    return <div className="loading-message">Checking login status...</div>; // This is outside the Router, so location isn't available yet
   }
 
   // Determine if the layout needs the main App wrapper (for logged-in state)
   const needsAppWrapper = !!currentUser;
 
   return (
-    <Router>
-      <NavigateSetter />
+    <> {/* Use Fragment to avoid extra div */}
       {needsAppWrapper ? (
         // Logged-in state: Render with Navigation and main App wrapper
         <div className="App">
@@ -300,10 +325,11 @@ function App() {
           />
           <main>
             {apiError && !loading && <p className="error-message main-error">{apiError}</p>}
-            <Routes>
-              {/* --- Logged-in Routes --- */}
-              <Route path="/" element={ <HomePage items={groceryItems} onAddToCart={handleAddToCart} loading={loading || authLoading} currentUser={currentUser} onDeleteItem={handleDeleteItem} onUpdateItem={handleUpdateItem} /> } />
-              <Route path="/cart" element={ <CartPage cartItems={cartItems} onIncrease={handleIncreaseQuantity} onDecrease={handleDecreaseQuantity} onRemove={handleRemoveFromCart} onBuy={handleBuy} groceryItems={groceryItems} currentUser={currentUser} /> } />
+            <AnimatePresence mode="wait">
+              <Routes location={location} key={location.pathname}>
+                {/* --- Logged-in Routes --- */}
+                <Route path="/" element={ <HomePage items={groceryItems} onAddToCart={handleAddToCart} loading={loading || authLoading} currentUser={currentUser} onDeleteItem={handleDeleteItem} onUpdateItem={handleUpdateItem} /> } />
+                <Route path="/cart" element={ <CartPage cartItems={cartItems} onIncrease={handleIncreaseQuantity} onDecrease={handleDecreaseQuantity} onRemove={handleRemoveFromCart} onBuy={handleBuy} groceryItems={groceryItems} currentUser={currentUser} /> } />
               <Route path="/add-item" element={ currentUser.type === 'owner' ? <NewItemPage onAddItem={handleAddItem} apiError={apiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
               <Route path="/update-stock" element={ currentUser.type === 'owner' ? <StockUpdatePage groceries={groceryItems} onUpdateStock={handleStockUpdate} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
               <Route path="/edit-history" element={ currentUser.type === 'owner' ? <EditHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
@@ -320,23 +346,37 @@ function App() {
               <Route path="/forgot-password" element={<Navigate to="/" replace />} />
 
               {/* Catch-all for logged-in state */}
-              <Route path="*" element={<h2>404 Page Not Found</h2>} />
-            </Routes>
+                <Route path="*" element={<h2>404 Page Not Found</h2>} />
+              </Routes>
+            </AnimatePresence>
           </main>
         </div>
       ) : (
         // Logged-out state: Render without the main App wrapper
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage onLogin={handleLogin} apiError={apiError} setApiError={setApiError} />} />
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage onLogin={handleLogin} apiError={apiError} setApiError={setApiError} />} />
           <Route path="/register" element={<RegisterPage apiError={apiError} setApiError={setApiError} />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           {/* Redirect any other path to landing page if not logged in */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AnimatePresence>
       )}
+    </>
+  );
+}
+
+// Wrap AppContent with Router
+function App() {
+  return (
+    <Router>
+      <NavigateSetter />
+      <AppContent /> {/* Render the component that uses useLocation */}
     </Router>
   );
 }
+
 
 export default App;

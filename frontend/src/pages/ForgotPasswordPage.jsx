@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion'; // Import motion
 import './ForgotPasswordPage.css'; // Import the new CSS
 
 // Placeholder Icon URLs
@@ -12,6 +13,19 @@ const eyeClosedIconUrl = '/closeeye.webp';
 // Define stages for the form
 const STAGE_IDENTIFIER = 'STAGE_IDENTIFIER';
 const STAGE_OTP_PASSWORD = 'STAGE_OTP_PASSWORD';
+
+// Animation Variants
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const stepVariants = {
+  hidden: { opacity: 0, x: -50 }, // Slide in from left slightly
+  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
+  exit: { opacity: 0, x: 50, transition: { duration: 0.3, ease: "easeInOut" } } // Slide out to right slightly
+};
+
 
 function ForgotPasswordPage() {
   const [stage, setStage] = useState(STAGE_IDENTIFIER);
@@ -72,18 +86,29 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="forgotPasswordPageContainer">
-      <div
-        className="forgotPasswordFormContainer"
-      >
+    // Apply container animation to the outermost div
+    <motion.div
+      className="forgotPasswordPageContainer"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="forgotPasswordFormContainer">
         <h2>Forgot Password</h2>
 
         {/* Display Messages */}
         {error && <p className="forgotPasswordErrorMessage">{error}</p>}
         {message && <p className="forgotPasswordInfoMessage">{message}</p>}
 
+        {/* AnimatePresence to handle transitions between stages */}
+        <AnimatePresence mode="wait">
           {stage === STAGE_IDENTIFIER && (
-            <form
+            <motion.form
+              key={STAGE_IDENTIFIER} // Unique key for AnimatePresence
+              variants={stepVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               onSubmit={handleSendOtp}
               className="forgotPasswordForm"
             >
@@ -100,11 +125,16 @@ function ForgotPasswordPage() {
               <button type="submit" className="forgotPasswordButton step-1" disabled={isLoading || !identifier} >
                 {isLoading ? 'Sending...' : 'Send OTP'}
               </button>
-            </form>
+            </motion.form>
           )}
 
           {stage === STAGE_OTP_PASSWORD && (
-            <form
+            <motion.form
+              key={STAGE_OTP_PASSWORD} // Unique key for AnimatePresence
+              variants={stepVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
               onSubmit={handleResetPassword}
               className="forgotPasswordForm"
             >
@@ -137,14 +167,15 @@ function ForgotPasswordPage() {
               <button type="submit" className="forgotPasswordButton step-2" disabled={isLoading || !otp || !newPassword || !confirmPassword} >
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </button>
-            </form>
+            </motion.form>
           )}
+        </AnimatePresence>
 
         <div className="forgotPasswordLinks">
           <Link to="/login">Back to Login</Link>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import '../App.css'; // Assuming general styles are here
 
 const API_BASE_URL = 'http://localhost:3001/api';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 function DeletedItemsPage({ currentUser, apiError, setApiError, onItemRestored }) { // Added onItemRestored prop
   const [deletedItems, setDeletedItems] = useState([]);
@@ -127,7 +137,14 @@ function DeletedItemsPage({ currentUser, apiError, setApiError, onItemRestored }
 
 
   return (
-    <div className="page-container deleted-items-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container deleted-items-page" // Apply existing classes here
+    >
       <h2>Deleted Grocery Items</h2>
       {deletedItems.length === 0 ? (
         <p>No items have been deleted yet.</p>
@@ -154,7 +171,7 @@ function DeletedItemsPage({ currentUser, apiError, setApiError, onItemRestored }
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

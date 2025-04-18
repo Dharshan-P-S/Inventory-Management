@@ -1,7 +1,17 @@
 import React, { useState, useMemo } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import GroceryList from '../components/GroceryList';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
+
+// Define variants locally or import from a shared file if preferred
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 // Added onUpdateItem prop
 function HomePage({ items, onAddToCart, loading, error, currentUser, onDeleteItem, onUpdateItem }) {
@@ -33,7 +43,15 @@ function HomePage({ items, onAddToCart, loading, error, currentUser, onDeleteIte
   if (error) return <p>Error loading groceries: {error}</p>;
 
   return (
-    <div className="page-container">
+    // Wrap with motion.div
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container" // Apply existing class here
+    >
       <SearchBar searchTerm={searchTerm} onSearchChange={handleSearchChange} />
       <CategoryFilter
         categories={categories}
@@ -48,7 +66,7 @@ function HomePage({ items, onAddToCart, loading, error, currentUser, onDeleteIte
         onDeleteItem={onDeleteItem}
         onUpdateItem={onUpdateItem}
       />
-    </div>
+    </motion.div>
   );
 }
 

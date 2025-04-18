@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import OrderHistoryItem from '../components/OrderHistoryItem';
 import '../App.css'; // Ensure styles are imported
 
 const API_BASE_URL = 'http://localhost:3001/api'; // Or use a shared config
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 // Accept currentUser prop
 function OrderHistoryPage({ currentUser, apiError, setApiError }) {
@@ -54,7 +64,14 @@ function OrderHistoryPage({ currentUser, apiError, setApiError }) {
   if (error || apiError) return <p className="error-message api-error">{error || apiError}</p>; // Show local error or error from App.jsx
 
   return (
-    <div className="page-container order-history-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container order-history-page" // Apply existing classes here
+    >
       <h2>Order History for {currentUser.username}</h2>
       {orders.length === 0 ? (
         <p className="empty-history-message">You have no past orders.</p>
@@ -65,7 +82,7 @@ function OrderHistoryPage({ currentUser, apiError, setApiError }) {
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 

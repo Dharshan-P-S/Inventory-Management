@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import '../App.css'; // Assuming shared styles
 
 const API_BASE_URL = 'http://localhost:3001/api';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 function UserManagementPage({ currentUser, apiError, setApiError }) {
   const [users, setUsers] = useState([]);
@@ -222,7 +232,14 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
   // if (apiError) return <p className="error-message api-error">{apiError}</p>;
 
   return (
-    <div className="page-container user-management-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container user-management-page" // Apply existing classes here
+    >
       <h2>User Management</h2>
 
       {/* Display API Error if any */}
@@ -440,7 +457,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
             </div>
          )}
        </section>
-    </div>
+    </motion.div>
   );
 }
 

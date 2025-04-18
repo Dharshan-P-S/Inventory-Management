@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; // Import motion
 import '../App.css'; // Assuming general styles are here
 
 const API_BASE_URL = 'http://localhost:3001/api';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 function ChangePasswordPage() {
   const [oldPassword, setOldPassword] = useState('');
@@ -71,10 +81,19 @@ function ChangePasswordPage() {
   };
 
   return (
-    <div className="auth-page"> {/* Use auth-page for consistent width */}
-      <div className="auth-container">
-        <h2>Change Password</h2>
-        <form onSubmit={handleSubmit} className="auth-form">
+    // Wrap the outer page-container with motion.div
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container" // Apply existing class here
+    >
+      <div className="auth-page"> {/* Keep auth-page for width constraint */}
+        <div className="auth-container">
+          <h2>Change Password</h2>
+          <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="change-old-password">Old Password:</label>
             <input
@@ -117,9 +136,10 @@ function ChangePasswordPage() {
           <button type="submit" className="auth-button" disabled={isLoading}>
             {isLoading ? 'Updating...' : 'Change Password'}
           </button>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

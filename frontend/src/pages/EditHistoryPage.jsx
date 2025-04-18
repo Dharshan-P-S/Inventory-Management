@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion'; // Import motion
 import '../App.css'; // Assuming shared styles
 
 const API_BASE_URL = 'http://localhost:3001/api';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 function EditHistoryPage({ currentUser, apiError, setApiError }) {
   const [history, setHistory] = useState([]);
@@ -148,7 +158,14 @@ function EditHistoryPage({ currentUser, apiError, setApiError }) {
   if (apiError) return <p className="error-message api-error">{apiError}</p>;
 
   return (
-    <div className="page-container edit-history-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container edit-history-page" // Apply existing classes here
+    >
       <h2>Edit History</h2>
 
       {/* Filter Controls Container */}
@@ -260,7 +277,7 @@ function EditHistoryPage({ currentUser, apiError, setApiError }) {
           </tbody>
         </table>
       )}
-    </div>
+    </motion.div>
   );
 }
 

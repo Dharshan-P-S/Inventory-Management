@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; // Import motion
 import AddItemForm from '../components/AddItem';
+
+// Define variants locally or import from a shared file
+const pageVariants = {
+  initial: { opacity: 0, x: "-100vw" },
+  in: { opacity: 1, x: 0 },
+  out: { opacity: 0, x: "100vw" }
+};
+
+const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
 
 function NewItemPage({ onAddItem, apiError }) {
   const navigate = useNavigate();
@@ -37,7 +47,14 @@ function NewItemPage({ onAddItem, apiError }) {
   };
 
   return (
-    <div className="page-container new-item-page">
+    <motion.div
+      initial="initial"
+      animate="in"
+      exit="out"
+      variants={pageVariants}
+      transition={pageTransition}
+      className="page-container new-item-page" // Apply existing classes here
+    >
       <h2>Add New Grocery Item</h2> {/* Keep page title here */}
 
       {/* Display API errors passed from App.jsx */}
@@ -45,7 +62,7 @@ function NewItemPage({ onAddItem, apiError }) {
 
       {/* Pass categories and submit handler to AddItemForm */}
       <AddItemForm onSubmit={handleFormSubmit} categorySuggestions={categorySuggestions} />
-    </div>
+    </motion.div>
   );
 }
 
