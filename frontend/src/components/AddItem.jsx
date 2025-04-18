@@ -55,6 +55,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="form-control" // Add form-control class
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? "name-error" : undefined}
           />
@@ -68,6 +69,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             inputMode="decimal"
+            className="form-control" // Add form-control class
             aria-invalid={!!errors.price}
             aria-describedby={errors.price ? "price-error" : undefined}
           />
@@ -82,6 +84,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             value={quantityAvailable}
             onChange={(e) => setQuantityAvailable(e.target.value)}
             inputMode="numeric"
+            className="form-control" // Add form-control class
             aria-invalid={!!errors.quantityAvailable}
             aria-describedby={errors.quantityAvailable ? "quantity-error" : undefined}
           />
@@ -98,6 +101,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             list="category-list" // Link to datalist
+            className="form-control" // Add form-control class
           />
           <datalist id="category-list">
             {categorySuggestions.map((suggestion, index) => (
@@ -114,6 +118,7 @@ function AddItemForm({ onSubmit, categorySuggestions }) { // Added categorySugge
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows="3" // Adjust rows as needed
+            className="form-control" // Add form-control class
           />
           {/* Add error display if validation is implemented */}
           {/* {errors.description && <p id="description-error" className="error-message">{errors.description}</p>} */}

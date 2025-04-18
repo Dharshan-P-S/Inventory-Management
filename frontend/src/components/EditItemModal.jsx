@@ -80,6 +80,7 @@ function EditItemModal({ item, onClose, onSave }) {
               id="edit-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              className="form-control" // Add form-control class
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "edit-name-error" : undefined}
             />
@@ -93,6 +94,7 @@ function EditItemModal({ item, onClose, onSave }) {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               inputMode="decimal"
+              className="form-control" // Add form-control class
               aria-invalid={!!errors.price}
               aria-describedby={errors.price ? "edit-price-error" : undefined}
             />
@@ -106,6 +108,7 @@ function EditItemModal({ item, onClose, onSave }) {
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               list="edit-category-list" // Link to datalist
+              className="form-control" // Add form-control class
             />
             <datalist id="edit-category-list">
               {categorySuggestions.map((suggestion, index) => (
@@ -122,6 +125,7 @@ function EditItemModal({ item, onClose, onSave }) {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows="3" // Adjust as needed
+              className="form-control" // Add form-control class
             />
             {/* No error display for optional description */}
           </div>

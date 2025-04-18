@@ -292,8 +292,8 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                                type="text"
                                name="username"
                                value={editFormData.username}
-                               onChange={handleEditFormChange}
-                               className="form-input form-input-sm"
+                                onChange={handleEditFormChange}
+                                className="form-control"
                              />
                            ) : (
                              user.username
@@ -306,7 +306,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
                                name="email"
                                value={editFormData.email}
                                onChange={handleEditFormChange}
-                               className="form-input form-input-sm"
+                               className="form-control"
                              />
                            ) : (
                              user.email

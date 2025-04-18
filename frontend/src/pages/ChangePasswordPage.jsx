@@ -84,6 +84,7 @@ function ChangePasswordPage() {
               onChange={(e) => setOldPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="form-control" // Add form-control class
             />
           </div>
           <div className="form-group">
@@ -96,6 +97,7 @@ function ChangePasswordPage() {
               placeholder="Min 6 characters"
               required
               disabled={isLoading}
+              className="form-control" // Add form-control class
             />
           </div>
           <div className="form-group">
@@ -107,6 +109,7 @@ function ChangePasswordPage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               disabled={isLoading}
+              className="form-control" // Add form-control class
             />
           </div>
           {error && <p className="error-message" style={{ textAlign: 'center', marginBottom: '1rem' }}>{error}</p>}

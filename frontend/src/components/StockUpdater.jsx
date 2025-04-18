@@ -96,6 +96,7 @@ function StockUpdater({ groceries = [], onUpdateStock }) {
             onChange={handleSearchChange} // Use updated handler
             placeholder="Type to search..."
             disabled={!!selectedItem} // Disable search input once an item is selected
+            className="form-control" // Add form-control class
           />
           {suggestions.length > 0 && !selectedItem && ( // Only show suggestions if no item is selected
             <ul className="suggestions-container">
