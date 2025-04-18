@@ -38,8 +38,11 @@ function GroceryItem({ item, onAddToCart, currentUser }) {
     }
   }, [isOutOfStock, quantityToAdd, item, onAddToCart]); // All relevant dependencies
 
+  // Determine additional class based on user type
+  const ownerClass = currentUser?.type === 'owner' ? 'owner-view' : '';
+
   return (
-    <div className={`grocery-item ${isOutOfStock ? 'out-of-stock' : ''}`}>
+    <div className={`grocery-item ${isOutOfStock ? 'out-of-stock' : ''} ${ownerClass}`}>
       {/* Link wraps the display part */}
       <Link to={`/item/${item.id}`} className="grocery-item-link">
         <h3>{item.name}</h3>
