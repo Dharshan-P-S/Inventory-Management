@@ -35,22 +35,25 @@ function NavigateSetter() {
 const pageVariants = {
   initial: {
     opacity: 0,
-    x: "-100vw" // Slide in from left
+    x: '-50px', // Start from left
+    y: '40px'   // Start slightly down
   },
   in: {
     opacity: 1,
-    x: 0
+    x: 0,
+    y: 0
   },
   out: {
     opacity: 0,
-    x: "100vw" // Slide out to right
+    x: 0,       // No horizontal movement on exit
+    y: '-40px'  // Move slightly up on exit
   }
 };
 
 const pageTransition = {
   type: "tween",
-  ease: "anticipate",
-  duration: 0.3 // Reduced duration for faster animation
+  ease: "easeInOut",
+  duration: 0.35 // Adjusted duration for the combined movement
 };
 
 
@@ -323,22 +326,69 @@ function AppContent() {
             currentUser={currentUser}
             onLogout={handleLogout}
           />
+          {/* Remove perspective style */}
           <main>
             {apiError && !loading && <p className="error-message main-error">{apiError}</p>}
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
+              {/* Wrap Route element with motion.div */}
               <Routes location={location} key={location.pathname}>
                 {/* --- Logged-in Routes --- */}
-                <Route path="/" element={ <HomePage items={groceryItems} onAddToCart={handleAddToCart} loading={loading || authLoading} currentUser={currentUser} onDeleteItem={handleDeleteItem} onUpdateItem={handleUpdateItem} /> } />
-                <Route path="/cart" element={ <CartPage cartItems={cartItems} onIncrease={handleIncreaseQuantity} onDecrease={handleDecreaseQuantity} onRemove={handleRemoveFromCart} onBuy={handleBuy} groceryItems={groceryItems} currentUser={currentUser} /> } />
-              <Route path="/add-item" element={ currentUser.type === 'owner' ? <NewItemPage onAddItem={handleAddItem} apiError={apiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/update-stock" element={ currentUser.type === 'owner' ? <StockUpdatePage groceries={groceryItems} onUpdateStock={handleStockUpdate} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/edit-history" element={ currentUser.type === 'owner' ? <EditHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/sales-history" element={ currentUser.type === 'owner' ? <SalesHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/user-management" element={ currentUser.type === 'owner' ? <UserManagementPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/deleted-items" element={ currentUser.type === 'owner' ? <DeletedItemsPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} onItemRestored={handleItemRestored} /> : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
-              <Route path="/order-history" element={<OrderHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />} />
-              <Route path="/item/:id" element={ <ProductDetailPage onAddToCart={handleAddToCart} currentUser={currentUser} onUpdateItem={handleUpdateItem} onDeleteItem={handleDeleteItem} onUpdateStock={handleStockUpdate} /> } />
-              <Route path="/change-password" element={<ChangePasswordPage />} />
+                {/* Remove position: absolute and width: 100% styles */}
+                <Route path="/" element={
+                  <motion.div key="home" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <HomePage items={groceryItems} onAddToCart={handleAddToCart} loading={loading || authLoading} currentUser={currentUser} onDeleteItem={handleDeleteItem} onUpdateItem={handleUpdateItem} />
+                  </motion.div>
+                } />
+                <Route path="/cart" element={
+                  <motion.div key="cart" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <CartPage cartItems={cartItems} onIncrease={handleIncreaseQuantity} onDecrease={handleDecreaseQuantity} onRemove={handleRemoveFromCart} onBuy={handleBuy} groceryItems={groceryItems} currentUser={currentUser} />
+                  </motion.div>
+                 } />
+              <Route path="/add-item" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="add-item" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <NewItemPage onAddItem={handleAddItem} apiError={apiError} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/update-stock" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="update-stock" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <StockUpdatePage groceries={groceryItems} onUpdateStock={handleStockUpdate} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/edit-history" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="edit-history" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <EditHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/sales-history" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="sales-history" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <SalesHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/user-management" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="user-management" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <UserManagementPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/deleted-items" element={ currentUser.type === 'owner' ? (
+                  <motion.div key="deleted-items" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <DeletedItemsPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} onItemRestored={handleItemRestored} />
+                  </motion.div>
+                ) : <Navigate to="/" state={{ message: "Access denied: Owners only." }} replace /> } />
+              <Route path="/order-history" element={
+                  <motion.div key="order-history" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <OrderHistoryPage currentUser={currentUser} apiError={apiError} setApiError={setApiError} />
+                  </motion.div>
+                } />
+              <Route path="/item/:id" element={
+                  <motion.div key={`item-${location.pathname}`} initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <ProductDetailPage onAddToCart={handleAddToCart} currentUser={currentUser} onUpdateItem={handleUpdateItem} onDeleteItem={handleDeleteItem} onUpdateStock={handleStockUpdate} />
+                  </motion.div>
+                } />
+              <Route path="/change-password" element={
+                  <motion.div key="change-password" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <ChangePasswordPage />
+                  </motion.div>
+                } />
 
               {/* Redirect logged-in users away from auth pages */}
               <Route path="/login" element={<Navigate to="/" replace />} />
@@ -346,21 +396,42 @@ function AppContent() {
               <Route path="/forgot-password" element={<Navigate to="/" replace />} />
 
               {/* Catch-all for logged-in state */}
-                <Route path="*" element={<h2>404 Page Not Found</h2>} />
+                <Route path="*" element={
+                  <motion.div key="not-found" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                    <h2>404 Page Not Found</h2>
+                  </motion.div>
+                } />
               </Routes>
             </AnimatePresence>
           </main>
         </div>
       ) : (
         // Logged-out state: Render without the main App wrapper
-        <AnimatePresence mode="wait">
+        // Apply similar motion wrapper if animations are desired here too
+        <AnimatePresence mode="wait" initial={false}>
           <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/login" element={<LoginPage onLogin={handleLogin} apiError={apiError} setApiError={setApiError} />} />
-          <Route path="/register" element={<RegisterPage apiError={apiError} setApiError={setApiError} />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          {/* Redirect any other path to landing page if not logged in */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+             <Route path="/" element={
+               <motion.div key="landing" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                 <LandingPage />
+               </motion.div>
+             } />
+             <Route path="/login" element={
+               <motion.div key="login" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                 <LoginPage onLogin={handleLogin} apiError={apiError} setApiError={setApiError} />
+               </motion.div>
+             } />
+             <Route path="/register" element={
+               <motion.div key="register" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                 <RegisterPage apiError={apiError} setApiError={setApiError} />
+               </motion.div>
+             } />
+             <Route path="/forgot-password" element={
+               <motion.div key="forgot-password" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+                 <ForgotPasswordPage />
+               </motion.div>
+             } />
+             {/* Redirect any other path to landing page if not logged in */}
+             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </AnimatePresence>
       )}
