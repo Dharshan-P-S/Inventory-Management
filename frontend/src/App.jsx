@@ -329,7 +329,7 @@ function AppContent() {
           {/* Remove perspective style */}
           <main>
             {apiError && !loading && <p className="error-message main-error">{apiError}</p>}
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="wait"> {/* Removed initial={false} */}
               {/* Wrap Route element with motion.div */}
               <Routes location={location} key={location.pathname}>
                 {/* --- Logged-in Routes --- */}
@@ -408,7 +408,7 @@ function AppContent() {
       ) : (
         // Logged-out state: Render without the main App wrapper
         // Apply similar motion wrapper if animations are desired here too
-        <AnimatePresence mode="wait" initial={false}>
+        <AnimatePresence mode="wait"> {/* Removed initial={false} */}
           <Routes location={location} key={location.pathname}>
              <Route path="/" element={
                <motion.div key="landing" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
