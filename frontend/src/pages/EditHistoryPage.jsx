@@ -168,39 +168,44 @@ function EditHistoryPage({ currentUser, apiError, setApiError }) {
     >
       <h2>Edit History</h2>
 
-      {/* Filter Controls Container */}
-      <div className="filter-controls-area">
-        {/* Category Filter Buttons */}
+      {/* Filter Controls Container - Use Flexbox */}
+      <div className="filter-controls-area filter-controls-flex-container">
+        {/* Category Filter Dropdown */}
         {categories.length > 1 && (
-          <div className="category-filter-container filter-row">
-            <span className="filter-label">Category:</span>
-            {categories.map(category => (
-              <button
-                key={category}
-                className={`category-button ${selectedCategory === category ? 'active' : ''}`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="filter-dropdown-container"> {/* Removed filter-row */}
+            <label htmlFor="category-filter" className="filter-label">Category:</label>
+            <select
+              id="category-filter"
+              className="filter-select"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 
-        {/* Action Filter Buttons */}
+        {/* Action Filter Dropdown */}
         {actions.length > 1 && (
-          <div className="action-filter-container filter-row">
-             <span className="filter-label">Action:</span>
-            {actions.map(action => (
-              <button
-                key={action}
-                // Use a different class for styling these buttons
-                className={`action-filter-button ${selectedAction === action ? 'active' : ''} action-btn-${action.toLowerCase()}`}
-                onClick={() => setSelectedAction(action)}
-              >
-                {/* Make action names more readable */}
-                {action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-              </button>
-            ))}
+          <div className="filter-dropdown-container"> {/* Removed filter-row */}
+            <label htmlFor="action-filter" className="filter-label">Action:</label>
+            <select
+              id="action-filter"
+              className="filter-select"
+              value={selectedAction}
+              onChange={(e) => setSelectedAction(e.target.value)}
+            >
+              {actions.map(action => (
+                <option key={action} value={action}>
+                  {/* Make action names more readable */}
+                  {action.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                </option>
+              ))}
+            </select>
           </div>
         )}
       </div>

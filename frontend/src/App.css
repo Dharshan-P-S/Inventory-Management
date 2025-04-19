@@ -1327,6 +1327,55 @@ textarea.form-control {
   margin-top: 1.5rem;
 }
 
+/* --- Filter Controls Styling (Edit History, etc.) --- */
+.filter-controls-flex-container {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+  gap: 1.5rem; /* Space between filter groups */
+  margin-bottom: 1.5rem; /* Space below the filter area */
+  align-items: center; /* Align items vertically */
+  justify-content: center; /* Center items horizontally */
+  background-color: var(--bg-secondary); /* Match page container bg */
+  padding: 1rem; /* Add some padding */
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+}
+
+.filter-dropdown-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* Space between label and select */
+}
+
+.filter-label {
+  font-weight: bold;
+  color: var(--text-secondary); /* Use secondary text */
+  flex-shrink: 0; /* Prevent label from shrinking */
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid var(--border-color); /* Use dark theme border */
+  border-radius: var(--border-radius);
+  background-color: var(--bg-tertiary); /* Darker select background */
+  color: var(--text-primary); /* Light text */
+  font-size: 0.95rem;
+  cursor: pointer;
+  min-width: 160px; /* Give dropdowns a decent minimum width */
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.filter-select:hover {
+  border-color: var(--border-color-light); /* Lighter border on hover */
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--text-accent); /* Accent border on focus */
+  box-shadow: 0 0 0 2px rgba(var(--text-accent-rgb, 96, 165, 250), 0.25); /* Subtle focus ring */
+}
+
+
 /* --- User Management Page Grouping --- */
 .user-group {
   margin-top: 2rem;
