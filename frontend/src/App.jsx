@@ -35,19 +35,26 @@ function NavigateSetter() {
 const pageVariants = {
   initial: {
     opacity: 0,
-    x: '-50px', // Start from left
-    y: '40px'   // Start slightly down
+    x: '-50px' // Start from left (Horizontal only)
+    // y: '40px' // REMOVED vertical movement
   },
   in: {
     opacity: 1,
-    x: 0,
-    y: 0
+    x: 0
+    // y: 0 // REMOVED vertical movement (or set to 0 explicitly if needed)
   },
   out: {
     opacity: 0,
-    x: 0,       // No horizontal movement on exit
-    y: '-40px'  // Move slightly up on exit
+    x: '50px' // Slide right while fading out
+    // y: '-40px' // REMOVED vertical movement
   }
+};
+
+// Separate variants for Landing Page (simple fade)
+const landingPageVariants = {
+  initial: { opacity: 0 },
+  in: { opacity: 1 },
+  out: { opacity: 0 }
 };
 
 const pageTransition = {
@@ -411,22 +418,21 @@ function AppContent() {
         <AnimatePresence mode="wait"> {/* Removed initial={false} */}
           <Routes location={location} key={location.pathname}>
              <Route path="/" element={
-               <motion.div key="landing" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
-                 <LandingPage />
-               </motion.div>
+               // Removed motion.div wrapper for no animation
+               <LandingPage />
              } />
              <Route path="/login" element={
-               <motion.div key="login" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+               <motion.div key="login" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}> {/* Keep pageVariants */}
                  <LoginPage onLogin={handleLogin} apiError={apiError} setApiError={setApiError} />
                </motion.div>
              } />
              <Route path="/register" element={
-               <motion.div key="register" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+               <motion.div key="register" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}> {/* Keep pageVariants */}
                  <RegisterPage apiError={apiError} setApiError={setApiError} />
                </motion.div>
              } />
              <Route path="/forgot-password" element={
-               <motion.div key="forgot-password" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}>
+               <motion.div key="forgot-password" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition}> {/* Keep pageVariants */}
                  <ForgotPasswordPage />
                </motion.div>
              } />

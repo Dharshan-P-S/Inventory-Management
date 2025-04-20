@@ -16,14 +16,14 @@ const STAGE_OTP_PASSWORD = 'STAGE_OTP_PASSWORD';
 
 // Animation Variants
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
+  hidden: { opacity: 0 }, // Removed scale
+  visible: { opacity: 1, transition: { duration: 0.4, ease: "easeOut" } }, // Removed scale
 };
 
 const stepVariants = {
-  hidden: { opacity: 0, x: -50 }, // Slide in from left slightly
-  visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: "easeInOut" } },
-  exit: { opacity: 0, x: 50, transition: { duration: 0.3, ease: "easeInOut" } } // Slide out to right slightly
+  hidden: { opacity: 0 }, // Only use opacity for hidden state
+  visible: { opacity: 1, transition: { duration: 0.5, ease: "easeInOut" } }, // Only use opacity for visible state
+  exit: { opacity: 0, transition: { duration: 0.3, ease: "easeInOut" } } // Only use opacity for exit state
 };
 
 

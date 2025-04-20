@@ -13,22 +13,20 @@ const eyeClosedIconUrl = '/closeeye.webp';
 
 // Framer Motion Variants (same as LoginPage for consistency)
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.9 },
+  hidden: { opacity: 0 }, // Removed scale
   visible: {
     opacity: 1,
-    scale: 1,
+    // Removed scale
     transition: {
-      duration: 0.5,
-      type: 'spring',
-      stiffness: 120,
-      staggerChildren: 0.1, // Stagger children slightly
+      duration: 0.5, // Kept duration, removed spring type
+      staggerChildren: 0.1, // Keep stagger for items
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
+  hidden: { opacity: 0 }, // Only use opacity for hidden state
+  visible: { opacity: 1, transition: { duration: 0.3 } }, // Only use opacity for visible state
 };
 
 const buttonVariants = {
