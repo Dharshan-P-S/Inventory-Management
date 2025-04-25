@@ -38,7 +38,7 @@
   --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Adjusted shadow */
   --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Adjusted shadow */
   --font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --transition-base: all 0.25s ease-in-out;
+  --transition-base: all 0.25s ease-in-out; /* Base transition */
 }
 
 /* --- Global Styles --- */
@@ -98,7 +98,6 @@ h4 { font-size: 1.25rem; }
 a {
   color: var(--text-accent); /* Use accent color for links */
   text-decoration: none;
-  transition: var(--transition-base);
 }
 a:hover {
   color: var(--text-accent-hover); /* Lighter accent on hover */
@@ -130,17 +129,14 @@ a:hover {
   padding: 0.5rem 1rem;
   font-size: 0.95rem;
   border-radius: var(--border-radius);
-  transition: var(--transition-base);
   box-shadow: var(--box-shadow-sm);
 }
 .button:hover:not(:disabled) {
-  transform: translateY(-2px);
   box-shadow: var(--box-shadow);
   border-color: var(--text-accent); /* Accent border on hover */
   background-color: var(--bg-tertiary); /* Keep background consistent */
 }
 .button:active:not(:disabled) {
-  transform: translateY(0);
   box-shadow: var(--box-shadow-sm);
 }
 .button:disabled {
@@ -205,7 +201,6 @@ a:hover {
   border: 1px solid var(--border-color); /* Use dark theme border */
   appearance: none;
   border-radius: var(--border-radius);
-  transition: var(--transition-base);
 }
 .form-control:focus {
   color: var(--text-primary);
@@ -278,7 +273,7 @@ textarea.form-control {
   font-weight: 500;
   padding: 0.5rem 0.2rem;
   border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease; /* Added transition */
   position: relative;
   background: none;
   border: none;
@@ -298,7 +293,7 @@ textarea.form-control {
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--text-accent); /* Use accent color */
-  transition: width 0.3s ease;
+  transition: width 0.3s ease; /* Added transition */
 }
 
 .main-nav a:hover,
@@ -373,7 +368,6 @@ textarea.form-control {
   background-color: var(--bg-tertiary); /* Darker input */
   color: var(--text-primary); /* Light text */
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Adjusted shadow */
-  transition: var(--transition-base);
 }
 .search-bar-container input[type="text"]:focus {
   border-color: var(--text-accent); /* Accent border */
@@ -395,14 +389,13 @@ textarea.form-control {
   color: var(--text-secondary); /* Muted text */
   border-radius: 20px;
   font-size: 0.9em;
-  transition: var(--transition-base);
   box-shadow: var(--box-shadow-sm);
 }
 .category-button:hover {
   background-color: var(--border-color); /* Slightly lighter dark */
   border-color: var(--border-color-light);
   color: var(--text-primary); /* Brighter text */
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */ /* Removed transform */
   box-shadow: var(--box-shadow);
 }
 .category-button.active {
@@ -410,7 +403,7 @@ textarea.form-control {
   color: var(--bg-primary); /* Dark text on accent bg */
   border-color: var(--primary-color);
   box-shadow: none;
-  transform: translateY(0);
+  /* transform: translateY(0); */ /* Removed transform */
 }
 
 /* --- Grocery List & Items --- */
@@ -427,7 +420,6 @@ textarea.form-control {
   box-shadow: var(--box-shadow-sm);
   display: flex;
   flex-direction: column;
-  transition: var(--transition-base);
   text-decoration: none;
   color: var(--text-primary); /* Ensure text is light */
   overflow: hidden;
@@ -435,7 +427,7 @@ textarea.form-control {
 }
 .grocery-item:hover {
   box-shadow: var(--box-shadow);
-  transform: translateY(-5px);
+  /* transform: translateY(-5px); */ /* Removed transform */
   border-left-color: var(--text-accent); /* Use accent color */
   /* background-color: var(--bg-tertiary); */ /* Removed background change on hover */
 }
@@ -510,7 +502,6 @@ textarea.form-control {
   background-color: var(--bg-secondary); /* Darker button */
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  transition: var(--transition-base);
 }
 .grocery-item .quantity-adjuster button:hover:not(:disabled) {
   background-color: var(--border-color); /* Slightly lighter dark */
@@ -607,7 +598,6 @@ textarea.form-control {
 .product-actions .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
   color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
-  transition: var(--transition-base);
 }
 .product-actions .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); color: var(--text-primary); }
 .product-actions .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -642,7 +632,6 @@ textarea.form-control {
 .product-detail-page .owner-stock-update .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
   color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
-  transition: var(--transition-base);
 }
 .product-detail-page .owner-stock-update .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); color: var(--text-primary); }
 .product-detail-page .owner-stock-update .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -664,7 +653,7 @@ textarea.form-control {
   padding: 1rem 0;
   border-bottom: 1px solid var(--border-color);
   gap: 1rem;
-  transition: background-color 0.2s ease;
+  /* transition: background-color 0.2s ease; */ /* Removed transition */
 }
 .cart-item:hover {
   background-color: rgba(var(--text-accent-rgb, 96, 165, 250), 0.05); /* Subtle accent hover */
@@ -675,7 +664,7 @@ textarea.form-control {
 .cart-item-controls button {
   padding: 4px 8px; font-size: 0.9rem; line-height: 1; min-width: 26px;
   color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
-  transition: var(--transition-base);
+  /* transition: var(--transition-base); */ /* Removed transition */
 }
 .cart-item-controls button:hover:not(:disabled) { background-color: var(--border-color); border-color: var(--border-color-light); color: var(--text-primary); }
 .cart-item-controls button:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -734,12 +723,10 @@ textarea.form-control {
   margin-top: 0.5rem;
   background-color: #66FCF1;
   color: #1F2833;
-  transition: transform 0.3s ease; /* Add transition for smooth effect */
+  /* transition: transform 0.3s ease; */ /* Removed transition */
 }
 
-.auth-button:hover {
-  transform: scale(1.05); /* Zoom effect on hover */
-}
+
 
 /* --- Error Messages --- */
 .error-message {
@@ -773,7 +760,7 @@ textarea.form-control {
 .suggestion-item {
   padding: 0.75rem 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-left-color 0.2s ease;
+  /* transition: background-color 0.2s ease, border-left-color 0.2s ease; */ /* Removed transition */
   color: var(--text-primary); /* Light text */
   border-left: 4px solid transparent; /* Default transparent border */
   margin-left: -4px; /* Offset padding to align text */
@@ -816,7 +803,7 @@ textarea.form-control {
 .stock-update-form .quantity-adjuster button {
   padding: 5px 10px; font-size: 1rem; line-height: 1; min-width: 28px;
   color: var(--text-secondary); background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 4px;
-  transition: var(--transition-base);
+  /* transition: var(--transition-base); */ /* Removed transition */
 }
 .stock-update-form .quantity-adjuster button:hover:not(:disabled) { background-color: var(--border-color); border-color: var(--border-color-light); color: var(--text-primary); }
 .stock-update-form .quantity-adjuster button:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -839,14 +826,14 @@ textarea.form-control {
 .edit-history-item { /* Shared item styles */
   background-color: var(--bg-secondary); border: 1px solid var(--border-color); /* Dark bg, dark border */
   border-radius: var(--border-radius); padding: 1rem 1.5rem; box-shadow: var(--box-shadow-sm);
-  transition: var(--transition-base);
+  /* transition: var(--transition-base); */ /* Removed transition */
   color: var(--text-primary); /* Ensure light text */
 }
 .order-history-item:hover,
 .edit-history-item:hover {
   border-left: 4px solid var(--info-color);
   box-shadow: var(--box-shadow);
-  transform: translateX(2px);
+  /* transform: translateX(2px); */ /* Removed transform */
   background-color: var(--bg-tertiary); /* Slightly lighter dark on hover */
 }
 
@@ -999,11 +986,12 @@ textarea.form-control {
 .deleted-item {
   border: 1px solid var(--border-color); border-radius: var(--border-radius); background-color: var(--bg-secondary); /* Dark bg */
   box-shadow: var(--box-shadow-sm); display: flex; flex-direction: column;
-  transition: var(--transition-base); color: var(--text-primary); overflow: hidden; /* Light text */
+  /* transition: var(--transition-base); */ /* Removed transition */
+  color: var(--text-primary); overflow: hidden; /* Light text */
   border-left: 5px solid var(--danger-color);
   opacity: 0.8; /* More faded */
 }
-.deleted-item:hover { box-shadow: var(--box-shadow); transform: translateY(-4px); opacity: 1; background-color: var(--bg-tertiary); } /* Lighter dark hover */
+.deleted-item:hover { box-shadow: var(--box-shadow); /* transform: translateY(-4px); */ opacity: 1; background-color: var(--bg-tertiary); } /* Lighter dark hover */
 .deleted-item .grocery-item-link { padding: 1rem 1.25rem; flex-grow: 1; }
 .deleted-item h3 { margin-bottom: 0.5rem; font-size: 1.1em; color: var(--text-primary); } /* Light text */
 .deleted-item p { margin: 0.2rem 0; font-size: 0.9em; color: var(--text-secondary); } /* Secondary text */
@@ -1176,7 +1164,7 @@ textarea.form-control {
   color: var(--text-secondary); /* Muted text */
   border-radius: var(--border-radius);
   font-size: 0.9em;
-  transition: var(--transition-base);
+  /* transition: var(--transition-base); */ /* Removed transition */
   box-shadow: var(--box-shadow-sm);
   cursor: pointer;
   text-transform: capitalize;
@@ -1185,13 +1173,13 @@ textarea.form-control {
   background-color: var(--border-color); /* Lighter dark */
   border-color: var(--border-color-light);
   color: var(--text-primary); /* Brighter text */
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */ /* Removed transform */
   box-shadow: var(--box-shadow);
 }
 .action-filter-button.active {
   color: #fff; /* White text on active colored buttons */
   box-shadow: none;
-  transform: translateY(0);
+  /* transform: translateY(0); */ /* Removed transform */
 }
 
 /* Specific colors for active action buttons (Ensure contrast) */
@@ -1364,7 +1352,7 @@ textarea.form-control {
   font-size: 0.95rem;
   cursor: pointer;
   min-width: 160px; /* Give dropdowns a decent minimum width */
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  /* transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out; */ /* Removed transition */
 }
 
 .filter-select:hover {
@@ -1410,7 +1398,7 @@ textarea.form-control {
   font-weight: 500;
   padding: 0.5rem 0.2rem;
   border-bottom: 2px solid transparent;
-  transition: all 0.3s ease;
+  /* transition: all 0.3s ease; */ /* Removed transition */
   position: relative;
   background: none;
   border: none;
@@ -1432,7 +1420,7 @@ textarea.form-control {
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--text-accent);
-  transition: width 0.3s ease;
+  /* transition: width 0.3s ease; */ /* Removed transition */
 }
 
 .dropdown-toggle:hover,
@@ -1454,7 +1442,7 @@ textarea.form-control {
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--text-accent);
-  transition: width 0.3s ease;
+  /* transition: width 0.3s ease; */ /* Removed transition */
 }
 
 .dropdown-toggle:hover,
@@ -1505,7 +1493,7 @@ textarea.form-control {
   text-decoration: none;
   font-size: 0.9em;
   white-space: nowrap;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease; /* Added transition */
   border-bottom: none; /* Remove main nav underline */
 }
 .dropdown-menu a::after {

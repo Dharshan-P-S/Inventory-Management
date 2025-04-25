@@ -1058,7 +1058,7 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
         if (!userToCheck) {
             console.warn(`[${new Date().toISOString()}] PUT /api/users/${userIdToUpdate} - User not found.`);
             return res.status(404).json({ message: 'User not found.' });
-        }ontend
+        }
         
         // Check if the owner is trying to modify another owner
         if (userToCheck.type === 'owner' && userToCheck.id !== updatingOwnerId) {
@@ -1107,7 +1107,15 @@ app.put('/api/users/:userId', requireAuth, requireOwner, async (req, res) => { /
          if (error.code === 11000) { // Duplicate key error during update
              return res.status(409).json({ message: 'Username or email already exists.' });
         }
-        res.status(500).json({ message: 'Failed to save updated user data.' });
+        console.error(`[${new Date().toISOString()}] Error updating user ${userIdToUpdate}:`, error); // Log the actual error
+         if (error.name === 'ValidationError') {
+            return res.status(400).json({ message: 'Validation failed.', errors: error.errors });
+        }
+         if (error.code === 11000) { // Duplicate key error during update
+             return res.status(409).json({ message: 'Username or email already exists.' });
+        }
+        // Return the specific error message for other server errors
+        res.status(500).json({ message: `Failed to save updated user data: ${error.message}` });
     }
 });
 

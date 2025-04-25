@@ -1,19 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react'; // Added useCallback
 import { useParams, Link, useNavigate } from 'react-router-dom'; // Added useNavigate
-import { motion } from 'framer-motion'; // Import motion
+// Removed motion import
 import EditItemModal from '../components/EditItemModal';
 import '../App.css';
 
 const API_BASE_URL = 'http://localhost:3001/api';
 
-// Define variants locally or import from a shared file
-const pageVariants = {
-  initial: { opacity: 0, x: "-100vw" },
-  in: { opacity: 1, x: 0 },
-  out: { opacity: 0, x: "100vw" }
-};
-
-const pageTransition = { type: "tween", ease: "anticipate", duration: 0.3 }; // Faster duration
+// Removed animation variants and transition
 
 // Accept onAddToCart, currentUser, onUpdateItem, onDeleteItem, onUpdateStock props
 function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteItem, onUpdateStock }) {
@@ -209,12 +202,7 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
   const projectedQuantity = item ? item.quantityAvailable + stockChangeAmount : null;
 
   return (
-    <motion.div
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={pageTransition}
+    <div
       className="page-container product-detail-page" // Apply existing classes here
     >
       <Link to="/" className="back-link">&larr; Back to Groceries</Link>
@@ -223,7 +211,7 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
         <div className="product-info">
           <h1>{item.name}</h1>
           <p className="product-category">Category: {item.category || 'N/A'}</p>
-          <p className="product-price">Price: Rs. {item.price.toFixed(2)}</p>
+          <p className="product-price">Price: Rs. {item.price?.toFixed(2)}</p>
           <p className={`product-stock ${isOutOfStock ? 'out-of-stock' : 'in-stock'}`}>
             {isOutOfStock ? 'Out of Stock' : `Available: ${item.quantityAvailable}`}
           </p>
@@ -334,7 +322,7 @@ function ProductDetailPage({ onAddToCart, currentUser, onUpdateItem, onDeleteIte
           onSave={handleSaveEdit}
         />
       )}
-    </motion.div>
+    </div>
   );
 }
 
