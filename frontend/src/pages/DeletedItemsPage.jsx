@@ -151,7 +151,7 @@ function DeletedItemsPage({ currentUser, apiError, setApiError, onItemRestored }
       ) : (
         <div className="deleted-items-list items-grid"> {/* Reuse items-grid for layout */}
           {deletedItems.map(item => (
-            <div key={item.id} className="deleted-item grocery-item"> {/* Reuse grocery-item styles */}
+            <div style={{padding:"10px"}} key={item.id} className="deleted-item grocery-item"> {/* Reuse grocery-item styles */}
               <h3>{item.name}</h3>
               <p>Price: Rs. {item.price?.toFixed(2)}</p>
               <p>Category: {item.category || 'N/A'}</p>
