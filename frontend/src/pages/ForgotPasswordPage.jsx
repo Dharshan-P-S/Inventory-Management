@@ -52,7 +52,7 @@ function ForgotPasswordPage() {
       });
       const data = await response.json();
       if (response.ok) {
-        setMessage((data.message || 'If an account exists, an OTP has been sent.') + ' Please check spam/junk.');
+        setMessage((data.message || 'If an account exists, an OTP has been sent.') + ' Please check spam/junk.  If OTP has not been received re-enter the correct username.');
         setStage(STAGE_OTP_PASSWORD);
       } else {
         setError(data.message || `Failed to send OTP (${response.status}).`);
