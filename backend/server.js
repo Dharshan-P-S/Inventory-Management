@@ -1277,12 +1277,14 @@ app.post('/api/send-reset-otp', async (req, res) => {
         // Save OTP and expiry to the user document
         user.resetPasswordOtp = otp;
         user.resetPasswordExpires = otpExpires;
-        await user.save();
+        await user.save(); // Attempt to save OTP to user
 
-        console.log(`[${new Date().toISOString()}] Generated OTP ${otp} for user ${user.username} (Email: ${user.email}), expires at ${otpExpires.toISOString()}`);
+        console.log(`[${new Date().toISOString()}] Successfully saved OTP to user document for ${user.username}. Proceeding to send email.`); // Log success before sending email
 
         // Send the OTP email
+        console.log(`[${new Date().toISOString()}] Attempting to send password reset OTP to: ${user.email}`); // Log before calling send function
         const emailSent = await sendPasswordResetOtp(user.email, otp);
+        console.log(`[${new Date().toISOString()}] sendPasswordResetOtp returned: ${emailSent}`); // Log the result
 
         if (emailSent) {
             res.status(200).json({ message: 'If an account with that identifier exists, an OTP has been sent.' });
@@ -1298,7 +1300,12 @@ app.post('/api/send-reset-otp', async (req, res) => {
         }
 
     } catch (error) {
-        console.error(`[${new Date().toISOString()}] Error processing send-reset-otp for identifier ${identifier}:`, error);
+        // Log the specific step where the error might have occurred
+        if (error.message.includes('saving user')) { // Check if error happened during save
+             console.error(`[${new Date().toISOString()}] Error saving OTP to user document for identifier ${identifier}:`, error);
+        } else {
+             console.error(`[${new Date().toISOString()}] Error processing send-reset-otp for identifier ${identifier} (could be user lookup, OTP generation, save, or email sending):`, error);
+        }
         res.status(500).json({ message: 'An internal server error occurred.' });
     }
 });

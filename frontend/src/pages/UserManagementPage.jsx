@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion'; // Import motion
+// Removed motion import
 import '../App.css'; // Assuming shared styles
 
 const API_BASE_URL = 'http://localhost:3001/api';
@@ -232,12 +232,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
   // if (apiError) return <p className="error-message api-error">{apiError}</p>;
 
   return (
-    <motion.div
-      initial="initial"
-      animate="in"
-      exit="out"
-      variants={pageVariants}
-      transition={pageTransition}
+    <div
       className="page-container user-management-page" // Apply existing classes here
     >
       <h2>User Management</h2>
@@ -457,7 +452,7 @@ function UserManagementPage({ currentUser, apiError, setApiError }) {
             </div>
          )}
        </section>
-    </motion.div>
+    </div>
   );
 }
 

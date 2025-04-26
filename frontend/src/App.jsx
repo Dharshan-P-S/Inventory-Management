@@ -35,7 +35,7 @@ function NavigateSetter() {
 const pageVariants = {
   initial: {
     opacity: 0,
-    x: '-50px' // Start from left (Horizontal only)
+    x: '-100vh' // Start from left (Horizontal only)
   },
   in: {
     opacity: 1,
@@ -43,14 +43,14 @@ const pageVariants = {
   },
   out: {
     opacity: 0,
-    x: '50px' // Slide right while fading out
+    x: '100vh' // Slide right while fading out
   }
 };
 
 const pageTransition = {
   type: "tween",
   ease: "easeInOut",
-  duration: 0.35 // Adjusted duration for the combined movement
+  duration: 0.25 // Adjusted duration for the combined movement
 };
 
 
