@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'; // Import hooks
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion'; // Import motion and AnimatePresence
+import { motion, AnimatePresence, useInView } from 'framer-motion'; // Import motion, AnimatePresence, and useInView
 import './LandingPage.css';
 
 // Animation variants for staggering children
@@ -39,6 +39,20 @@ const fixedButtonsVariants = {
 function LandingPage() {
   const [showFixedButtons, setShowFixedButtons] = useState(true);
   const footerRef = useRef(null); // Ref to track the footer element
+
+  // Refs and inView states for each section
+  const aboutRef = useRef(null);
+  const inViewAbout = useInView(aboutRef, { amount: "some" });
+
+  const whyRef = useRef(null);
+  const inViewWhy = useInView(whyRef, { amount: "some" });
+
+  const userFlowRef = useRef(null);
+  const inViewUserFlow = useInView(userFlowRef, { amount: "some" });
+
+  const footerMotionRef = useRef(null); // Renamed to avoid conflict with footerRef
+  const inViewFooter = useInView(footerMotionRef, { amount: "some" });
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -97,7 +111,13 @@ function LandingPage() {
       </motion.header>
 
       {/* About Section with motion */}
-      <motion.section className="landing-about" variants={itemVariants}>
+      <motion.section
+        ref={aboutRef} // Assign ref
+        className="landing-about"
+        variants={itemVariants}
+        initial="hidden"
+        animate={inViewAbout ? "visible" : "hidden"} // Control animation with inView
+      >
         <h2>About the Project</h2>
         <p>
           Inventory Management System is a comprehensive solution designed to help businesses
@@ -109,7 +129,13 @@ function LandingPage() {
       </motion.section>
 
       {/* Why Choose Us Section with motion */}
-      <motion.section className="landing-why" variants={itemVariants}>
+      <motion.section
+        ref={whyRef} // Assign ref
+        className="landing-why"
+        variants={itemVariants}
+        initial="hidden"
+        animate={inViewWhy ? "visible" : "hidden"} // Control animation with inView
+      >
         <h2>Why Choose Us?</h2>
         <ul>
           <li><strong>Real-time Tracking:</strong> Keep an accurate count of your stock levels instantly.</li>
@@ -121,7 +147,13 @@ function LandingPage() {
       </motion.section>
 
       {/* User Flow Section with motion */}
-      <motion.section className="landing-user-flow" variants={itemVariants}>
+      <motion.section
+        ref={userFlowRef} // Assign ref
+        className="landing-user-flow"
+        variants={itemVariants}
+        initial="hidden"
+        animate={inViewUserFlow ? "visible" : "hidden"} // Control animation with inView
+      >
         <h2>Experience the Inventory Management System</h2>
         <p>
           See how easy it is to manage your inventory with our intuitive system.
@@ -129,25 +161,25 @@ function LandingPage() {
         <div className="user-flow-steps">
           <div className="flow-step">
             {/* Replaced with Wikimedia Commons User Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png" alt="Login" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png" alt="Login" />
             <h3>Login</h3>
             <p>Securely access your account.</p>
           </div>
           <div className="flow-step">
             {/* Replaced with Wikimedia Commons Plus Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Plus_big.svg/640px-Plus_big.svg.png" alt="Add Item" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/6/69/Plus_big.svg/640px-Plus_big.svg.png" alt="Add Item" />
             <h3>Add Items</h3>
             <p>Easily add new products to your inventory.</p>
           </div>
           <div className="flow-step">
             {/* Replaced with Wikimedia Commons List Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Noun_Project_list_icon_119366_cc.svg/640px-Noun_Project_list_icon_119366_cc.svg.png" alt="View Inventory" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/4/4d/Noun_Project_list_icon_119366_cc.svg/640px-Noun_Project_list_icon_119366_cc.svg.png" alt="View Inventory" />
             <h3>View Inventory</h3>
             <p>Get a clear overview of your current stock.</p>
           </div>
           <div className="flow-step">
             {/* Replaced with Wikimedia Commons Shopping Cart Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Shopping_cart_icon.svg/512px-Shopping_cart_icon.svg.png" alt="Manage Orders" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/d/df/Shopping_cart_icon.svg/512px-Shopping_cart_icon.svg.png" alt="Manage Orders" />
             <h3>Manage Orders</h3>
             <p>Process and track customer orders efficiently.</p>
           </div>
@@ -155,7 +187,13 @@ function LandingPage() {
       </motion.section>
 
       {/* Footer with motion */}
-      <motion.footer ref={footerRef} className="landing-footer" variants={itemVariants}>
+      <motion.footer
+        ref={footerMotionRef} // Assign ref
+        className="landing-footer"
+        variants={itemVariants}
+        initial="hidden"
+        animate={inViewFooter ? "visible" : "hidden"} // Control animation with inView
+      >
         <p>Ready to get started?</p>
         <motion.div className="landing-actions" variants={itemVariants}>
           {/* Add motion to buttons for subtle hover effect */}
