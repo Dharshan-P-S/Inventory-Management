@@ -1,7 +1,7 @@
 // --- App.jsx ---
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate, useLocation } from 'react-router-dom'; // Added useLocation
-import { motion, AnimatePresence } from 'framer-motion'; // Added framer-motion imports
+import { BrowserRouter as Router, Route, Routes, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from './components/Navigation.jsx';
 import HomePage from './pages/HomePage.jsx';
 import CartPage from './pages/CartPage.jsx';
@@ -56,7 +56,7 @@ const pageTransition = {
 
 // Main App component needs to be wrapped by Router to use useLocation
 function AppContent() {
-  const location = useLocation(); // Get location here
+  const location = useLocation();
   const [groceryItems, setGroceryItems] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -172,6 +172,21 @@ function AppContent() {
     checkSession();
     fetchGroceries();
   }, [checkSession, fetchGroceries]);
+
+  // Add/remove body class based on landing page visibility
+  useEffect(() => {
+    const isLanding = location.pathname === '/' && !currentUser;
+    if (isLanding) {
+      document.body.classList.add('landing-page-active');
+    } else {
+      document.body.classList.remove('landing-page-active');
+    }
+    // Cleanup function to remove the class when the component unmounts
+    // or before the effect runs again if dependencies change.
+    return () => {
+      document.body.classList.remove('landing-page-active');
+    };
+  }, [location.pathname, currentUser]); // Re-run effect if path or user status changes
 
   // --- Cart Management ---
   const handleAddToCart = (itemToAdd, quantityToAdd = 1) => {
