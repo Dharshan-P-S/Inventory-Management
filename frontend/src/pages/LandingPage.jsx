@@ -160,26 +160,26 @@ function LandingPage() {
         </p><br />
         <div className="user-flow-steps">
           <div className="flow-step">
-            {/* Replaced with Wikimedia Commons User Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/7/7c/User_font_awesome.svg/512px-User_font_awesome.svg.png" alt="Login" />
+            {/* Using local icon from public directory */}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/PICOL_icon_Login.svg/640px-PICOL_icon_Login.svg.png" alt="Login" />
             <h3>Login</h3>
             <p>Securely access your account.</p>
           </div>
           <div className="flow-step">
-            {/* Replaced with Wikimedia Commons Plus Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/6/69/Plus_big.svg/640px-Plus_big.svg.png" alt="Add Item" />
+            {/* Using local icon from public directory */}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/Contribs_icon-black.svg/640px-Contribs_icon-black.svg.png" alt="Add Item" />
             <h3>Add Items</h3>
             <p>Easily add new products to your inventory.</p>
           </div>
           <div className="flow-step">
-            {/* Replaced with Wikimedia Commons List Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/4/4d/Noun_Project_list_icon_119366_cc.svg/640px-Noun_Project_list_icon_119366_cc.svg.png" alt="View Inventory" />
+            {/* Using local icon from public directory */}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Shopping_cart_icon.svg/640px-Shopping_cart_icon.svg.png" alt="View Inventory" />
             <h3>View Inventory</h3>
             <p>Get a clear overview of your current stock.</p>
           </div>
           <div className="flow-step">
-            {/* Replaced with Wikimedia Commons Shopping Cart Icon */}
-            <img src="https://upload.wikimedia.org/wikipedia/commons/commons/thumb/d/df/Shopping_cart_icon.svg/512px-Shopping_cart_icon.svg.png" alt="Manage Orders" />
+            {/* Using local icon from public directory */}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Noun_48949_-_Delivery.svg/640px-Noun_48949_-_Delivery.svg.png" alt="Manage Orders" />
             <h3>Manage Orders</h3>
             <p>Process and track customer orders efficiently.</p>
           </div>

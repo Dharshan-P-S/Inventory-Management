@@ -69,7 +69,7 @@ body {
 
 .App {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1250px; /* Increased max-width to allow page-container to expand */
   margin: 0 auto;
   padding: 0 1rem;
   flex-grow: 1;
@@ -229,6 +229,7 @@ textarea.form-control {
   background: var(--bg-secondary); /* Use dark theme variable */
   padding: 0.8rem 1.5rem;
   box-shadow: var(--box-shadow); /* Use adjusted shadow */
+  border-radius: 5px;
   margin-bottom: 1.5rem;
   position: sticky;
   top: 0;
@@ -350,6 +351,9 @@ textarea.form-control {
   box-shadow: var(--box-shadow);
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-color); /* Add subtle border */
+  max-width: 1250px; /* Increased max-width by another 50px */
+  margin-left: auto; /* Center the container */
+  margin-right: auto; /* Center the container */
 }
 
 /* --- Search & Filter --- */
@@ -879,13 +883,14 @@ textarea.form-control {
   border-radius: var(--border-radius);
   padding: 1rem;
   background-color: var(--bg-tertiary); /* Darker item background */
+  min-width: 600px; /* Increased minimum width further */
 }
 
 .sales-order-header {
   display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
+  justify-content: space-between; /* Restore space-between */
+  flex-wrap: nowrap; /* Force onto one line */
+  gap: 0.5rem 1rem; /* Keep reduced gap */
   font-size: 0.9em;
   color: var(--text-secondary); /* Use secondary text */
   margin-bottom: 0.75rem;
@@ -895,6 +900,7 @@ textarea.form-control {
 .sales-order-header span:last-child {
   font-weight: 500;
   color: var(--text-primary); /* Use primary text */
+  /* Removed flex-shrink, white-space, margin-left */
 }
 
 .sales-item-list {
@@ -1099,6 +1105,7 @@ textarea.form-control {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  min-width: 150px; /* Ensure User ID is fully visible */
 }
 
 .user-table .action-cell {
@@ -1237,6 +1244,7 @@ textarea.form-control {
   font-size: 0.9em;
   color: var(--text-secondary); /* Muted text */
   white-space: nowrap;
+  min-width: 180px; /* Ensure timestamp is fully visible */
 }
 .history-table td:nth-child(3), /* Item ID */
 .history-table td:nth-child(7) { /* User ID */
